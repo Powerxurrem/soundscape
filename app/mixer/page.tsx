@@ -8,31 +8,113 @@ type LibraryItem = {
   id: string;
   name: string;
   type: TrackType;
+  assets: { id: string; label: string }[];
   defaultAssetId: string;
 };
 
 type MixTrack = {
-  id: string; // unique per track instance
+  id: string;
   libraryId: string;
   name: string;
   type: TrackType;
   assetId: string;
   volume: number; // 0..1
-  // event-only:
-  ratePreset?: 'Rare' | 'Medium' | 'Often' | 'Very Often';
+  ratePreset?: 'Rare' | 'Medium' | 'Often' | 'Very Often'; // event-only
 };
 
+const EVENT_RATE_SECONDS: Record<
+  NonNullable<MixTrack['ratePreset']>,
+  { min: number; max: number }
+> = {
+  Rare: { min: 45, max: 90 },
+  Medium: { min: 20, max: 45 },
+  Often: { min: 10, max: 20 },
+  'Very Often': { min: 5, max: 10 },
+};
+
+
 const LIBRARY: LibraryItem[] = [
-  { id: 'rain', name: 'Rain', type: 'loop', defaultAssetId: 'rain_soft_loop_01' },
-  { id: 'fireplace', name: 'Fireplace', type: 'loop', defaultAssetId: 'fireplace_cozy_loop_01' },
-  { id: 'wind', name: 'Wind', type: 'loop', defaultAssetId: 'wind_gentle_loop_01' },
-  { id: 'thunder', name: 'Thunder', type: 'event', defaultAssetId: 'thunder_distant_02' },
-  { id: 'cafe', name: 'Cafe', type: 'loop', defaultAssetId: 'cafe_murmur_loop_01' },
+  {
+    id: 'rain',
+    name: 'Rain',
+    type: 'loop',
+    defaultAssetId: 'rain_soft_loop_01',
+    assets: [
+      { id: 'rain_soft_loop_01', label: 'Soft Rain' },
+      { id: 'rain_medium_loop_01', label: 'Medium Rain' },
+      { id: 'rain_on_window_loop_01', label: 'Rain on Window' },
+    ],
+  },
+  {
+    id: 'fireplace',
+    name: 'Fireplace',
+    type: 'loop',
+    defaultAssetId: 'fireplace_cozy_loop_01',
+    assets: [
+      { id: 'fireplace_cozy_loop_01', label: 'Cozy Fireplace' },
+      { id: 'fireplace_crackle_loop_01', label: 'Crackle Focus' },
+      { id: 'fireplace_roomy_loop_01', label: 'Roomy Fireplace' },
+    ],
+  },
+  {
+    id: 'wind',
+    name: 'Wind',
+    type: 'loop',
+    defaultAssetId: 'wind_gentle_loop_01',
+    assets: [
+      { id: 'wind_gentle_loop_01', label: 'Gentle Wind' },
+      { id: 'wind_forest_loop_01', label: 'Forest Wind' },
+      { id: 'wind_stormy_loop_01', label: 'Stormy Wind' },
+    ],
+  },
+  {
+    id: 'thunder',
+    name: 'Thunder',
+    type: 'event',
+    defaultAssetId: 'thunder_distant_02',
+    assets: [
+      { id: 'thunder_distant_02', label: 'Distant Roll' },
+      { id: 'thunder_close_01', label: 'Close Strike' },
+      { id: 'thunder_rolling_03', label: 'Rolling Thunder' },
+    ],
+  },
+  {
+    id: 'cafe',
+    name: 'Cafe',
+    type: 'loop',
+    defaultAssetId: 'cafe_murmur_loop_01',
+    assets: [
+      { id: 'cafe_murmur_loop_01', label: 'Murmur' },
+      { id: 'cafe_busy_loop_01', label: 'Busy Cafe' },
+      { id: 'cafe_soft_jazz_loop_01', label: 'Soft Jazz Cafe' },
+    ],
+  },
 ];
+
 
 function makeId(prefix: string) {
   return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now()}`;
 }
+
+function generateEventTimes(durationSec: number, minSec: number, maxSec: number) {
+  const times: number[] = [];
+  let t = 0;
+
+  while (true) {
+    const gap = minSec + Math.random() * (maxSec - minSec);
+    t += gap;
+    if (t >= durationSec) break;
+    times.push(Math.round(t * 10) / 10);
+  }
+
+  return times;
+}
+
+function estimateEvents(durationSec: number, minSec: number, maxSec: number) {
+  const avg = (minSec + maxSec) / 2;
+  return Math.floor(durationSec / avg);
+}
+
 
 export default function MixerPage() {
   const [query, setQuery] = useState('');
@@ -97,6 +179,12 @@ export default function MixerPage() {
       )
     );
   }
+
+  function setAsset(trackId: string, assetId: string) {
+  setTracks((prev) =>
+    prev.map((t) => (t.id === trackId ? { ...t, assetId } : t))
+  );
+}
 
   return (
     <main className="min-h-[calc(100vh-57px)]">
@@ -169,7 +257,23 @@ export default function MixerPage() {
                       <div className="text-sm font-medium">
                         {t.name} ({t.type === 'loop' ? 'Loop' : 'Event'})
                       </div>
-                      <div className="text-xs text-gray-600">Asset: {t.assetId}</div>
+                      <div className="mt-1 flex items-center gap-2">
+  <span className="text-xs text-gray-600 w-10">Asset</span>
+
+  <select
+    value={t.assetId}
+    onChange={(e) => setAsset(t.id, e.target.value)}
+    className="w-full rounded-lg border bg-black text-white px-2 py-2 text-sm"
+
+  >
+    {(LIBRARY.find((x) => x.id === t.libraryId)?.assets ?? []).map((a) => (
+      <option key={a.id} value={a.id}>
+        {a.label}
+      </option>
+    ))}
+  </select>
+</div>
+
                     </div>
                     <button
                       onClick={() => removeTrack(t.id)}
@@ -197,24 +301,36 @@ export default function MixerPage() {
                     </div>
 
                     {t.type === 'event' ? (
-                      <div className="flex items-center gap-3">
-                        <div className="text-xs text-gray-600 w-12">Rate</div>
-                        <select
-                          value={t.ratePreset ?? 'Rare'}
-                          onChange={(e) =>
-                            setRate(
-                              t.id,
-                              e.target.value as MixTrack['ratePreset']
-                            )
-                          }
-                          className="w-full rounded-lg border px-2 py-2 text-sm"
-                        >
-                          <option>Rare</option>
-                          <option>Medium</option>
-                          <option>Often</option>
-                          <option>Very Often</option>
-                        </select>
-                      </div>
+<div className="flex items-start gap-3">
+  <div className="text-xs text-gray-600 w-12 pt-2">Rate</div>
+
+  <div className="flex-1">
+    <select
+      value={t.ratePreset ?? 'Rare'}
+      onChange={(e) =>
+        setRate(t.id, e.target.value as MixTrack['ratePreset'])
+      }
+      className="w-full rounded-lg border bg-black text-white px-2 py-2 text-sm"
+      style={{ colorScheme: 'dark' }}
+    >
+      <option>Rare</option>
+      <option>Medium</option>
+      <option>Often</option>
+      <option>Very Often</option>
+    </select>
+
+    {(() => {
+      const r = EVENT_RATE_SECONDS[t.ratePreset ?? 'Rare'];
+      const n = estimateEvents(10 * 60, r.min, r.max); // per 10 minutes (for now)
+      return (
+        <div className="mt-1 text-xs text-gray-600">
+          ~{n} events per 10 min • {r.min}–{r.max}s
+        </div>
+      );
+    })()}
+  </div>
+</div>
+
                     ) : (
                       <div className="flex items-center gap-3 opacity-50">
                         <div className="text-xs text-gray-600 w-12">Rate</div>

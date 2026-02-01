@@ -222,8 +222,8 @@ export default function Home() {
             </div>
 
             {/* guarantees */}
-<div className="block lg:hidden h-px bg-white/10 my-2" />
-<div className="rounded-2xl border border-white/15 bg-white/[0.03] p-5 mt-2 lg:mt-0">
+<div className="block lg:hidden h-px bg-white/20 my-2" />
+<div className="rounded-2xl border border-white/ bg-white/[0.07] p-5 mt-2 lg:mt-0">
 
   <div className="text-sm font-medium">Guarantees</div>
   <div className="mt-1 text-xs text-white/100">How Soundscape behaves — every time.</div>

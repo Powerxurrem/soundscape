@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-
-type TrackType = 'loop' | 'event';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { TrackType } from './assets';
+import { createAudioEngine, type AudioEngine } from './audio/audioengine';
 
 type LibraryItem = {
   id: string;
@@ -19,21 +19,18 @@ type MixTrack = {
   type: TrackType;
   assetId: string;
   volume: number; // 0..1
-  ratePreset?: 'Rare' | 'Medium' | 'Often' | 'Very Often'; // event-only
+
+  // event-only
+  ratePreset?: 'Rare' | 'Medium' | 'Often' | 'Very Often';
+  rateSpeed?: 0.5 | 1 | 2;
+
+  // thunder-only (for now)
+  randomizeVariants?: boolean;
 };
 
-const EVENT_RATE_SECONDS: Record<
-  NonNullable<MixTrack['ratePreset']>,
-  { min: number; max: number }
-> = {
-  Rare: { min: 45, max: 90 },
-  Medium: { min: 20, max: 45 },
-  Often: { min: 10, max: 20 },
-  'Very Often': { min: 5, max: 10 },
-};
-
-
+// UI Library (MINIMAL SHIP SET)
 const LIBRARY: LibraryItem[] = [
+  // --- LOOPS ---
   {
     id: 'rain',
     name: 'Rain',
@@ -42,81 +39,81 @@ const LIBRARY: LibraryItem[] = [
     assets: [
       { id: 'rain_soft_loop_01', label: 'Soft Rain' },
       { id: 'rain_medium_loop_01', label: 'Medium Rain' },
-      { id: 'rain_on_window_loop_01', label: 'Rain on Window' },
-    ],
-  },
-  {
-    id: 'fireplace',
-    name: 'Fireplace',
-    type: 'loop',
-    defaultAssetId: 'fireplace_cozy_loop_01',
-    assets: [
-      { id: 'fireplace_cozy_loop_01', label: 'Cozy Fireplace' },
-      { id: 'fireplace_crackle_loop_01', label: 'Crackle Focus' },
-      { id: 'fireplace_roomy_loop_01', label: 'Roomy Fireplace' },
     ],
   },
   {
     id: 'wind',
     name: 'Wind',
     type: 'loop',
-    defaultAssetId: 'wind_gentle_loop_01',
-    assets: [
-      { id: 'wind_gentle_loop_01', label: 'Gentle Wind' },
-      { id: 'wind_forest_loop_01', label: 'Forest Wind' },
-      { id: 'wind_stormy_loop_01', label: 'Stormy Wind' },
-    ],
+    defaultAssetId: 'wind_soft_trees_loop_01',
+    assets: [{ id: 'wind_soft_trees_loop_01', label: 'Soft Trees Wind' }],
   },
+  {
+    id: 'fireplace',
+    name: 'Fireplace',
+    type: 'loop',
+    defaultAssetId: 'fireplace_cozy_loop_01',
+    assets: [{ id: 'fireplace_cozy_loop_01', label: 'Cozy Fireplace' }],
+  },
+  {
+    id: 'water',
+    name: 'Water',
+    type: 'loop',
+    defaultAssetId: 'water_stream_with_distant_birds_01',
+    assets: [{ id: 'water_stream_with_distant_birds_01', label: 'Stream + Distant Birds' }],
+  },
+  {
+    id: 'birds',
+    name: 'Birds',
+    type: 'loop',
+    defaultAssetId: 'birds_morning_chirp_01',
+    assets: [{ id: 'birds_morning_chirp_01', label: 'Morning Chirps' }],
+  },
+  {
+    id: 'insects',
+    name: 'Insects',
+    type: 'loop',
+    defaultAssetId: 'insects_soft_night_loop_01',
+    assets: [{ id: 'insects_soft_night_loop_01', label: 'Soft Night Insects' }],
+  },
+
+  // --- EVENTS ---
   {
     id: 'thunder',
     name: 'Thunder',
     type: 'event',
-    defaultAssetId: 'thunder_distant_02',
-    assets: [
-      { id: 'thunder_distant_02', label: 'Distant Roll' },
-      { id: 'thunder_close_01', label: 'Close Strike' },
-      { id: 'thunder_rolling_03', label: 'Rolling Thunder' },
-    ],
-  },
-  {
-    id: 'cafe',
-    name: 'Cafe',
-    type: 'loop',
-    defaultAssetId: 'cafe_murmur_loop_01',
-    assets: [
-      { id: 'cafe_murmur_loop_01', label: 'Murmur' },
-      { id: 'cafe_busy_loop_01', label: 'Busy Cafe' },
-      { id: 'cafe_soft_jazz_loop_01', label: 'Soft Jazz Cafe' },
-    ],
+    defaultAssetId: 'thunder_distant_roll_01',
+    assets: [{ id: 'thunder_distant_roll_01', label: 'Distant Roll' }],
   },
 ];
 
-
 function makeId(prefix: string) {
-  return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now()}`;
+  return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
 }
 
-function generateEventTimes(durationSec: number, minSec: number, maxSec: number) {
-  const times: number[] = [];
-  let t = 0;
-
-  while (true) {
-    const gap = minSec + Math.random() * (maxSec - minSec);
-    t += gap;
-    if (t >= durationSec) break;
-    times.push(Math.round(t * 10) / 10);
-  }
-
-  return times;
+// Map UI library IDs to folder names.
+// - loops: folder == libraryId
+// - events: allow ids like "birds_events" but folder is "birds"
+function folderIdFor(track: { type: TrackType; libraryId: string }) {
+  if (track.type !== 'event') return track.libraryId;
+  return track.libraryId.endsWith('_events')
+    ? track.libraryId.replace(/_events$/, '')
+    : track.libraryId;
 }
 
-function estimateEvents(durationSec: number, minSec: number, maxSec: number) {
-  const avg = (minSec + maxSec) / 2;
-  return Math.floor(durationSec / avg);
+function assetUrlFor(track: { type: TrackType; libraryId: string }, assetId: string) {
+  const base = track.type === 'loop' ? 'loops' : 'events';
+  const folder = folderIdFor(track);
+  return `/assets/${base}/${folder}/${assetId}.mp3`;
 }
-
 
 export default function MixerPage() {
+  // Audio (runtime-only)
+  const audioRef = useRef<AudioEngine | null>(null);
+  const [audioOn, setAudioOn] = useState(false);
+  const [masterVol, setMasterVol] = useState(0.8);
+
+  const [assetStatus, setAssetStatus] = useState<Record<string, boolean>>({});
   const [query, setQuery] = useState('');
   const [tracks, setTracks] = useState<MixTrack[]>([
     {
@@ -132,11 +129,45 @@ export default function MixerPage() {
       libraryId: 'thunder',
       name: 'Thunder',
       type: 'event',
-      assetId: 'thunder_distant_02',
+      assetId: 'thunder_distant_roll_01',
       volume: 0.35,
       ratePreset: 'Rare',
+      rateSpeed: 1,
+      randomizeVariants: false,
     },
   ]);
+
+  // Cleanup
+  useEffect(() => {
+    return () => {
+      audioRef.current?.stopAll();
+    };
+  }, []);
+
+  async function activateAudio() {
+    if (!audioRef.current) audioRef.current = createAudioEngine();
+    await audioRef.current.activate();
+    audioRef.current.setMaster(masterVol);
+    setAudioOn(true);
+    await audioRef.current.syncMix(tracks, assetUrlFor);
+  }
+
+  function stopAudio() {
+    audioRef.current?.stopAll();
+    setAudioOn(false);
+  }
+
+  // Keep audio synced with state
+  useEffect(() => {
+    if (!audioOn) return;
+    if (!audioRef.current?.isActive()) return;
+    audioRef.current.syncMix(tracks, assetUrlFor);
+  }, [audioOn, tracks]);
+
+  useEffect(() => {
+    if (!audioOn) return;
+    audioRef.current?.setMaster(masterVol);
+  }, [audioOn, masterVol]);
 
   const filteredLibrary = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -144,215 +175,261 @@ export default function MixerPage() {
     return LIBRARY.filter((i) => i.name.toLowerCase().includes(q));
   }, [query]);
 
-  function addToMix(item: LibraryItem) {
-    // For loops: only allow one instance per libraryId (keeps it simple for v1)
-    if (item.type === 'loop' && tracks.some((t) => t.libraryId === item.id)) return;
-
-    setTracks((prev) => [
-      ...prev,
-      {
-        id: makeId('t'),
-        libraryId: item.id,
-        name: item.name,
-        type: item.type,
-        assetId: item.defaultAssetId,
-        volume: 0.5,
-        ...(item.type === 'event' ? { ratePreset: 'Rare' as const } : {}),
-      },
-    ]);
-  }
-
-  function removeTrack(trackId: string) {
-    setTracks((prev) => prev.filter((t) => t.id !== trackId));
-  }
-
-  function setVolume(trackId: string, vol: number) {
-    setTracks((prev) =>
-      prev.map((t) => (t.id === trackId ? { ...t, volume: vol } : t))
-    );
-  }
-
-  function setRate(trackId: string, rate: MixTrack['ratePreset']) {
-    setTracks((prev) =>
-      prev.map((t) =>
-        t.id === trackId ? { ...t, ratePreset: rate } : t
-      )
-    );
-  }
-
-  function setAsset(trackId: string, assetId: string) {
-  setTracks((prev) =>
-    prev.map((t) => (t.id === trackId ? { ...t, assetId } : t))
+  const loopsList = useMemo(
+    () => filteredLibrary.filter((i) => i.type === 'loop'),
+    [filteredLibrary]
   );
-}
+  const eventsList = useMemo(
+    () => filteredLibrary.filter((i) => i.type === 'event'),
+    [filteredLibrary]
+  );
+
+  function addToMix(item: LibraryItem) {
+    if (item.type === 'loop' && tracks.some((t) => t.type === 'loop' && t.libraryId === item.id)) return;
+
+    const next: MixTrack = {
+      id: makeId('t'),
+      libraryId: item.id,
+      name: item.name,
+      type: item.type,
+      assetId: item.defaultAssetId,
+      volume: item.type === 'loop' ? 0.5 : 0.35,
+
+      ...(item.type === 'event'
+        ? {
+            ratePreset: 'Rare' as const,
+            rateSpeed: 1 as const,
+            randomizeVariants: false,
+          }
+        : {}),
+    };
+
+    setTracks((prev) => [...prev, next]);
+  }
+
+  function removeTrack(id: string) {
+    setTracks((prev) => prev.filter((t) => t.id !== id));
+  }
+
+  function updateTrack(id: string, patch: Partial<MixTrack>) {
+    setTracks((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
+  }
+
+  // Asset HEAD validation
+  useEffect(() => {
+    let alive = true;
+
+    async function checkAll() {
+      const entries: [string, boolean][] = await Promise.all(
+        tracks.map(async (t) => {
+          const url = assetUrlFor(t, t.assetId);
+          try {
+            const res = await fetch(url, { method: 'HEAD' });
+            return [t.id, res.ok] as [string, boolean];
+          } catch {
+            return [t.id, false] as [string, boolean];
+          }
+        })
+      );
+
+      if (!alive) return;
+      const next: Record<string, boolean> = {};
+      for (const [id, ok] of entries) next[id] = ok;
+      setAssetStatus(next);
+    }
+
+    checkAll();
+    return () => {
+      alive = false;
+    };
+  }, [tracks]);
 
   return (
-    <main className="min-h-[calc(100vh-57px)]">
-      <div className="grid h-full grid-cols-12 gap-4 p-4">
+    <main className="mx-auto max-w-6xl p-6">
+      <div className="grid grid-cols-12 gap-6">
         {/* LEFT: Library */}
-        <section className="col-span-12 md:col-span-3 rounded-xl border p-4">
-          <h1 className="text-lg font-semibold">Library</h1>
-          <p className="mt-1 text-sm text-gray-600">
-            Click to add. Loops are single-instance (for now).
-          </p>
+        <aside className="col-span-12 md:col-span-4 rounded-xl border p-4">
+          <h2 className="text-lg font-semibold">Library</h2>
+          <input
+            className="mt-3 w-full rounded-lg border px-3 py-2 text-sm"
+            placeholder="Search…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
 
-          <div className="mt-4">
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search sounds..."
-              className="w-full rounded-lg border px-3 py-2 text-sm"
-            />
+          {/* Two segments: Loops + Events, each scrolls */}
+          <div className="mt-4 flex h-[calc(100vh-260px)] flex-col gap-4 min-h-0">
+            <div className="flex min-h-0 flex-1 flex-col">
+              <div className="mb-2 flex items-baseline justify-between">
+                <div className="text-sm font-semibold">Loops</div>
+                <div className="text-xs text-gray-600">Total {loopsList.length}</div>
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+                <div className="space-y-2">
+                  {loopsList.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => addToMix(item)}
+                      className="w-full rounded-lg border px-3 py-2 text-left text-sm hover:bg-gray-50"
+                    >
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-xs text-gray-600">Loop</div>
+                    </button>
+                  ))}
+                  {loopsList.length === 0 && (
+                    <div className="text-xs text-gray-600">No loop items.</div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex min-h-0 flex-1 flex-col">
+              <div className="mb-2 flex items-baseline justify-between">
+                <div className="text-sm font-semibold">Events</div>
+                <div className="text-xs text-gray-600">Total {eventsList.length}</div>
+              </div>
+              <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+                <div className="space-y-2">
+                  {eventsList.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => addToMix(item)}
+                      className="w-full rounded-lg border px-3 py-2 text-left text-sm hover:bg-gray-50"
+                    >
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-xs text-gray-600">Event</div>
+                    </button>
+                  ))}
+                  {eventsList.length === 0 && (
+                    <div className="text-xs text-gray-600">No event items.</div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
+        </aside>
 
-          <div className="mt-4 space-y-2">
-            {filteredLibrary.map((item) => {
-              const alreadyAdded =
-                item.type === 'loop' && tracks.some((t) => t.libraryId === item.id);
-
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => addToMix(item)}
-                  disabled={alreadyAdded}
-                  className={[
-                    'w-full rounded-lg border px-3 py-2 text-left text-sm',
-                    alreadyAdded ? 'opacity-40 cursor-not-allowed' : 'hover:bg-gray-50',
-                  ].join(' ')}
-                >
-                  <div className="flex items-center justify-between">
-                    <span>
-                      {item.name}{' '}
-                      <span className="text-xs text-gray-600">
-                        ({item.type === 'loop' ? 'Loop' : 'Event'})
-                      </span>
-                    </span>
-                    {alreadyAdded ? (
-                      <span className="text-xs text-gray-600">Added</span>
-                    ) : null}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* MIDDLE: Mix */}
-        <section className="col-span-12 md:col-span-6 rounded-xl border p-4">
-          <h2 className="text-lg font-semibold">Current Mix</h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Loops + Events. This is state-only (audio later).
-          </p>
+        {/* CENTER: Mixer */}
+        <section className="col-span-12 md:col-span-5 rounded-xl border p-4">
+          <h1 className="text-lg font-semibold">Mixer</h1>
+          <p className="mt-1 text-sm text-gray-600">Ugly is correct. Logic first.</p>
 
           <div className="mt-4 space-y-3">
-            {tracks.length === 0 ? (
-              <div className="rounded-lg border border-dashed p-6 text-center text-sm text-gray-600">
-                Add items from the Library to build your mix.
-              </div>
-            ) : (
-              tracks.map((t) => (
-                <div key={t.id} className="rounded-lg border p-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm font-medium">
-                        {t.name} ({t.type === 'loop' ? 'Loop' : 'Event'})
-                      </div>
-                      <div className="mt-1 flex items-center gap-2">
-  <span className="text-xs text-gray-600 w-10">Asset</span>
-
-  <select
-    value={t.assetId}
-    onChange={(e) => setAsset(t.id, e.target.value)}
-    className="w-full rounded-lg border bg-black text-white px-2 py-2 text-sm"
-
-  >
-    {(LIBRARY.find((x) => x.id === t.libraryId)?.assets ?? []).map((a) => (
-      <option key={a.id} value={a.id}>
-        {a.label}
-      </option>
-    ))}
-  </select>
-</div>
-
+            {tracks.map((t) => (
+              <div key={t.id} className="rounded-xl border p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div className="font-medium">{t.name}</div>
+                      <span className="text-xs text-gray-600">({t.type})</span>
+                      <span className="text-xs">{assetStatus[t.id] ? '🟢' : '🔴'}</span>
                     </div>
-                    <button
-                      onClick={() => removeTrack(t.id)}
-                      className="text-sm text-gray-600 hover:underline"
-                    >
-                      Remove
-                    </button>
+                    <div className="mt-1 text-xs text-gray-600">
+                      {folderIdFor(t)}/{t.assetId}.mp3
+                    </div>
                   </div>
 
-                  <div className="mt-3 grid gap-3 md:grid-cols-2">
-                    <div className="flex items-center gap-3">
-                      <div className="text-xs text-gray-600 w-12">Vol</div>
-                      <input
-                        type="range"
-                        min={0}
-                        max={1}
-                        step={0.01}
-                        value={t.volume}
-                        onChange={(e) => setVolume(t.id, Number(e.target.value))}
-                        className="w-full"
-                      />
-                      <div className="w-10 text-right text-xs text-gray-600">
-                        {Math.round(t.volume * 100)}
-                      </div>
-                    </div>
-
-                    {t.type === 'event' ? (
-<div className="flex items-start gap-3">
-  <div className="text-xs text-gray-600 w-12 pt-2">Rate</div>
-
-  <div className="flex-1">
-    <select
-      value={t.ratePreset ?? 'Rare'}
-      onChange={(e) =>
-        setRate(t.id, e.target.value as MixTrack['ratePreset'])
-      }
-      className="w-full rounded-lg border bg-black text-white px-2 py-2 text-sm"
-      style={{ colorScheme: 'dark' }}
-    >
-      <option>Rare</option>
-      <option>Medium</option>
-      <option>Often</option>
-      <option>Very Often</option>
-    </select>
-
-    {(() => {
-      const r = EVENT_RATE_SECONDS[t.ratePreset ?? 'Rare'];
-      const n = estimateEvents(10 * 60, r.min, r.max); // per 10 minutes (for now)
-      return (
-        <div className="mt-1 text-xs text-gray-600">
-          ~{n} events per 10 min • {r.min}–{r.max}s
-        </div>
-      );
-    })()}
-  </div>
-</div>
-
-                    ) : (
-                      <div className="flex items-center gap-3 opacity-50">
-                        <div className="text-xs text-gray-600 w-12">Rate</div>
-                        <div className="text-sm text-gray-600">—</div>
-                      </div>
-                    )}
-                  </div>
+                  <button
+                    onClick={() => removeTrack(t.id)}
+                    className="rounded-lg border px-2 py-1 text-xs hover:bg-gray-50"
+                  >
+                    Remove
+                  </button>
                 </div>
-              ))
-            )}
+
+                {/* Asset selector */}
+                <div className="mt-3">
+                  <label className="text-xs text-gray-600">Asset</label>
+                  <select
+                    className="mt-1 w-full rounded-lg border border-white/20 bg-black text-white px-2 py-2 text-sm"
+                    value={t.assetId}
+                    onChange={(e) => updateTrack(t.id, { assetId: e.target.value })}
+                  >
+                    {LIBRARY.find((x) => x.id === t.libraryId)?.assets.map((a) => (
+                      <option key={a.id} value={a.id} className="bg-black text-white">
+                        {a.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Volume */}
+                <div className="mt-3 flex items-center gap-3">
+                  <span className="text-xs text-gray-600 w-14">Vol</span>
+                  <input
+                    type="range"
+                    className="flex-1"
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={t.volume}
+                    onChange={(e) => updateTrack(t.id, { volume: Number(e.target.value) })}
+                  />
+                  <span className="text-xs text-gray-600 w-10 text-right">
+                    {Math.round(t.volume * 100)}%
+                  </span>
+                </div>
+
+                {/* Event controls */}
+                {t.type === 'event' && (
+                  <div className="mt-3 grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs text-gray-600">Rate</label>
+                      <select
+                        className="mt-1 w-full rounded-lg border border-white/20 bg-black text-white px-2 py-2 text-sm"
+                        value={t.ratePreset}
+                        onChange={(e) =>
+                          updateTrack(t.id, { ratePreset: e.target.value as MixTrack['ratePreset'] })
+                        }
+                      >
+                        <option className="bg-black text-white">Rare</option>
+                        <option className="bg-black text-white">Medium</option>
+                        <option className="bg-black text-white">Often</option>
+                        <option className="bg-black text-white">Very Often</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs text-gray-600">Speed</label>
+                      <select
+                        className="mt-1 w-full rounded-lg border border-white/20 bg-black text-white px-2 py-2 text-sm"
+                        value={t.rateSpeed}
+                        onChange={(e) =>
+                          updateTrack(t.id, { rateSpeed: Number(e.target.value) as MixTrack['rateSpeed'] })
+                        }
+                      >
+                        <option value={0.5} className="bg-black text-white">0.5×</option>
+                        <option value={1} className="bg-black text-white">1×</option>
+                        <option value={2} className="bg-black text-white">2×</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
+          {/* AUDIO CONTROLS */}
           <div className="mt-6 flex gap-3">
-            <button className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50">
-              Play (later)
+            <button onClick={activateAudio} className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50">
+              {audioOn ? 'Audio Active' : 'Activate Audio'}
             </button>
-            <button className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50">
-              Stop (later)
+
+            <button onClick={stopAudio} className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50">
+              Stop
             </button>
+
             <div className="ml-auto flex items-center gap-3">
               <span className="text-xs text-gray-600">Master</span>
-              <input type="range" className="w-40" />
+              <input
+                type="range"
+                className="w-40"
+                min={0}
+                max={1}
+                step={0.01}
+                value={masterVol}
+                onChange={(e) => setMasterVol(Number(e.target.value))}
+              />
             </div>
           </div>
         </section>
@@ -365,10 +442,10 @@ export default function MixerPage() {
           <div className="mt-4 space-y-3">
             <div>
               <label className="text-xs text-gray-600">Duration</label>
-              <select className="mt-1 w-full rounded-lg border px-2 py-2 text-sm">
-                <option>10 min</option>
-                <option>30 min</option>
-                <option>60 min (max)</option>
+              <select className="mt-1 w-full rounded-lg border border-white/20 bg-black text-white px-2 py-2 text-sm">
+                <option className="bg-black text-white">10 min</option>
+                <option className="bg-black text-white">30 min</option>
+                <option className="bg-black text-white">60 min (max)</option>
               </select>
             </div>
 
@@ -382,9 +459,7 @@ export default function MixerPage() {
                   WAV
                 </button>
               </div>
-              <div className="mt-2 text-xs text-gray-600">
-                🔒 Commercial license required to export.
-              </div>
+              <div className="mt-2 text-xs text-gray-600">🔒 Commercial license required to export.</div>
             </div>
 
             <button className="w-full rounded-lg border px-4 py-2 text-sm text-gray-400" disabled>

@@ -54,33 +54,34 @@ function themeBg(theme: Trip['theme']) {
 export default function TripsPage() {
   const trips: Trip[] = useMemo(
     () => [
-      {
-        id: 'wadden-schiermonnikoog',
-        title: 'Wadden Sea',
-        subtitle: 'Quiet island coast with minimal human noise',
-        locationLine: 'Schiermonnikoog, Netherlands',
-        status: 'Planned',
-        theme: 'coast',
-        focusTags: ['wind', 'water', 'dunes', 'coast'],
-        image: '/trips/schiermonnikoog.jpg',
+{
+  id: 'wadden-schiermonnikoog',
+  title: 'Wadden Sea',
+  subtitle: 'Quiet island coast with minimal human noise',
+  window: 'Spring (approx)',
+  locationLine: 'Schiermonnikoog, Netherlands',
+  status: 'Planned',
+  theme: 'coast',
+  focusTags: ['wind', 'water', 'dunes', 'coast'],
+  image: '/trips/schiermonnikoog.jpg',
 
-        targets: [
-          { kind: 'loop', category: 'wind', assetId: 'dunes_wind_bed_loop_01' },
-          { kind: 'loop', category: 'water', assetId: 'coast_soft_waves_loop_01' },
-          { kind: 'loop', category: 'water', assetId: 'distant_surf_loop_01' },
-          { kind: 'loop', category: 'texture', assetId: 'coastal_grass_movement_loop_01' },
+  targets: [
+    { kind: 'loop', category: 'wind', assetId: 'dunes_wind_bed_loop_01' },
+    { kind: 'loop', category: 'water', assetId: 'coast_soft_waves_loop_01' },
+    { kind: 'loop', category: 'water', assetId: 'distant_surf_loop_01' },
+    { kind: 'loop', category: 'texture', assetId: 'coastal_grass_movement_loop_01' },
+    { kind: 'event', category: 'birds', assetId: 'seabirds_sparse_event_01' },
+    { kind: 'event', category: 'water', assetId: 'wave_hit_event_01' },
+  ],
 
-          { kind: 'event', category: 'birds', assetId: 'seabirds_sparse_event_01' },
-          { kind: 'event', category: 'water', assetId: 'wave_hit_event_01' },
-        ],
+  notes: [
+    'Intent: clean, loopable coastal ambience with minimal human presence.',
+    'Focus: wind beds (dunes/grass) + soft wave textures + sparse seabird events.',
+    'Out of scope: dense bird choruses, people/tourism, storms, interiors.',
+    'Goal output: 3–4 loop beds + 5–8 short events. Multiple takes; ship best only.',
+  ],
+}
 
-        notes: [
-          'Intent: clean, loopable coastal ambience with minimal human presence.',
-          'Focus: wind beds (dunes/grass) + soft wave textures + sparse seabird events.',
-          'Out of scope: dense bird choruses, people/tourism, storms, interiors.',
-          'Goal output: 3–4 loop beds + 5–8 short events. Multiple takes; ship best only.',
-        ],
-      },
     ],
     []
   );

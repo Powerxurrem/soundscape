@@ -171,7 +171,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-7 grid gap-5 lg:grid-cols-3">
+          <div className="mt-7 grid gap-8 lg:grid-cols-3 lg:gap-5">
+
             {/* now playing */}
             <div className="lg:col-span-2 rounded-2xl border border-white/ bg-white/[0.04] p-5">
               <div className="flex items-center justify-between gap-4">
@@ -221,7 +222,9 @@ export default function Home() {
             </div>
 
             {/* guarantees */}
-<div className="rounded-2xl border border-white/ bg-white/[0.02] backdrop-blur-md p-5">
+<div className="block lg:hidden h-px bg-white/10 my-2" />
+<div className="rounded-2xl border border-white/15 bg-white/[0.03] p-5 mt-2 lg:mt-0">
+
   <div className="text-sm font-medium">Guarantees</div>
   <div className="mt-1 text-xs text-white/100">How Soundscape behaves — every time.</div>
 

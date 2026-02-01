@@ -86,16 +86,16 @@ export default function Home() {
 
       <div className="relative mx-auto max-w-5xl px-6 py-14">
         {/* HERO */}
-        <section className="rounded-3xl border border-white/50 bg-white/[0.03] p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_40px_120px_rgba(0,0,0,0.65)] backdrop-blur-md">
+        <section className="rounded-3xl border border-white/ bg-white/[0.09] p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_40px_120px_rgba(0,0,0,0.65)] backdrop-blur-md">
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/50 bg-white/[0.04] px-3 py-1 text-xs text-white/50">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/ bg-white/[0.04] px-3 py-1 text-xs text-white/100">
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400/90" />
                 Engine stable • Assets deterministic
               </div>
 
               <h1 className="mt-4 text-4xl font-semibold tracking-tight">Soundscape</h1>
-              <p className="mt-3 text-sm leading-relaxed text-white/65">
+              <p className="mt-3 text-sm leading-relaxed text-white/100">
                 Calm, realistic ambient soundscapes — built to be deterministic, offline-friendly,
                 and boring to maintain.
               </p>
@@ -103,53 +103,53 @@ export default function Home() {
               <div className="mt-6 flex flex-wrap gap-3">
                 <a
                   href="/autopilot"
-                  className="rounded-xl border border-white/50 bg-white/25 px-5 py-2.5 text-sm hover:bg-white/15"
+                  className="rounded-xl border border-white/ bg-white/10 px-5 py-2.5 text-sm hover:bg-white/[0.06]"
                 >
                   Start Autopilot
                 </a>
                 <a
                   href="/mixer"
-                  className="rounded-xl border border-white/50 bg-white/[0.25] px-5 py-2.5 text-sm hover:bg-white/[0.06]"
+                  className="rounded-xl border border-white/ bg-white/10 px-5 py-2.5 text-sm hover:bg-white/[0.06]"
                 >
                   Open Mixer
                 </a>
               </div>
             </div>
 
-            <div className="w-full md:w-[320px]">
-              <div className="rounded-2xl border border-white/50 bg-white/[0.02] p-4">
-                <div className="text-sm font-medium">Quick paths</div>
-                <div className="mt-3 grid gap-2 text-sm">
-                  <a
-                    href="/autopilot"
-                    className="rounded-xl border border-white/50 bg-white/[0.02] px-4 py-2 hover:bg-white/[0.06]"
-                  >
-                    → Autopilot (one-click)
-                  </a>
-                  <a
-                    href="/mixer"
-                    className="rounded-xl border border-white/50 bg-white/[0.02] px-4 py-2 hover:bg-white/[0.06]"
-                  >
-                    → Mixer (manual control)
-                  </a>
-                  <a
-                    href="/pricing"
-                    className="rounded-xl border border-white/50 bg-white/[0.02] px-4 py-2 hover:bg-white/[0.06]"
-                  >
-                    → Pricing
-                  </a>
-                </div>
-              </div>
-            </div>
+<div className="w-full md:w-[320px]">
+  <div className="rounded-2xl border border-white/ bg-white/[0.04] p-4 backdrop-blur-md">
+    <div className="text-sm font-medium">What you get</div>
+    <div className="mt-3 space-y-2 text-sm text-white/100">
+      <div className="flex gap-2">
+        <span className="text-white/50">•</span>
+        <span>Real recordings first</span>
+      </div>
+      <div className="flex gap-2">
+        <span className="text-white/50">•</span>
+        <span>Deterministic mixes (recipe export)</span>
+      </div>
+      <div className="flex gap-2">
+        <span className="text-white/50">•</span>
+        <span>Offline &amp; private</span>
+      </div>
+    </div>
+
+    <div className="mt-3 rounded-xl border border-white/ bg-white/[0.10] px-3 py-2 text-[11px] text-white/80">
+      Export includes WAV + deterministic recipe. Commercial use license included.
+    </div>
+  </div>
+</div>
+
+
           </div>
         </section>
 
         {/* DEMO */}
-        <section className="mt-10 rounded-3xl border border-white/50 bg-white/[0.09] p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_40px_120px_rgba(0,0,0,0.65)] backdrop-blur-md">
+        <section className="mt-10 rounded-3xl border border-white/ bg-white/[0.09] p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_40px_120px_rgba(0,0,0,0.65)] backdrop-blur-md">
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">Demo</h2>
-              <p className="mt-2 text-sm text-white/65">Rain + Fireplace. One click. No setup.</p>
+              <p className="mt-2 text-sm text-white/100">Rain + Fireplace. One click. No setup.</p>
             </div>
 
             <div className="flex gap-2">
@@ -173,20 +173,20 @@ export default function Home() {
 
           <div className="mt-7 grid gap-5 lg:grid-cols-3">
             {/* now playing */}
-            <div className="lg:col-span-2 rounded-2xl border border-white/50 bg-white/[0.02] p-5">
+            <div className="lg:col-span-2 rounded-2xl border border-white/ bg-white/[0.04] p-5">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2">
                     <div className="text-sm font-medium">Now Playing</div>
                     <span className="text-xs">{isOn ? '🟢' : '⚪'}</span>
                   </div>
-                  <div className="mt-1 text-xs text-white/60">
+                  <div className="mt-1 text-xs text-white/100">
                     {isOn ? 'Rain + Fireplace running.' : 'Press Play to start the demo.'}
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-white/55">Volume</span>
+                  <span className="text-xs text-white/100">Volume</span>
                   <input
                     type="range"
                     className="w-44 accent-white"
@@ -199,47 +199,58 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="mt-4 rounded-xl border border-white/10 bg-transparant/30 p-4 text-xs text-white/80">
+<div className="mt-4 rounded-xl border border-white/ bg-black/5 p-4 text-xs text-white/100 backdrop-blur">
+
                 <div className="flex items-center justify-between gap-3">
-                  <span className="font-medium text-white/75">Sources</span>
-                  <span className="text-white/45">locked asset paths</span>
+                  <span className="font-medium text-white/100">Sources</span>
+                  <span className="text-white/100">locked asset paths</span>
                 </div>
                 <div className="mt-3 space-y-2">
                   <div className="flex gap-2">
-                    <span className="text-white/75">•</span>
-                    <span className="min-w-[80px] text-white/75">Rain</span>
+                    <span className="text-white/100">•</span>
+                    <span className="min-w-[80px] text-white/100">Rain</span>
                     <span className="truncate">{rainPath}</span>
                   </div>
                   <div className="flex gap-2">
-                    <span className="text-white/75">•</span>
-                    <span className="min-w-[80px] text-white/75">Fireplace</span>
+                    <span className="text-white/100">•</span>
+                    <span className="min-w-[80px] text-white/100">Fireplace</span>
                     <span className="truncate">{firePath}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* principles */}
-            <div className="rounded-2xl border border-white/50 bg-white/[0.02] p-5">
-              <div className="text-sm font-medium">Principles</div>
+            {/* guarantees */}
+<div className="rounded-2xl border border-white/ bg-white/[0.02] backdrop-blur-md p-5">
+  <div className="text-sm font-medium">Guarantees</div>
+  <div className="mt-1 text-xs text-white/100">How Soundscape behaves — every time.</div>
 
-              <div className="mt-4 space-y-3">
-                <div className="rounded-xl border border-white/50 bg-white/[0.02] p-4">
-                  <div className="text-sm font-medium">Real recordings first</div>
-                  <div className="mt-1 text-xs text-white/60">Curate reality. Don’t sterilize it.</div>
-                </div>
+  <div className="mt-4 divide-y divide-white/ overflow-hidden rounded-xl border border-white/ bg-white/[0.1]">
+    <div className="p-4">
+      <div className="text-sm font-medium">Deterministic exports</div>
+      <div className="mt-1 text-xs text-white/80">Same inputs → same WAV + recipe.</div>
+    </div>
 
-                <div className="rounded-xl border border-white/50 bg-white/[0.02] p-4">
-                  <div className="text-sm font-medium">Deterministic by design</div>
-                  <div className="mt-1 text-xs text-white/60">Same inputs, same behavior.</div>
-                </div>
+    <div className="p-4">
+      <div className="text-sm font-medium">No account required</div>
+      <div className="mt-1 text-xs text-white/80">Runs without signup. No analytics.</div>
+    </div>
 
-                <div className="rounded-xl border border-white/50 bg-white/[0.02] p-4">
-                  <div className="text-sm font-medium">Offline & private</div>
-                  <div className="mt-1 text-xs text-white/60">No accounts. No analytics.</div>
-                </div>
-              </div>
-            </div>
+    <div className="p-4">
+      <div className="text-sm font-medium">Transparent sourcing</div>
+      <div className="mt-1 text-xs text-white/80">
+        Trips shows what’s recorded vs generated.
+      </div>
+      <a
+        href="/trips"
+        className="mt-3 inline-flex items-center gap-2 text-xs text-white/100 hover:text-white"
+      >
+        View Trips
+      </a>
+    </div>
+  </div>
+</div>
+
           </div>
 
           <div className="mt-6 text-xs text-white/45">

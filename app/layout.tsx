@@ -26,24 +26,24 @@ export default function RootLayout({
     backgroundImage: `
       radial-gradient(
         ellipse at top,
-        rgba(0,0,0,0.45),
+        rgba(0,0,0,0.35),
         rgba(0,0,0,0.45)
       ),
       url(/bg/aurora_wide_converted.jpg)
     `,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    filter: 'brightness(0.9) contrast(1.2) saturate(1)',
+    filter: 'brightness(0.8) contrast(1) saturate(1.3)',
   }}
 />
 
 
         {/* ===== Header ===== */}
-        <header className="sticky top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur">
+        <header className="sticky top-0 z-50 border-b border-white/ bg-white/15 bg-transparant/10 backdrop-blur-md">
           <div className="mx-auto max-w-5xl px-6 py-4">
             <nav className="flex items-center justify-between">
               <div className="flex items-center gap-6 text-sm font-medium">
-                <a href="/" className="text-white hover:opacity-80">Home</a>
+                <a href="/" className="text-white  hover:opacity-80">Home</a>
                 <a href="/pricing" className="text-white/80 hover:text-white">Pricing</a>
                 <a href="/about" className="text-white/80 hover:text-white">About</a>
                 <a href="/trips" className="text-white/80 hover:text-white">Trips</a>

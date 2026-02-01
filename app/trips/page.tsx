@@ -29,7 +29,7 @@ type Trip = {
 
 const STATUS_STYLE: Record<TripStatus, string> = {
   Planned: 'border-white/15 bg-white/[0.03] text-white/70',
-  'In progress': 'border-white/20 bg-white/[0.06] text-white/80',
+  'In progress': 'border-white/20 bg-white/[0.12] text-white/80',
   Recorded: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200',
   Shipped: 'border-emerald-400/40 bg-emerald-400/15 text-emerald-100',
 };
@@ -199,7 +199,6 @@ export default function TripsPage() {
         </section>
 
         <div className="mt-8 text-xs text-white/45">
-          Tip: this page is a logbook. It’s allowed to be incomplete.
         </div>
       </div>
 
@@ -222,7 +221,7 @@ export default function TripsPage() {
               <>
                 <div
                   aria-hidden
-                  className="absolute inset-0 bg-cover bg-center opacity-90 blur-[0px] scale-100"
+                  className="absolute inset-0 bg-cover bg-center opacity-90 blur-[0px] scale-100" 
                   style={{ backgroundImage: `url(${activeTrip.image})` }}
                 />
                 <div aria-hidden className="absolute inset-0 bg-black/70" />

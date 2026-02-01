@@ -19,32 +19,24 @@ export default function RootLayout({
       <body className="bg-black text-white">
         {/* ===== Global background layers ===== */}
         {/* Aurora background */}
-        <div
-          aria-hidden
-          className="fixed inset-0 -z-10"
-          style={{
-            backgroundImage: `
-              radial-gradient(
-                ellipse at top,
-                rgba(0,0,0,0.6),
-                rgba(0,0,0,0.95)
-              ),
-              url(/bg/aurora-soft.jpg)
-            `,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
+<div
+  aria-hidden
+  className="fixed inset-0 -z-10"
+  style={{
+    backgroundImage: `
+      radial-gradient(
+        ellipse at top,
+        rgba(0,0,0,0.45),
+        rgba(0,0,0,0.45)
+      ),
+      url(/bg/aurora_wide_converted.jpg)
+    `,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    filter: 'brightness(0.9) contrast(1.2) saturate(1)',
+  }}
+/>
 
-        {/* Optional grain overlay */}
-        <div
-          aria-hidden
-          className="fixed inset-0 -z-10 opacity-[0.04]"
-          style={{
-            backgroundImage: 'url(/grain.png)',
-            backgroundRepeat: 'repeat',
-          }}
-        />
 
         {/* ===== Header ===== */}
         <header className="sticky top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur">

@@ -23,8 +23,7 @@ type Trip = {
   notes: string[];
   theme: 'frost' | 'forest' | 'coast' | 'cabin' | 'city';
 
-  // NEW: optional card image (placed under /public)
-  // Example: "/trips/schiermonnikoog.jpg"
+  // optional card image (path under /public)
   image?: string;
 };
 
@@ -36,7 +35,6 @@ const STATUS_STYLE: Record<TripStatus, string> = {
 };
 
 function themeBg(theme: Trip['theme']) {
-  // Stable fallback backgrounds (still used when no image is provided)
   switch (theme) {
     case 'frost':
       return 'bg-gradient-to-br from-white/10 via-white/[0.04] to-black';
@@ -66,18 +64,12 @@ export default function TripsPage() {
         focusTags: ['wind', 'water', 'dunes', 'coast'],
         image: '/trips/schiermonnikoog.jpg',
 
-
-        // OPTIONAL: add an image here (place file under /public/trips/)
-        // image: '/trips/schiermonnikoog.jpg',
-
         targets: [
-          // Loop beds (primary)
           { kind: 'loop', category: 'wind', assetId: 'dunes_wind_bed_loop_01' },
           { kind: 'loop', category: 'water', assetId: 'coast_soft_waves_loop_01' },
           { kind: 'loop', category: 'water', assetId: 'distant_surf_loop_01' },
           { kind: 'loop', category: 'texture', assetId: 'coastal_grass_movement_loop_01' },
 
-          // Events (secondary, sparse)
           { kind: 'event', category: 'birds', assetId: 'seabirds_sparse_event_01' },
           { kind: 'event', category: 'water', assetId: 'wave_hit_event_01' },
         ],
@@ -96,7 +88,6 @@ export default function TripsPage() {
   const [openId, setOpenId] = useState<string | null>(null);
   const activeTrip = useMemo(() => trips.find((t) => t.id === openId) ?? null, [openId, trips]);
 
-  // ESC to close
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') setOpenId(null);
@@ -107,7 +98,7 @@ export default function TripsPage() {
 
   return (
     <main className="min-h-screen bg-transparent text-zinc-100">
-      {/* page glow (optional; safe because main bg is transparent) */}
+      {/* page glow */}
       <div className="pointer-events-none fixed inset-0 opacity-60">
         <div className="absolute -top-24 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-white/10 blur-3xl" />
         <div className="absolute top-[35%] left-[10%] h-[360px] w-[360px] rounded-full bg-white/5 blur-3xl" />
@@ -128,80 +119,82 @@ export default function TripsPage() {
           </p>
         </section>
 
-        {/* NOTE: since you only have 1 trip now, feel free to keep the grid.
-            If you want it centered, change md:grid-cols-2 lg:grid-cols-3 to just "max-w-[520px]" etc. */}
         <section className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {trips.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setOpenId(t.id)}
-              className={[
-                'relative overflow-hidden text-left rounded-2xl border border-white/15 p-5 backdrop-blur',
-                'shadow-[0_0_0_1px_rgba(255,255,255,0.03)] hover:border-white/25 hover:bg-white/[0.04]',
-                // fallback theme gradient under everything
-                themeBg(t.theme),
-              ].join(' ')}
-            >
-              {t.image && (
-  <>
-    <div
-      aria-hidden
-      className="absolute inset-0 bg-cover bg-center opacity-100 blur-0 scale-100"
-      style={{ backgroundImage: `url(${t.image})` }}
-    />
-    <div aria-hidden className="absolute inset-0 bg-black/-0" />
-    <div aria-hidden className="absolute inset-0 bg-white/[0.06]" />
-  </>
-)}
+          {trips.map((t) => {
+            const isActive = openId === t.id;
 
-              {/* OPTIONAL IMAGE BACKGROUND LAYER */}
-              {t.image && (
-                <>
-                  <div
-                    aria-hidden
-                    className="absolute inset-0 bg-cover bg-center opacity-40 blur-[2px] scale-100"
-                    style={{ backgroundImage: `url(${t.image})` }}
-                  />
-                  <div
-                    aria-hidden
-                    className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/65 to-black/85"
-                  />
-                </>
-              )}
+            return (
+              <button
+                key={t.id}
+                onClick={() => setOpenId(t.id)}
+                className={[
+                  'relative overflow-hidden text-left rounded-2xl border border-white/15 p-5 backdrop-blur',
+                  'shadow-[0_0_0_1px_rgba(255,255,255,0.03)] hover:border-white/25 hover:bg-white/[0.04]',
+                  themeBg(t.theme),
+                ].join(' ')}
+              >
+                {/* ✅ SINGLE image layer block (inactive vs active brightness) */}
+                {t.image && (
+                  <>
+                    <div
+                      aria-hidden
+                      className={[
+                        'absolute inset-0 bg-cover bg-center blur-[2px] scale-105 transition-opacity duration-300',
+                        isActive ? 'opacity-' : 'opacity-28',
+                      ].join(' ')}
+                      style={{ backgroundImage: `url(${t.image})` }}
+                    />
+                    <div
+                      aria-hidden
+                      className={[
+                        'absolute inset-0 transition-colors duration-300',
+                        isActive ? 'bg-black/35' : 'bg-black/55',
+                      ].join(' ')}
+                    />
+                    <div
+                      aria-hidden
+                      className={[
+                        'absolute inset-0 transition-opacity duration-300',
+                        isActive ? 'bg-white/[0.06]' : 'bg-white/[0.03]',
+                      ].join(' ')}
+                    />
+                  </>
+                )}
 
-              {/* Content layer */}
-              <div className="relative">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-sm text-white/70">{t.subtitle}</div>
-                    <div className="mt-1 text-2xl font-semibold tracking-tight">{t.title}</div>
-                    <div className="mt-1 text-xs text-white/50">{t.locationLine}</div>
+                {/* Content layer */}
+                <div className="relative">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-sm text-white/70">{t.subtitle}</div>
+                      <div className="mt-1 text-2xl font-semibold tracking-tight">{t.title}</div>
+                      <div className="mt-1 text-xs text-white/50">{t.locationLine}</div>
+                    </div>
+
+                    <div className={`shrink-0 rounded-full border px-3 py-1 text-xs ${STATUS_STYLE[t.status]}`}>
+                      {t.status}
+                    </div>
                   </div>
 
-                  <div className={`shrink-0 rounded-full border px-3 py-1 text-xs ${STATUS_STYLE[t.status]}`}>
-                    {t.status}
+                  <div className="mt-4 text-xs text-white/55">{t.window}</div>
+
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {t.focusTags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-xs text-white/60"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="mt-4 text-xs text-white/55">
+                    Targets: <span className="text-white/70">{t.targets.length}</span>
                   </div>
                 </div>
-
-                <div className="mt-4 text-xs text-white/55">{t.window}</div>
-
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {t.focusTags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-xs text-white/60"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="mt-4 text-xs text-white/55">
-                  Targets: <span className="text-white/70">{t.targets.length}</span>
-                </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </section>
 
         <div className="mt-8 text-xs text-white/45">
@@ -217,21 +210,18 @@ export default function TripsPage() {
           aria-modal="true"
           aria-label={`Trip details: ${activeTrip.title}`}
         >
-          {/* backdrop */}
           <button
             className="absolute inset-0 bg-black/70"
             onClick={() => setOpenId(null)}
             aria-label="Close"
           />
 
-          {/* panel */}
           <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/15 bg-black/80 p-6 shadow-[0_40px_160px_rgba(0,0,0,0.85)] backdrop-blur">
-            {/* Optional: use the same image in modal header background */}
             {activeTrip.image && (
               <>
                 <div
                   aria-hidden
-                  className="absolute inset-0 bg-cover bg-center opacity-20 blur-[2px] scale-105"
+                  className="absolute inset-0 bg-cover bg-center opacity-90 blur-[0px] scale-100"
                   style={{ backgroundImage: `url(${activeTrip.image})` }}
                 />
                 <div aria-hidden className="absolute inset-0 bg-black/70" />
@@ -264,7 +254,6 @@ export default function TripsPage() {
               </div>
 
               <div className="mt-6 grid gap-5 md:grid-cols-2">
-                {/* Focus */}
                 <div className="rounded-2xl border border-white/15 bg-white/[0.03] p-5">
                   <div className="text-sm font-medium text-white/80">Focus</div>
                   <div className="mt-3 flex flex-wrap gap-2">
@@ -279,7 +268,6 @@ export default function TripsPage() {
                   </div>
                 </div>
 
-                {/* Notes */}
                 <div className="rounded-2xl border border-white/15 bg-white/[0.03] p-5">
                   <div className="text-sm font-medium text-white/80">Notes</div>
                   <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-white/65">
@@ -290,7 +278,6 @@ export default function TripsPage() {
                 </div>
               </div>
 
-              {/* Targets */}
               <div className="mt-5 rounded-2xl border border-white/15 bg-white/[0.03] p-5">
                 <div className="text-sm font-medium text-white/80">Target assets</div>
                 <div className="mt-3 overflow-hidden rounded-xl border border-white/10">
@@ -317,7 +304,6 @@ export default function TripsPage() {
                 </div>
 
                 <div className="mt-3 text-xs text-white/45">
-                  Reminder: filenames == assetId, mp3 only, events mono, loops seamless.
                 </div>
               </div>
             </div>

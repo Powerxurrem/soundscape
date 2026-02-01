@@ -27,6 +27,7 @@ export default function RootLayout({
                 <a href="/trips" className="text-white/80 hover:text-white">Trips</a>
                 <a href="/mixer" className="text-white/80 hover:text-white">Mixer</a>
                 <a href="/autopilot" className="text-white/80 hover:text-white">Autopilot</a>
+                <a href="/terms" className="text-white/80 hover:text-white">Terms</a>
               </div>
 
             </nav>

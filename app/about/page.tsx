@@ -2,7 +2,7 @@
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-transparent text-zinc-100">
       {/* background glow */}
       <div className="pointer-events-none fixed inset-0 opacity-60">
         <div className="absolute -top-24 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-white/10 blur-3xl" />

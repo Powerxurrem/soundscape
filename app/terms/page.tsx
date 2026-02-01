@@ -11,7 +11,7 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <main className="min-h-screen bg-black text-zinc-100">
+    <main className="min-h-screen bg-transparent text-zinc-100">
       {/* Background glow */}
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.08),rgba(0,0,0,0)_55%)]" />

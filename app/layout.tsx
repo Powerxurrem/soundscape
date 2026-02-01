@@ -16,7 +16,36 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-black text-white">
-        {/* Header */}
+        {/* ===== Global background layers ===== */}
+        {/* Aurora background */}
+        <div
+          aria-hidden
+          className="fixed inset-0 -z-10"
+          style={{
+            backgroundImage: `
+              radial-gradient(
+                ellipse at top,
+                rgba(0,0,0,0.6),
+                rgba(0,0,0,0.95)
+              ),
+              url(/bg/aurora-soft.jpg)
+            `,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+
+        {/* Optional grain overlay */}
+        <div
+          aria-hidden
+          className="fixed inset-0 -z-10 opacity-[0.04]"
+          style={{
+            backgroundImage: 'url(/grain.png)',
+            backgroundRepeat: 'repeat',
+          }}
+        />
+
+        {/* ===== Header ===== */}
         <header className="sticky top-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur">
           <div className="mx-auto max-w-5xl px-6 py-4">
             <nav className="flex items-center justify-between">
@@ -29,12 +58,11 @@ export default function RootLayout({
                 <a href="/autopilot" className="text-white/80 hover:text-white">Autopilot</a>
                 <a href="/terms" className="text-white/80 hover:text-white">Terms</a>
               </div>
-
             </nav>
           </div>
         </header>
 
-        {/* Main */}
+        {/* ===== Main ===== */}
         <main>
           {children}
         </main>

@@ -251,7 +251,7 @@ export default function MixerPage() {
         <aside className="glass-panel col-span-12 md:col-span-4 rounded-3xl p-6">
           <h2 className="text-lg font-semibold">Library</h2>
           <input
-            className="glass-surface mt-3 w-full rounded-lg px-3 py-2 text-sm text-white/80 placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
+            className="glass-surface mt-3 w-full rounded-lg px-3 py-2 text-sm text-app placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
             placeholder="Search…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -262,7 +262,7 @@ export default function MixerPage() {
             <div className="flex min-h-0 flex-1 flex-col">
               <div className="mb-2 flex items-baseline justify-between">
                 <div className="text-sm font-semibold">Loops</div>
-                <div className="text-xs text-white/55">Total {loopsList.length}</div>
+                <div className="text-xs text-faint">Total {loopsList.length}</div>
               </div>
               <div className="min-h-0 flex-1 overflow-y-auto pr-1">
                 <div className="space-y-2">
@@ -270,14 +270,16 @@ export default function MixerPage() {
                     <button
                       key={item.id}
                       onClick={() => addToMix(item)}
-                      className="btn-glass"
+                      className="btn-glass w-full text-left rounded-lg px-3 py-2"
+
                     >
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-xs text-white/55">Loop</div>
+                <div className="font-medium text-strong">{item.name}</div>
+                <div className="text-xs text-muted">Loop</div>
+
                     </button>
                   ))}
                   {loopsList.length === 0 && (
-                    <div className="text-xs text-white/55">No loop items.</div>
+                    <div className="text-xs text-faint">No loop items.</div>
                   )}
                 </div>
               </div>
@@ -286,7 +288,7 @@ export default function MixerPage() {
             <div className="flex min-h-0 flex-1 flex-col">
               <div className="mb-2 flex items-baseline justify-between">
                 <div className="text-sm font-semibold">Events</div>
-                <div className="text-xs text-white/55">Total {eventsList.length}</div>
+                <div className="text-xs text-faint">Total {eventsList.length}</div>
               </div>
               <div className="min-h-0 flex-1 overflow-y-auto pr-1">
                 <div className="space-y-2">
@@ -294,14 +296,15 @@ export default function MixerPage() {
                     <button
                       key={item.id}
                       onClick={() => addToMix(item)}
-                      className="btn-glass"
+                      className="btn-glass w-full text-left rounded-lg px-3 py-2"
+
                     >
                       <div className="font-medium">{item.name}</div>
-                      <div className="text-xs text-white/55">Event</div>
+                      <div className="text-xs text-faint">Event</div>
                     </button>
                   ))}
                   {eventsList.length === 0 && (
-                    <div className="text-xs text-white/55">No event items.</div>
+                    <div className="text-xs text-faint">No event items.</div>
                   )}
                 </div>
               </div>
@@ -312,7 +315,7 @@ export default function MixerPage() {
         {/* CENTER: Mixer */}
         <section className="glass-panel col-span-12 md:col-span-5 rounded-3xl p-6">
           <h1 className="text-lg font-semibold">Mixer</h1>
-          <p className="mt-1 text-sm text-white/55">Ugly is correct. Logic first.</p>
+          <p className="mt-1 text-sm text-faint">Ugly is correct. Logic first.</p>
 
           <div className="mt-4 space-y-3">
             {tracks.map((t) => (
@@ -321,17 +324,18 @@ export default function MixerPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <div className="font-medium">{t.name}</div>
-                      <span className="text-xs text-white/55">({t.type})</span>
+                      <span className="text-xs text-faint">({t.type})</span>
                       <span className="text-xs">{assetStatus[t.id] ? '🟢' : '🔴'}</span>
                     </div>
-                    <div className="mt-1 text-xs text-white/55">
+                    <div className="mt-1 text-xs text-faint">
                       {folderIdFor(t)}/{t.assetId}.mp3
                     </div>
                   </div>
 
                   <button
                     onClick={() => removeTrack(t.id)}
-                    className="btn-glass"
+                    className="btn-glass w-full text-left rounded-lg px-3 py-2"
+
                   >
                     Remove
                   </button>
@@ -339,14 +343,14 @@ export default function MixerPage() {
 
                 {/* Asset selector */}
                 <div className="mt-3">
-                  <label className="text-xs text-white/55">Asset</label>
+                  <label className="text-xs text-faint">Asset</label>
                   <select
-                    className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-white/80 focus:outline-none focus:ring-2 focus:ring-white/20"
+                    className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-app focus:outline-none focus:ring-2 focus:ring-white/20"
                     value={t.assetId}
                     onChange={(e) => updateTrack(t.id, { assetId: e.target.value })}
                   >
                     {LIBRARY.find((x) => x.id === t.libraryId)?.assets.map((a) => (
-                      <option key={a.id} value={a.id} className="bg-white/[0.06] text-white/80">
+                      <option key={a.id} value={a.id} className="bg-white/[0.06] text-app">
                         {a.label}
                       </option>
                     ))}
@@ -355,7 +359,7 @@ export default function MixerPage() {
 
                 {/* Volume */}
                 <div className="mt-3 flex items-center gap-3">
-                  <span className="text-xs text-white/55 w-14">Vol</span>
+                  <span className="text-xs text-faint w-14">Vol</span>
                   <input
                     type="range"
                     className="flex-1"
@@ -365,7 +369,7 @@ export default function MixerPage() {
                     value={t.volume}
                     onChange={(e) => updateTrack(t.id, { volume: Number(e.target.value) })}
                   />
-                  <span className="text-xs text-white/55 w-10 text-right">
+                  <span className="text-xs text-faint w-10 text-right">
                     {Math.round(t.volume * 100)}%
                   </span>
                 </div>
@@ -374,33 +378,33 @@ export default function MixerPage() {
                 {t.type === 'event' && (
                   <div className="mt-3 grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-white/55">Rate</label>
+                      <label className="text-xs text-faint">Rate</label>
                       <select
-                        className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-white/80 focus:outline-none focus:ring-2 focus:ring-white/20"
+                        className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-app focus:outline-none focus:ring-2 focus:ring-white/20"
                         value={t.ratePreset}
                         onChange={(e) =>
                           updateTrack(t.id, { ratePreset: e.target.value as MixTrack['ratePreset'] })
                         }
                       >
-                        <option className="bg-white/[0.06] text-white/80">Rare</option>
-                        <option className="bg-white/[0.06] text-white/80">Medium</option>
-                        <option className="bg-white/[0.06] text-white/80">Often</option>
-                        <option className="bg-white/[0.06] text-white/80">Very Often</option>
+                        <option className="bg-white/[0.06] text-app">Rare</option>
+                        <option className="bg-white/[0.06] text-app">Medium</option>
+                        <option className="bg-white/[0.06] text-app">Often</option>
+                        <option className="bg-white/[0.06] text-app">Very Often</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="text-xs text-white/55">Speed</label>
+                      <label className="text-xs text-faint">Speed</label>
                       <select
-                        className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-white/80 focus:outline-none focus:ring-2 focus:ring-white/20"
+                        className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-app focus:outline-none focus:ring-2 focus:ring-white/20"
                         value={t.rateSpeed}
                         onChange={(e) =>
                           updateTrack(t.id, { rateSpeed: Number(e.target.value) as MixTrack['rateSpeed'] })
                         }
                       >
-                        <option value={0.5} className="bg-white/[0.06] text-white/80">0.5×</option>
-                        <option value={1} className="bg-white/[0.06] text-white/80">1×</option>
-                        <option value={2} className="bg-white/[0.06] text-white/80">2×</option>
+                        <option value={0.5} className="bg-white/[0.06] text-app">0.5×</option>
+                        <option value={1} className="bg-white/[0.06] text-app">1×</option>
+                        <option value={2} className="bg-white/[0.06] text-app">2×</option>
                       </select>
                     </div>
                   </div>
@@ -411,16 +415,18 @@ export default function MixerPage() {
 
           {/* AUDIO CONTROLS */}
           <div className="mt-6 flex gap-3">
-            <button onClick={activateAudio} className="btn-glass">
+            <button onClick={activateAudio} className="btn-glass w-full text-left rounded-lg px-3 py-2"
+>
               {audioOn ? 'Audio Active' : 'Activate Audio'}
             </button>
 
-            <button onClick={stopAudio} className="btn-glass">
+            <button onClick={stopAudio} className="btn-glass w-full text-left rounded-lg px-3 py-2"
+>
               Stop
             </button>
 
             <div className="ml-auto flex items-center gap-3">
-              <span className="text-xs text-white/55">Master</span>
+              <span className="text-xs text-faint">Master</span>
               <input
                 type="range"
                 className="w-40"
@@ -437,36 +443,36 @@ export default function MixerPage() {
         {/* RIGHT: Export */}
         <aside className="glass-panel col-span-12 md:col-span-3 rounded-3xl p-6">
           <h2 className="text-lg font-semibold">Export</h2>
-          <p className="mt-1 text-sm text-white/55">Export is locked on Personal.</p>
+          <p className="mt-1 text-sm text-faint">Export is locked on Personal.</p>
 
           <div className="mt-4 space-y-3">
             <div>
-              <label className="text-xs text-white/55">Duration</label>
-              <select className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-white/80 focus:outline-none focus:ring-2 focus:ring-white/20">
-                <option className="bg-white/[0.06] text-white/80">10 min</option>
-                <option className="bg-white/[0.06] text-white/80">30 min</option>
-                <option className="bg-white/[0.06] text-white/80">60 min (max)</option>
+              <label className="text-xs text-faint">Duration</label>
+              <select className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-app focus:outline-none focus:ring-2 focus:ring-white/20">
+                <option className="bg-white/[0.06] text-app">10 min</option>
+                <option className="bg-white/[0.06] text-app">30 min</option>
+                <option className="bg-white/[0.06] text-app">60 min (max)</option>
               </select>
             </div>
 
             <div>
-              <label className="text-xs text-white/55">Format</label>
+              <label className="text-xs text-faint">Format</label>
               <div className="mt-1 grid grid-cols-2 gap-2">
-                <button className="glass-panel rounded-lg px-3 py-2 text-sm text-white/45" disabled>
+                <button className="glass-panel rounded-lg px-3 py-2 text-sm text-faint" disabled>
                   MP3
                 </button>
-                <button className="glass-panel rounded-lg px-3 py-2 text-sm text-white/45" disabled>
+                <button className="glass-panel rounded-lg px-3 py-2 text-sm text-faint" disabled>
                   WAV
                 </button>
               </div>
-              <div className="mt-2 text-xs text-white/55">🔒 Commercial license required to export.</div>
+              <div className="mt-2 text-xs text-faint">🔒 Commercial license required to export.</div>
             </div>
 
-            <button className="glass-panel w-full rounded-lg border border-white/15 px-4 py-2 text-sm text-white/45" disabled>
+            <button className="glass-panel w-full rounded-lg px-4 py-2 text-sm text-faint" disabled>
               Export (Locked)
             </button>
 
-            <div className="glass-panel rounded-xl border-dashed p-4 text-xs text-white/55">
+            <div className="glass-panel rounded-2xl p-4">
               <div className="font-medium">Commercial unlock includes:</div>
               <ul className="mt-2 list-disc pl-4 space-y-1">
                 <li>MP3 + WAV exports</li>
@@ -480,3 +486,5 @@ export default function MixerPage() {
     </main>
   );
 }
+
+

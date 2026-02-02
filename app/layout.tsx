@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-white/[0.06] text-white/80">
+      <body className="bg-white/[0.06] text-app">
         {/* ===== Global background layers ===== */}
         {/* Aurora background */}
 <div
@@ -33,7 +33,7 @@ export default function RootLayout({
     `,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    filter: 'brightness(0.8) contrast(1) saturate(1.3)',
+    filter: 'brightness(0.8) contrast(1) saturate(1.2)',
   }}
 />
 
@@ -45,12 +45,12 @@ export default function RootLayout({
             <nav className="flex items-center justify-between">
               <div className="flex items-center gap-6 text-sm font-medium">
                 <a href="/" className="text-white hover:opacity-80">Home</a>
-                <a href="/pricing" className="text-white/80 hover:text-white">Pricing</a>
-                <a href="/about" className="text-white/80 hover:text-white">About</a>
-                <a href="/trips" className="text-white/80 hover:text-white">Trips</a>
-                <a href="/mixer" className="text-white/80 hover:text-white">Mixer</a>
-                <a href="/autopilot" className="text-white/80 hover:text-white">Autopilot</a>
-                <a href="/terms" className="text-white/80 hover:text-white">Terms</a>
+                <a href="/pricing" className="text-app hover:text-white">Pricing</a>
+                <a href="/about" className="text-app hover:text-white">About</a>
+                <a href="/trips" className="text-app hover:text-white">Trips</a>
+                <a href="/mixer" className="text-app hover:text-white">Mixer</a>
+                <a href="/autopilot" className="text-app hover:text-white">Autopilot</a>
+                <a href="/terms" className="text-app hover:text-white">Terms</a>
               </div>
             </nav>
           </div>
@@ -64,3 +64,4 @@ export default function RootLayout({
     </html>
   );
 }
+

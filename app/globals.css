@@ -21,67 +21,117 @@
 
 /* -------------------------------------------------------
    GLASS / UI TOKENS (Soundscape)
-   Change these once, the whole app updates.
 -------------------------------------------------------- */
-/* -------------------------------------------------------
-   GLASS / UI TOKENS (Soundscape)
-   Change these once, the whole app updates.
--------------------------------------------------------- */
+
 :root {
-  --glass-blur: 32px;
+  /* blur knob */
+  --glass-blur: 14px;
 
-  /* tune these once */
-  --glass-panel-bg: rgba(255, 255, 255, 0.04);
-  --glass-surface-bg: rgba(255, 255, 255, 0.06);
-  --glass-inset-bg: rgba(255, 255, 255, 0.03);
+  /* base glass color (R G B) */
+  --glass-rgb: 168 200 200;
 
-  --glass-border: rgba(255, 255, 255, 0.40);
-  --glass-border-soft: rgba(255, 255, 255, 0.10);
+ /* glass optical knobs */
+  --glass-saturate: 2;   /* 1 = neutral, >1 richer, <1 flatter */
+  --glass-contrast: 2;   /* 1 = neutral, >1 crisper */  
+  /* master transparency knob
+     1   = current
+     0.7 = more transparent
+     1.2 = more opaque
+  */
+  --glass-alpha: 2.4;
+
+  /* border strength knobs */
+  --glass-border-strong: rgb(255 255 255 / 0.10);
+  --glass-border-medium: rgb(255 255 255 / 0.20);
+  --glass-border-soft: rgb(255 255 255 / 0.12);
+
+  /* per-tier base alpha (before master multiplier) */
+  --glass-fill-big-a: 0.045;
+  --glass-fill-section-a: 0.060;
+  --glass-fill-mini-a: 0.055;
+  --glass-fill-inset-a: 0.035;
+  --glass-fill-field-a: 0.070;
+
+  /* derived fills (color × transparency) */
+  --glass-fill-big: rgb(var(--glass-rgb) / calc(var(--glass-fill-big-a) * var(--glass-alpha)));
+  --glass-fill-section: rgb(var(--glass-rgb) / calc(var(--glass-fill-section-a) * var(--glass-alpha)));
+  --glass-fill-mini: rgb(var(--glass-rgb) / calc(var(--glass-fill-mini-a) * var(--glass-alpha)));
+  --glass-fill-inset: rgb(var(--glass-rgb) / calc(var(--glass-fill-inset-a) * var(--glass-alpha)));
+  --glass-fill-field: rgb(var(--glass-rgb) / calc(var(--glass-fill-field-a) * var(--glass-alpha)));
+
+  /* text color (R G B) */
+  --text-rgb: 220 235 255;
+
+  /* brightness tiers */
+  --text-strong: rgb(var(--text-rgb) / 2);
+  --text:        rgb(var(--text-rgb) / 1.2);
+  --text-muted:  rgb(var(--text-rgb) / 1.2);
+  --text-faint:  rgb(var(--text-rgb) / 1.21);
 }
 
 @layer components {
+  /* --------------------
+     Glass blur (shared)
+  -------------------- */
   .glass-panel,
   .glass-surface,
-  .glass-inset,
-  .pill-glass,
-  .btn-glass,
-  .btn-glass-secondary {
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
+  .glass-inset {
+    backdrop-filter:
+      blur(var(--glass-blur))
+      saturate(var(--glass-saturate))
+      contrast(var(--glass-contrast));
+    -webkit-backdrop-filter:
+      blur(var(--glass-blur))
+      saturate(var(--glass-saturate))
+      contrast(var(--glass-contrast));
   }
 
+
+  /* --------------------
+     Glass surfaces
+  -------------------- */
   .glass-panel {
-    background: var(--glass-panel-bg);
-    border: 1px solid var(--glass-border);
+    background: var(--glass-fill-big);
+    border: 1px solid var(--glass-border-strong);
   }
 
   .glass-surface {
-    background: var(--glass-surface-bg);
-    border: 1px solid var(--glass-border-soft);
+    background: var(--glass-fill-section);
+    border: 1px solid var(--glass-border-medium);
   }
 
   .glass-inset {
-    background: var(--glass-inset-bg);
+    background: var(--glass-fill-inset);
     border: 1px solid var(--glass-border-soft);
   }
 
+  /* --------------------
+     Controls / chips
+  -------------------- */
   .btn-glass,
-  .btn-glass-secondary {
-    background: var(--glass-surface-bg);
+  .btn-glass-secondary,
+  .pill-glass {
+    background: var(--glass-fill-mini);
     border: 1px solid var(--glass-border-soft);
   }
 
-  .pill-glass {
-    background: var(--glass-surface-bg);
+  /* --------------------
+     Form fields
+  -------------------- */
+  .field-glass {
+    background: var(--glass-fill-field);
     border: 1px solid var(--glass-border-soft);
   }
-  @layer components {
+
+  /* --------------------
+     Elevation tokens
+  -------------------- */
   .elev-0 { box-shadow: none; }
 
   .elev-1 {
     box-shadow:
       0 0 0 1px rgba(255,255,255,0.03),
-      0 40px 60px rgba(0,0,0,0.45);
+      0 16px 60px rgba(0,0,0,0.45);
   }
 
   .elev-2 {
@@ -89,12 +139,17 @@
       0 0 0 1px rgba(255,255,255,0.03),
       0 40px 120px rgba(0,0,0,0.65);
   }
-  
+
   .elev-3 {
-  box-shadow:
-    0 40px 160px rgba(0,0,0,0.85);
-}
-}
-}
+    box-shadow:
+      0 40px 160px rgba(0,0,0,0.85);
+  }
 
-
+  /* --------------------
+     Text tokens
+  -------------------- */
+  .text-app { color: var(--text); }
+  .text-strong { color: var(--text-strong); }
+  .text-muted { color: var(--text-muted); }
+  .text-faint { color: var(--text-faint); }
+}

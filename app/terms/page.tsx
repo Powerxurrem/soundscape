@@ -11,11 +11,11 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <main className="min-h-screen bg-transparent text-zinc-100">
+    <main className="min-h-screen bg-transparent text-strong">
       {/* Background glow */}
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.08),rgba(0,0,0,0)_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(255,255,255,0.04),rgba(0,0,0,0)_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_55%)]" />
       </div>
 
       <div className="mx-auto w-full max-w-4xl px-6 py-12">
@@ -29,39 +29,39 @@ export default function TermsPage() {
           <h1 className="mt-5 text-3xl font-semibold tracking-tight md:text-4xl">
             Terms &amp; Conditions
           </h1>
-          <p className="mt-2 text-sm text-zinc-400">
-            Last updated: <span className="text-zinc-300">[02.2026]</span>
+          <p className="mt-2 text-sm text-muted">
+            Last updated: <span className="text-app">[02.2026]</span>
           </p>
 
-          <div className="mt-8 space-y-8 text-sm leading-relaxed text-zinc-300">
+          <div className="mt-8 space-y-8 text-sm leading-relaxed text-app">
             <p>
               These Terms &amp; Conditions (“Terms”) govern your access to and use of{" "}
-              <span className="text-zinc-100">Soundscape</span> (“Soundscape”, “we”, “us”, “our”),
+              <span className="text-strong">Soundscape</span> (“Soundscape”, “we”, “us”, “our”),
               available at soundscape.run (the “Service”).
             </p>
 
             <p>By accessing or using the Service, you agree to these Terms.</p>
 
             <Section title="1. Definitions">
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-zinc-300">
+              <ul className="mt-3 list-disc space-y-2 pl-5 text-app">
                 <li>
-                  <b className="text-zinc-100">Service</b>: The Soundscape website, mixer, and
+                  <b className="text-strong">Service</b>: The Soundscape website, mixer, and
                   related features.
                 </li>
                 <li>
-                  <b className="text-zinc-100">Assets</b>: Audio recordings owned and provided by
+                  <b className="text-strong">Assets</b>: Audio recordings owned and provided by
                   Soundscape.
                 </li>
                 <li>
-                  <b className="text-zinc-100">Export</b>: Audio files rendered through the
+                  <b className="text-strong">Export</b>: Audio files rendered through the
                   Service.
                 </li>
                 <li>
-                  <b className="text-zinc-100">Credits</b>: Units used to export audio (1 credit =
+                  <b className="text-strong">Credits</b>: Units used to export audio (1 credit =
                   5 minutes of export).
                 </li>
                 <li>
-                  <b className="text-zinc-100">User</b>: Any individual or entity using the
+                  <b className="text-strong">User</b>: Any individual or entity using the
                   Service.
                 </li>
               </ul>
@@ -70,8 +70,8 @@ export default function TermsPage() {
             <Section title="2. License Grant (Exports)">
               <p>
                 When you export audio using Soundscape, we grant you a{" "}
-                <b className="text-zinc-100">non-exclusive, perpetual, worldwide license</b> to use
-                the exported audio for <b className="text-zinc-100">commercial and non-commercial</b>{" "}
+                <b className="text-strong">non-exclusive, perpetual, worldwide license</b> to use
+                the exported audio for <b className="text-strong">commercial and non-commercial</b>{" "}
                 purposes, including but not limited to:
               </p>
 
@@ -86,7 +86,7 @@ export default function TermsPage() {
               <p className="mt-3">No attribution is required.</p>
 
               <p className="mt-3">
-                This license applies <b className="text-zinc-100">only to exported audio</b>, not to
+                This license applies <b className="text-strong">only to exported audio</b>, not to
                 the underlying Assets or the Service itself.
               </p>
             </Section>
@@ -98,7 +98,7 @@ export default function TermsPage() {
                 <li>sublicense or transfer the exported audio on a standalone basis</li>
                 <li>offer competing sound libraries, ambient mixers, or similar services using exported audio</li>
                 <li>
-                  register exported audio with <b className="text-zinc-100">YouTube Content ID</b>{" "}
+                  register exported audio with <b className="text-strong">YouTube Content ID</b>{" "}
                   or any other audio fingerprinting or rights-management system
                 </li>
                 <li>claim ownership or exclusivity over exported audio</li>
@@ -126,10 +126,10 @@ export default function TermsPage() {
             <Section title="5. Ownership">
               <p>
                 All Assets, recordings, and rendered audio are{" "}
-                <b className="text-zinc-100">owned by Soundscape</b>.
+                <b className="text-strong">owned by Soundscape</b>.
               </p>
               <p className="mt-3">
-                Users receive a <b className="text-zinc-100">license to use exported audio</b>, not
+                Users receive a <b className="text-strong">license to use exported audio</b>, not
                 ownership or authorship rights.
               </p>
               <p className="mt-3">
@@ -144,7 +144,7 @@ export default function TermsPage() {
                 <li>1 credit equals 5 minutes of exported audio.</li>
                 <li>Credits do not expire.</li>
                 <li>
-                  <b className="text-zinc-100">All purchases are final. No refunds are provided</b>,
+                  <b className="text-strong">All purchases are final. No refunds are provided</b>,
                   including after export.
                 </li>
                 <li>Prices and credit packs may change for future purchases.</li>
@@ -184,7 +184,7 @@ export default function TermsPage() {
             <Section title="10. Governing Law">
               <p>
                 These Terms are governed by and construed in accordance with the{" "}
-                <b className="text-zinc-100">laws of the Netherlands</b>, without regard to conflict
+                <b className="text-strong">laws of the Netherlands</b>, without regard to conflict
                 of law principles.
               </p>
             </Section>
@@ -192,12 +192,12 @@ export default function TermsPage() {
             <Section title="11. Contact">
               <p>
                 For questions regarding these Terms or licensing, contact:{" "}
-                <b className="text-zinc-100">summit-sight@hotmail.com</b>
+                <b className="text-strong">summit-sight@hotmail.com</b>
               </p>
             </Section>
 
-            <div className="pt-2 text-xs text-zinc-500">
-              Tip: Link this page in your footer as <span className="text-zinc-300">/terms</span>.
+            <div className="pt-2 text-xs text-faint">
+              Tip: Link this page in your footer as <span className="text-app">/terms</span>.
             </div>
           </div>
         </section>
@@ -210,8 +210,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
 <section className="glass-inset rounded-2xl p-6">
 
-      <h2 className="text-base font-semibold text-zinc-100">{title}</h2>
+      <h2 className="text-base font-semibold text-strong">{title}</h2>
       <div className="mt-3">{children}</div>
     </section>
   );
 }
+

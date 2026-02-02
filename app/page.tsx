@@ -76,27 +76,25 @@ export default function Home() {
   const firePath = assetUrlFor({ type: 'loop', libraryId: 'fireplace' }, 'fireplace_cozy_loop_01');
 
   return (
-    <main className="min-h-screen bg-transparent text-zinc-100">
+    <main className="min-h-screen bg-transparent text-strong">
       {/* background glow */}
       <div className="pointer-events-none fixed inset-0 opacity-10">
         <div className="absolute -top-24 left-1/2 h-[420px] w-[820px] -translate-x-1/2 blur-3xl" />
-
 
       </div>
 
       <div className="relative mx-auto max-w-5xl px-6 py-14">
         {/* HERO */}
       <section className="glass-surface elev-2 rounded-3xl p-8">
-
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div className="max-w-2xl">
-              <div className="glass-panel inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs text-white/70">
+              <div className="glass-panel inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs text-app">
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400/90" />
                 Engine stable • Assets deterministic
               </div>
 
               <h1 className="mt-4 text-4xl font-semibold tracking-tight">Soundscape</h1>
-              <p className="mt-3 text-sm leading-relaxed text-white/70">
+              <p className="mt-3 text-sm leading-relaxed text-app">
                 Calm, realistic ambient soundscapes — built to be deterministic &  offline-friendly.
               </p>
 
@@ -120,22 +118,22 @@ export default function Home() {
               <div className="glass-panel rounded-2xl p-4">
                 <div className="text-sm font-medium">What you get</div>
 
-                <div className="mt-3 space-y-2 text-sm text-white/75">
+                <div className="mt-3 space-y-2 text-sm text-app">
                   <div className="flex gap-2">
-                    <span className="text-white/45">•</span>
+                    <span className="text-faint">•</span>
                     <span>Real recordings first</span>
                   </div>
                   <div className="flex gap-2">
-                    <span className="text-white/45">•</span>
+                    <span className="text-faint">•</span>
                     <span>Deterministic mixes (recipe export)</span>
                   </div>
                   <div className="flex gap-2">
-                    <span className="text-white/45">•</span>
+                    <span className="text-faint">•</span>
                     <span>Offline &amp; private</span>
                   </div>
                 </div>
 
-                <div className="glass-panel mt-3 rounded-xl px-3 py-2 text-[11px] text-white/60">
+                <div className="glass-panel mt-3 rounded-xl px-3 py-2 text-[11px] text-muted">
                   Export includes WAV + deterministic recipe. Commercial use license included.
                 </div>
               </div>
@@ -148,7 +146,7 @@ export default function Home() {
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">Demo</h2>
-              <p className="mt-2 text-sm text-white/65">Rain + Fireplace. One click. No setup.</p>
+              <p className="mt-2 text-sm text-muted">Rain + Fireplace. One click. No setup.</p>
             </div>
 
             <div className="flex gap-2">
@@ -179,13 +177,13 @@ export default function Home() {
                     <div className="text-sm font-medium">Now Playing</div>
                     <span className="text-xs">{isOn ? '🟢' : '⚪'}</span>
                   </div>
-                  <div className="mt-1 text-xs text-white/60">
+                  <div className="mt-1 text-xs text-muted">
                     {isOn ? 'Rain + Fireplace running.' : 'Press Play to start the demo.'}
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-white/55">Volume</span>
+                  <span className="text-xs text-faint">Volume</span>
                   <input
                     type="range"
                     className="w-44 accent-white"
@@ -198,21 +196,21 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="glass-panel mt-4 rounded-xl p-4 text-xs text-white/65">
+              <div className="glass-panel mt-4 rounded-xl p-4 text-xs text-muted">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="font-medium text-white/75">Sources</span>
-                  <span className="text-white/45">locked asset paths</span>
+                  <span className="font-medium text-app">Sources</span>
+                  <span className="text-faint">locked asset paths</span>
                 </div>
 
                 <div className="mt-3 space-y-2">
                   <div className="flex gap-2">
-                    <span className="text-white/60">•</span>
-                    <span className="min-w-[80px] text-white/75">Rain</span>
+                    <span className="text-muted">•</span>
+                    <span className="min-w-[80px] text-app">Rain</span>
                     <span className="truncate">{rainPath}</span>
                   </div>
                   <div className="flex gap-2">
-                    <span className="text-white/60">•</span>
-                    <span className="min-w-[80px] text-white/75">Fireplace</span>
+                    <span className="text-muted">•</span>
+                    <span className="min-w-[80px] text-app">Fireplace</span>
                     <span className="truncate">{firePath}</span>
                   </div>
                 </div>
@@ -222,25 +220,25 @@ export default function Home() {
             {/* guarantees */}
             <div className="glass-panel rounded-2xl p-5">
               <div className="text-sm font-medium">Guarantees</div>
-              <div className="mt-1 text-xs text-white/55">How Soundscape behaves — every time.</div>
+              <div className="mt-1 text-xs text-faint">How Soundscape behaves — every time.</div>
 
               <div className="glass-panel mt-4 divide-y divide-white/10 overflow-hidden rounded-xl">
                 <div className="p-4">
                   <div className="text-sm font-medium">Deterministic exports</div>
-                  <div className="mt-1 text-xs text-white/60">Same inputs → same WAV + recipe.</div>
+                  <div className="mt-1 text-xs text-muted">Same inputs → same WAV + recipe.</div>
                 </div>
 
                 <div className="p-4">
                   <div className="text-sm font-medium">No account required</div>
-                  <div className="mt-1 text-xs text-white/60">Runs without signup. No analytics.</div>
+                  <div className="mt-1 text-xs text-muted">Runs without signup. No analytics.</div>
                 </div>
 
                 <div className="p-4">
                   <div className="text-sm font-medium">Transparent sourcing</div>
-                  <div className="mt-1 text-xs text-white/60">Trips shows what’s recorded vs generated.</div>
+                  <div className="mt-1 text-xs text-muted">Trips shows what’s recorded vs generated.</div>
                   <a
                     href="/trips"
-                    className="mt-3 inline-flex items-center gap-2 text-xs text-white/60 hover:text-white"
+                    className="mt-3 inline-flex items-center gap-2 text-xs text-muted hover:text-white"
                   >
                     View Trips
                   </a>
@@ -249,9 +247,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-6 text-xs text-white/45"></div>
+          <div className="mt-6 text-xs text-faint"></div>
         </section>
       </div>
     </main>
   );
 }
+
+

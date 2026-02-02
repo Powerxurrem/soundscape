@@ -521,11 +521,11 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
 
   return (
     <main className="mx-auto max-w-4xl p-6">
-      <div className="glass-panel rounded-2xl border border-white/15 p-5">
+      <div className="glass-panel rounded-2xl p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-xl font-semibold">Autopilot</h1>
-            <p className="mt-1 text-sm text-white/55">
+            <p className="mt-1 text-sm text-faint">
               Deterministic mix generator using only available assets. No AI.
             </p>
           </div>
@@ -548,9 +548,9 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
 
         <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
           <div>
-            <label className="text-xs text-white/55">Mood</label>
+            <label className="text-xs text-faint">Mood</label>
             <select
-              className="glass-panel mt-1 w-full rounded-lg border border-white/15 px-2 py-2 text-sm"
+              className="glass-panel mt-1 w-full rounded-lg px-2 py-2 text-sm"
               value={mood}
               onChange={(e) => setMood(e.target.value as Mood)}
             >
@@ -562,9 +562,9 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
           </div>
 
           <div>
-            <label className="text-xs text-white/55">Length</label>
+            <label className="text-xs text-faint">Length</label>
             <select
-              className="glass-panel mt-1 w-full rounded-lg border border-white/15 px-2 py-2 text-sm"
+              className="glass-panel mt-1 w-full rounded-lg px-2 py-2 text-sm"
               value={lengthMin}
               onChange={(e) => setLengthMin(Number(e.target.value) as 10 | 30 | 60)}
             >
@@ -575,10 +575,10 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
           </div>
 
           <div>
-            <label className="text-xs text-white/55">Seed</label>
+            <label className="text-xs text-faint">Seed</label>
             <div className="mt-1 flex gap-2">
               <input
-                className="glass-panel w-full rounded-lg border border-white/15 px-2 py-2 text-sm"
+                className="glass-panel w-full rounded-lg px-2 py-2 text-sm"
                 value={seed}
                 onChange={(e) => setSeed(e.target.value)}
               />
@@ -597,7 +597,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
           <div className="flex items-center justify-between">
             <div className="font-medium">Now Playing</div>
             <div className="flex items-center gap-3">
-              <span className="text-xs text-white/55">Master</span>
+              <span className="text-xs text-faint">Master</span>
               <input
                 type="range"
                 className="w-40"
@@ -610,23 +610,23 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
             </div>
           </div>
 
-          <div className="mt-3 text-sm text-white/55">{nowPlaying}</div>
+          <div className="mt-3 text-sm text-faint">{nowPlaying}</div>
 
           {tracks.length > 0 && (
             <div className="mt-3 space-y-2">
               {tracks.map((t) => (
-                <div key={t.id} className="glass-panel flex items-center justify-between rounded-lg border border-white/15 px-3 py-2">
+                <div key={t.id} className="glass-panel flex items-center justify-between rounded-lg px-3 py-2">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <div className="font-medium">{t.name}</div>
-                      <span className="text-xs text-white/55">({t.type})</span>
+                      <span className="text-xs text-faint">({t.type})</span>
                       <span className="text-xs">{trackStatus[t.id] ? '🟢' : '🔴'}</span>
                     </div>
-                    <div className="mt-1 text-xs text-white/55 truncate">{assetUrlFor(t, t.assetId)}</div>
+                    <div className="mt-1 text-xs text-faint truncate">{assetUrlFor(t, t.assetId)}</div>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="text-xs text-white/55 w-10 text-right">{Math.round(t.volume * 100)}%</div>
+                    <div className="text-xs text-faint w-10 text-right">{Math.round(t.volume * 100)}%</div>
                     <input
                       type="range"
                       className="w-36"
@@ -649,16 +649,16 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
         {recipe && (
           <div className="mt-5">
             <div className="font-medium">Recipe</div>
-            <pre className="glass-panel mt-2 whitespace-pre-wrap rounded-xl border border-white/15 bg-black/40 p-4 text-xs text-gray-200">
+            <pre className="glass-panel mt-2 whitespace-pre-wrap rounded-xl bg-black/40 p-4 text-xs text-gray-200">
               {recipe}
             </pre>
           </div>
         )}
 
         {/* EXPORT */}
-        <div className="glass-panel mt-6 rounded-2xl border border-white/15 p-5">
+        <div className="glass-panel mt-6 rounded-2xl p-5">
           <h2 className="text-lg font-semibold">Export</h2>
-          <p className="mt-1 text-sm text-white/55">
+          <p className="mt-1 text-sm text-faint">
             {EXPORT_TEMPORARILY_UNLOCKED
               ? 'Export temporarily unlocked for testing.'
               : 'Export is locked on Personal.'}
@@ -666,25 +666,25 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
 
           <div className="mt-4 space-y-3">
             <div>
-              <label className="text-xs text-white/55">Duration</label>
+              <label className="text-xs text-faint">Duration</label>
               <select
-                className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-white/80 focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-app focus:outline-none focus:ring-2 focus:ring-white/20"
                 value={lengthMin}
                 onChange={(e) => setLengthMin(Number(e.target.value) as 10 | 30 | 60)}
               >
-                <option value={10} className="bg-white/[0.06] text-white/80">10 min</option>
-                <option value={30} className="bg-white/[0.06] text-white/80">30 min</option>
-                <option value={60} className="bg-white/[0.06] text-white/80">60 min (max)</option>
+                <option value={10} className="bg-white/[0.06] text-app">10 min</option>
+                <option value={30} className="bg-white/[0.06] text-app">30 min</option>
+                <option value={60} className="bg-white/[0.06] text-app">60 min (max)</option>
               </select>
             </div>
 
             <div>
-              <label className="text-xs text-white/55">Format</label>
+              <label className="text-xs text-faint">Format</label>
               <div className="mt-1 grid grid-cols-3 gap-2">
                 <button
                   className={`rounded-lg border border-white/15 px-3 py-2 text-sm${
                     exportKind === 'wav' ? 'bg-white/10' : ''
-                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:bg-gray-50' : 'text-white/45'}`}
+                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:bg-gray-50' : 'text-faint'}`}
                   disabled={!EXPORT_TEMPORARILY_UNLOCKED || isExporting}
                   onClick={() => setExportKind('wav')}
                 >
@@ -693,7 +693,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
                 <button
                   className={`rounded-lg border border-white/15 px-3 py-2 text-sm${
                     exportKind === 'mp3' ? 'bg-white/10' : ''
-                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:bg-gray-50' : 'text-white/45'}`}
+                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:bg-gray-50' : 'text-faint'}`}
                   disabled={!EXPORT_TEMPORARILY_UNLOCKED || isExporting}
                   onClick={() => setExportKind('mp3')}
                 >
@@ -702,7 +702,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
                 <button
                   className={`rounded-lg border border-white/15 px-3 py-2 text-sm${
                     exportKind === 'recipe' ? 'bg-white/10' : ''
-                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:bg-gray-50' : 'text-white/45'}`}
+                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:bg-gray-50' : 'text-faint'}`}
                   disabled={!EXPORT_TEMPORARILY_UNLOCKED || isExporting}
                   onClick={() => setExportKind('recipe')}
                 >
@@ -710,7 +710,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
                 </button>
               </div>
 
-              <div className="mt-2 text-xs text-white/55">
+              <div className="mt-2 text-xs text-faint">
                 {exportKind === 'wav'
                   ? 'WAV renders offline in-browser.'
                   : exportKind === 'mp3'
@@ -719,13 +719,13 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
               </div>
             </div>
 
-            <div className="mt-2 text-xs text-white/55">
+            <div className="mt-2 text-xs text-faint">
               🔒 Commercial license required to export.
             </div>
 
             <button
               className={`w-full rounded-lg border border-white/15 px-4 py-2 text-sm${
-                EXPORT_TEMPORARILY_UNLOCKED ? 'hover:bg-gray-50' : 'text-white/45'
+                EXPORT_TEMPORARILY_UNLOCKED ? 'hover:bg-gray-50' : 'text-faint'
               }`}
               disabled={!EXPORT_TEMPORARILY_UNLOCKED || isExporting}
               onClick={() => {
@@ -743,9 +743,9 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
                     : 'Export MP3'}
             </button>
 
-            {exportMsg && <div className="text-xs text-white/55">{exportMsg}</div>}
+            {exportMsg && <div className="text-xs text-faint">{exportMsg}</div>}
 
-            <div className="glass-panel rounded-xl border-dashed p-4 text-xs text-white/55">
+            <div className="glass-panel rounded-xl-dashed p-4 text-xs text-faint">
               <div className="font-medium">Commercial unlock includes:</div>
               <ul className="mt-2 list-disc pl-4 space-y-1">
                 <li>MP3 + WAV exports</li>
@@ -756,10 +756,12 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
           </div>
         </div>
 
-        <div className="mt-5 text-xs text-white/55">
+        <div className="mt-5 text-xs text-faint">
           Notes: Autopilot only uses assets that respond to HEAD checks. Missing files are skipped.
         </div>
       </div>
     </main>
   );
 }
+
+

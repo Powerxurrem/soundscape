@@ -2,7 +2,7 @@
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-transparent text-zinc-100">
+    <main className="min-h-screen bg-transparent text-strong">
       {/* background glow */}
       <div className="pointer-events-none fixed inset-0 opacity-60">
         <div className="absolute -top-24 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-white/10 blur-3xl" />
@@ -19,7 +19,7 @@ export default function AboutPage() {
             Built to be quiet, reliable, and real
           </h1>
 
-          <p className="mt-4 text-sm leading-relaxed text-white/65 max-w-2xl">
+          <p className="mt-4 text-sm leading-relaxed text-muted max-w-2xl">
             Soundscape is a deterministic ambient sound generator.
             It creates calm, realistic soundscapes from real recordings — without accounts,
             subscriptions, or attention-seeking features.
@@ -30,12 +30,12 @@ export default function AboutPage() {
         <section className="glass-panel mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">What Soundscape is</h2>
 
-          <p className="mt-4 text-sm text-white/65 leading-relaxed">
+          <p className="mt-4 text-sm text-muted leading-relaxed">
             Soundscape is a utility. You choose a mood, generate a mix, and export what you need.
             The system behaves the same every time, and nothing changes unless you change it.
           </p>
 
-          <p className="mt-4 text-sm text-white/65 leading-relaxed">
+          <p className="mt-4 text-sm text-muted leading-relaxed">
             Playback is free. Exporting creates a licensed audio file you can use in your projects.
             No profiles, no subscriptions, no hidden behavior.
           </p>
@@ -45,21 +45,21 @@ export default function AboutPage() {
         <section className="glass-panel mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">Design principles</h2>
 
-          <ul className="mt-6 space-y-4 text-sm text-white/65">
+          <ul className="mt-6 space-y-4 text-sm text-muted">
             <li>
-              <span className="font-medium text-white/80">Low effort over cleverness</span><br />
+              <span className="font-medium text-app">Low effort over cleverness</span><br />
               The system should work without configuration or explanation.
             </li>
             <li>
-              <span className="font-medium text-white/80">Determinism over randomness</span><br />
+              <span className="font-medium text-app">Determinism over randomness</span><br />
               The same inputs always produce the same result.
             </li>
             <li>
-              <span className="font-medium text-white/80">Silence over dashboards</span><br />
+              <span className="font-medium text-app">Silence over dashboards</span><br />
               No accounts to manage. No metrics to watch.
             </li>
             <li>
-              <span className="font-medium text-white/80">Shipping over optimizing</span><br />
+              <span className="font-medium text-app">Shipping over optimizing</span><br />
               Real output matters more than theoretical perfection.
             </li>
           </ul>
@@ -69,17 +69,17 @@ export default function AboutPage() {
         <section className="glass-panel mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">Real recordings first</h2>
 
-          <p className="mt-4 text-sm text-white/65 leading-relaxed">
+          <p className="mt-4 text-sm text-muted leading-relaxed">
             Many ambient tools rely entirely on generated audio.
             Soundscape does not.
           </p>
 
-          <p className="mt-4 text-sm text-white/65 leading-relaxed">
+          <p className="mt-4 text-sm text-muted leading-relaxed">
             Real-world recordings — wind, water, fire, insects — carry imperfections that synthetic
             audio often removes. Those imperfections are part of what makes a soundscape feel believable.
           </p>
 
-          <p className="mt-4 text-sm text-white/65 leading-relaxed">
+          <p className="mt-4 text-sm text-muted leading-relaxed">
             Soundscape curates reality instead of sterilizing it.
           </p>
         </section>
@@ -88,11 +88,11 @@ export default function AboutPage() {
         <section className="glass-panel mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">Deterministic by design</h2>
 
-          <p className="mt-4 text-sm text-white/65 leading-relaxed">
+          <p className="mt-4 text-sm text-muted leading-relaxed">
             When you generate a soundscape, the system produces a specific result — not a suggestion.
           </p>
 
-          <p className="mt-4 text-sm text-white/65 leading-relaxed">
+          <p className="mt-4 text-sm text-muted leading-relaxed">
             Exports include a small recipe file that describes the mix.
             This makes soundscapes reproducible, debuggable, and stable over time.
           </p>
@@ -102,7 +102,7 @@ export default function AboutPage() {
         <section className="glass-panel mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">What Soundscape is not</h2>
 
-          <ul className="mt-6 space-y-2 text-sm text-white/65">
+          <ul className="mt-6 space-y-2 text-sm text-muted">
             <li>• A DAW or music production tool</li>
             <li>• A generative music feed</li>
             <li>• A subscription platform</li>
@@ -115,19 +115,19 @@ export default function AboutPage() {
         <section className="glass-panel mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">Privacy and growth</h2>
 
-          <p className="mt-4 text-sm text-white/65 leading-relaxed">
+          <p className="mt-4 text-sm text-muted leading-relaxed">
             Soundscape does not track usage and does not require a traditional account.
             Purchases are linked to an email address so credits can always be restored.
           </p>
 
-          <p className="mt-4 text-sm text-white/65 leading-relaxed">
+          <p className="mt-4 text-sm text-muted leading-relaxed">
             The asset library grows over time as new real-world recordings are added.
             Growth is intentional and curated, not algorithmic.
           </p>
         </section>
 
         {/* CLOSING */}
-        <section className="mt-10 text-xs text-white/45">
+        <section className="mt-10 text-xs text-faint">
           Soundscape is built to be boring to maintain and pleasant to use.<br />
           If that sounds like your kind of tool, you’re in the right place.
         </section>
@@ -135,3 +135,5 @@ export default function AboutPage() {
     </main>
   );
 }
+
+

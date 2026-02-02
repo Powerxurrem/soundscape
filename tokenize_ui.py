@@ -51,6 +51,49 @@ def ensure_border_keyword(classes: list[str]) -> list[str]:
         return ["border"] + classes
     return classes
 
+def tokenize_buttons(classes: list[str]) -> tuple[list[str], str | None]:
+    s = set(classes)
+
+    # already tokenized
+    if any(c in s for c in ("btn-glass", "btn-glass-secondary")):
+        return classes, None
+
+    # Hard match (exact recipes)
+    def contains_all(req: list[str]) -> bool:
+        return all(r in s for r in req)
+
+    if contains_all(BTN_GLASS):
+        new_cls = [c for c in classes if c not in BTN_GLASS]
+        new_cls.insert(0, "btn-glass")
+        return new_cls, "btn-glass"
+
+    if contains_all(BTN_GLASS_SECONDARY):
+        new_cls = [c for c in classes if c not in BTN_GLASS_SECONDARY]
+        new_cls.insert(0, "btn-glass-secondary")
+        return new_cls, "btn-glass-secondary"
+
+    # Soft match (handles px/py/border/hover variance)
+    is_buttonish = any(c.startswith("px-") for c in s) and any(c.startswith("py-") for c in s)
+    is_buttonish = is_buttonish and any(c.startswith("hover:") for c in s)
+    is_buttonish = is_buttonish and ("rounded-xl" in s or any(c.startswith("rounded-") for c in s))
+    is_buttonish = is_buttonish and "border" in s
+
+    if not is_buttonish:
+        return classes, None
+
+    # Decide primary vs secondary by background style
+    bg = next((c for c in classes if c.startswith("bg-white/") or c.startswith("bg-white/[")), None)
+    hover = next((c for c in classes if c.startswith("hover:bg-white")), None)
+
+    if bg in {"bg-white/10", "bg-white/15", "bg-white/[0.10]"} or (hover in {"hover:bg-white/15", "hover:bg-white/20"}):
+        return ["btn-glass"], "btn-glass"
+
+    # Default to secondary
+    if bg in {"bg-white/[0.03]", "bg-white/[0.04]"} or (hover in {"hover:bg-white/[0.06]", "hover:bg-white/[0.08]"}):
+        return ["btn-glass-secondary"], "btn-glass-secondary"
+
+    # Fallback: primary
+    return ["btn-glass"], "btn-glass"
 
 def tokenize_glass(classes: list[str]) -> tuple[list[str], str | None]:
     cls = classes
@@ -101,82 +144,60 @@ def tokenize_glass(classes: list[str]) -> tuple[list[str], str | None]:
     new_cls.insert(0, chosen)
     return new_cls, chosen
 
-
-
-def tokenize_buttons(classes: list[str]) -> tuple[list[str], str | None]:
+def maybe_add_glass_token(classes: list[str]) -> tuple[list[str], str | None]:
     s = set(classes)
 
-    # already tokenized
-    if any(c in s for c in ("btn-glass", "btn-glass-secondary")):
+    if any(t in s for t in ("glass-panel", "glass-surface", "glass-inset", "pill-glass")):
         return classes, None
 
-    # Hard match (exact recipes)
-    def contains_all(req: list[str]) -> bool:
-        return all(r in s for r in req)
-
-    if contains_all(BTN_GLASS):
-        new_cls = [c for c in classes if c not in BTN_GLASS]
-        new_cls.insert(0, "btn-glass")
-        return new_cls, "btn-glass"
-
-    if contains_all(BTN_GLASS_SECONDARY):
-        new_cls = [c for c in classes if c not in BTN_GLASS_SECONDARY]
-        new_cls.insert(0, "btn-glass-secondary")
-        return new_cls, "btn-glass-secondary"
-
-    # Soft match (handles px/py/border/hover variance)
-    is_buttonish = any(c.startswith("px-") for c in s) and any(c.startswith("py-") for c in s)
-    is_buttonish = is_buttonish and any(c.startswith("hover:") for c in s)
-    is_buttonish = is_buttonish and ("rounded-xl" in s or any(c.startswith("rounded-") for c in s))
-    is_buttonish = is_buttonish and "border" in s
-
-    if not is_buttonish:
+    if any(c.startswith("hover:") for c in s) and any(c.startswith("px-") for c in s) and any(c.startswith("py-") for c in s):
         return classes, None
 
-    # Decide primary vs secondary by background style
-    bg = next((c for c in classes if c.startswith("bg-white/") or c.startswith("bg-white/[")), None)
-    hover = next((c for c in classes if c.startswith("hover:bg-white")), None)
+    has_border = "border" in s or any(c.startswith("border-") for c in s)
+    has_round = any(c.startswith("rounded-") for c in s)
+    has_translucent_bg = any(
+        c.startswith("bg-white/") or c.startswith("bg-white/[") or c.startswith("bg-black/")
+        for c in s
+    )
 
-    if bg in {"bg-white/10", "bg-white/15", "bg-white/[0.10]"} or (hover in {"hover:bg-white/15", "hover:bg-white/20"}):
-        return ["btn-glass"], "btn-glass"
+    if has_border and has_round and has_translucent_bg:
+        return ["glass-panel"] + classes, "glass-panel"
 
-    # Default to secondary
-    if bg in {"bg-white/[0.03]", "bg-white/[0.04]"} or (hover in {"hover:bg-white/[0.06]", "hover:bg-white/[0.08]"}):
-        return ["btn-glass-secondary"], "btn-glass-secondary"
+    if has_border and has_round and not has_translucent_bg:
+        return ["glass-panel"] + classes, "glass-panel"
 
-    # Fallback: primary
-    return ["btn-glass"], "btn-glass"
+    return classes, None
+
 
 def process_class_string(s: str) -> tuple[str, list[str]]:
     classes = ensure_border_keyword(s.split())
     changes: list[str] = []
 
-    # --- STEP 2: normalize blur everywhere (tokens own blur) ---
-    before = len(classes)
-    classes = [c for c in classes if not c.startswith("backdrop-blur")]
-    if len(classes) != before:
-        changes.append("removed: backdrop-blur*")
-
-    # buttons first (more specific)
+    # buttons first
     classes2, btn = tokenize_buttons(classes)
     if btn:
         changes.append(f"token: {btn}")
         classes = classes2
 
-    # glass surfaces/panels
+    # NEW: add missing glass token to panel-like blocks
+    classes2, added = maybe_add_glass_token(classes)
+    if added:
+        changes.append(f"added: {added}")
+        classes = classes2
+
+    # glass surfaces/panels tokenization (your existing logic)
     classes2, tok = tokenize_glass(classes)
     if tok:
         changes.append(f"token: {tok}")
         classes = classes2
 
-    # pill token (common badge style)
+    # pill token (your existing logic)
     sset = set(classes)
     if "rounded-full" in sset and any(c.startswith("px-") for c in classes) and any(c.startswith("py-") for c in classes):
         if any(c.startswith("bg-white/") or c.startswith("bg-white/[") for c in classes) and any(c.startswith("border-white/") for c in classes):
             return "pill-glass", ["token: pill-glass"]
 
     return " ".join(classes), changes
-
 
 def tokenize_file(text: str) -> tuple[str, list[str]]:
     changes: list[str] = []
@@ -187,9 +208,14 @@ def tokenize_file(text: str) -> tuple[str, list[str]]:
         if ch and updated != original:
             changes.extend(ch)
         return f'className="{updated}"'
+    
+    
 
     new_text = CLASSNAME_RE.sub(repl, text)
     return new_text, changes
+    if "backdrop-blur" in original:
+        # We don't fail yet; just report loudly.
+        pass
 
 
 def main() -> None:

@@ -12,11 +12,8 @@ export default function AboutPage() {
 
       <div className="relative mx-auto max-w-4xl px-6 py-14">
         {/* HERO */}
-        <section className="glass-panel rounded-3xl p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_40px_120px_rgba(0,0,0,0.65)]">
-          <div className="pill-glass">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400/90" />
-            About Soundscape
-          </div>
+        <section className="glass-panel rounded-3xl p-8 ,0_40px_120px_rgba(0,0,0,0.65)]">
+
 
           <h1 className="mt-4 text-4xl font-semibold tracking-tight">
             Built to be quiet, reliable, and real

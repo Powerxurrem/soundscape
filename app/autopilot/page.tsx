@@ -521,7 +521,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
 
   return (
     <main className="mx-auto max-w-4xl p-6">
-      <div className="rounded-2xl border border-white/15 p-5">
+      <div className="glass-panel rounded-2xl border border-white/15 p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-xl font-semibold">Autopilot</h1>
@@ -550,7 +550,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
           <div>
             <label className="text-xs text-white/55">Mood</label>
             <select
-              className="mt-1 w-full rounded-lg border border-white/15 px-2 py-2 text-sm"
+              className="glass-panel mt-1 w-full rounded-lg border border-white/15 px-2 py-2 text-sm"
               value={mood}
               onChange={(e) => setMood(e.target.value as Mood)}
             >
@@ -564,7 +564,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
           <div>
             <label className="text-xs text-white/55">Length</label>
             <select
-              className="mt-1 w-full rounded-lg border border-white/15 px-2 py-2 text-sm"
+              className="glass-panel mt-1 w-full rounded-lg border border-white/15 px-2 py-2 text-sm"
               value={lengthMin}
               onChange={(e) => setLengthMin(Number(e.target.value) as 10 | 30 | 60)}
             >
@@ -578,7 +578,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
             <label className="text-xs text-white/55">Seed</label>
             <div className="mt-1 flex gap-2">
               <input
-                className="w-full rounded-lg border border-white/15 px-2 py-2 text-sm"
+                className="glass-panel w-full rounded-lg border border-white/15 px-2 py-2 text-sm"
                 value={seed}
                 onChange={(e) => setSeed(e.target.value)}
               />
@@ -615,7 +615,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
           {tracks.length > 0 && (
             <div className="mt-3 space-y-2">
               {tracks.map((t) => (
-                <div key={t.id} className="flex items-center justify-between rounded-lg border border-white/15 px-3 py-2">
+                <div key={t.id} className="glass-panel flex items-center justify-between rounded-lg border border-white/15 px-3 py-2">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <div className="font-medium">{t.name}</div>
@@ -649,14 +649,14 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
         {recipe && (
           <div className="mt-5">
             <div className="font-medium">Recipe</div>
-            <pre className="mt-2 whitespace-pre-wrap rounded-xl border border-white/15 bg-black/40 p-4 text-xs text-gray-200">
+            <pre className="glass-panel mt-2 whitespace-pre-wrap rounded-xl border border-white/15 bg-black/40 p-4 text-xs text-gray-200">
               {recipe}
             </pre>
           </div>
         )}
 
         {/* EXPORT */}
-        <div className="mt-6 rounded-2xl border border-white/15 p-5">
+        <div className="glass-panel mt-6 rounded-2xl border border-white/15 p-5">
           <h2 className="text-lg font-semibold">Export</h2>
           <p className="mt-1 text-sm text-white/55">
             {EXPORT_TEMPORARILY_UNLOCKED

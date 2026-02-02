@@ -462,7 +462,7 @@ export default function MixerPage() {
               <div className="mt-2 text-xs text-white/55">🔒 Commercial license required to export.</div>
             </div>
 
-            <button className="w-full rounded-lg border border-white/15 px-4 py-2 text-sm text-white/45" disabled>
+            <button className="glass-panel w-full rounded-lg border border-white/15 px-4 py-2 text-sm text-white/45" disabled>
               Export (Locked)
             </button>
 

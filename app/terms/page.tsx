@@ -19,13 +19,8 @@ export default function TermsPage() {
       </div>
 
       <div className="mx-auto w-full max-w-4xl px-6 py-12">
-        <section
-          className={cx(
-            "glass-surface rounded-[28px]",
-            "shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_30px_120px_rgba(0,0,0,0.9)]",
-            "p-8 md:p-10"
-          )}
-        >
+<section className="glass-surface elev-3 rounded-[28px] p-8 md:p-10">
+
           <div className="pill-glass">
             <span className="h-2 w-2 rounded-full bg-emerald-400/80" />
             <span>Private beta • Legal</span>
@@ -213,7 +208,8 @@ export default function TermsPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-white/10 bg-black/30 p-6">
+<section className="glass-inset rounded-2xl p-6">
+
       <h2 className="text-base font-semibold text-zinc-100">{title}</h2>
       <div className="mt-3">{children}</div>
     </section>

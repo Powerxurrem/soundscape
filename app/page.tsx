@@ -79,14 +79,15 @@ export default function Home() {
     <main className="min-h-screen bg-transparent text-zinc-100">
       {/* background glow */}
       <div className="pointer-events-none fixed inset-0 opacity-10">
-        <div className="absolute -top-24 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-white/5 blur-3xl" />
-        <div className="absolute top-[35%] left-[10%] h-[360px] w-[360px] rounded-full bg-white/5 blur-3xl" />
-        <div className="absolute top-[55%] right-[12%] h-[420px] w-[420px] rounded-full bg-white/5 blur-3xl" />
+        <div className="absolute -top-24 left-1/2 h-[420px] w-[820px] -translate-x-1/2 blur-3xl" />
+
+
       </div>
 
       <div className="relative mx-auto max-w-5xl px-6 py-14">
         {/* HERO */}
-        <section className="glass-surface rounded-3xl p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_40px_120px_rgba(0,0,0,0.65)]">
+      <section className="glass-surface elev-2 rounded-3xl p-8">
+
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div className="max-w-2xl">
               <div className="glass-panel inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs text-white/70">
@@ -96,8 +97,7 @@ export default function Home() {
 
               <h1 className="mt-4 text-4xl font-semibold tracking-tight">Soundscape</h1>
               <p className="mt-3 text-sm leading-relaxed text-white/70">
-                Calm, realistic ambient soundscapes — built to be deterministic, offline-friendly,
-                and boring to maintain.
+                Calm, realistic ambient soundscapes — built to be deterministic &  offline-friendly.
               </p>
 
               <div className="mt-6 flex flex-wrap gap-3">
@@ -109,7 +109,7 @@ export default function Home() {
                 </a>
                 <a
                   href="/mixer"
-                  className="glass-panel rounded-xl px-5 py-2.5 text-sm hover:bg-white/[0.06]"
+                  className="btn-glass-secondary"
                 >
                   Open Mixer
                 </a>
@@ -144,7 +144,7 @@ export default function Home() {
         </section>
 
         {/* DEMO */}
-        <section className="glass-surface mt-10 rounded-3xl p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_40px_120px_rgba(0,0,0,0.65)]">
+        <section className="glass-surface mt-10 rounded-3xl p-8 ,0_40px_120">
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">Demo</h2>

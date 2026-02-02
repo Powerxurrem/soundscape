@@ -101,13 +101,11 @@ export default function TripsPage() {
     <main className="min-h-screen bg-transparent text-zinc-100">
       {/* page glow */}
       <div className="pointer-events-none fixed inset-0 opacity-60">
-        <div className="absolute -top-24 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute top-[35%] left-[10%] h-[360px] w-[360px] rounded-full bg-white/5 blur-3xl" />
-        <div className="absolute top-[55%] right-[12%] h-[420px] w-[420px] rounded-full bg-white/5 blur-3xl" />
+        <div className="absolute -top-24 left-1/2 h-[420px] w-[820px] -translate-x-1/2 blur-3xl" />
       </div>
 
       <div className="relative mx-auto max-w-5xl px-6 py-14">
-        <section className="glass-panel rounded-3xl p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_40px_120px_rgba(0,0,0,0.65)]">
+        <section className="glass-panel rounded-3xl p-8 elev-2">
           <div className="pill-glass">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400/90" />
             Trips • field recording plan
@@ -138,7 +136,7 @@ export default function TripsPage() {
                   <>
                     <div
                       aria-hidden
-                      className={['absolute inset-0 bg-cover bg-center blur-[2px] scale-105 transition-opacity duration-300',
+                      className={['absolute inset-0 bg-cover bg-center scale-105 transition-opacity duration-300',
                         isActive ? 'opacity-45' : 'opacity-28',].join(' ')}
                       style={{ backgroundImage: `url(${t.image})` }}
                     />
@@ -175,7 +173,7 @@ export default function TripsPage() {
                     {t.focusTags.map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-xs text-white/60"
+                        className="glass-panel rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-xs text-white/60"
                       >
                         {tag}
                       </span>
@@ -209,12 +207,12 @@ export default function TripsPage() {
             aria-label="Close"
           />
 
-          <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/15 bg-black/80 p-6 shadow-[0_40px_160px_rgba(0,0,0,0.85)]">
+          <div className="glass-panel relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/15 bg-black/80 p-6 elev-3">
             {activeTrip.image && (
               <>
                 <div
                   aria-hidden
-                  className="absolute inset-0 bg-cover bg-center opacity-90 blur-[0px] scale-100" 
+                  className="absolute inset-0 bg-cover bg-center opacity-90 scale-100" 
                   style={{ backgroundImage: `url(${activeTrip.image})` }}
                 />
                 <div aria-hidden className="absolute inset-0 bg-black/70" />
@@ -253,7 +251,7 @@ export default function TripsPage() {
                     {activeTrip.focusTags.map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-xs text-white/60"
+                        className="glass-panel rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-xs text-white/60"
                       >
                         {tag}
                       </span>
@@ -273,7 +271,7 @@ export default function TripsPage() {
 
               <div className="glass-panel mt-5 rounded-2xl p-5">
                 <div className="text-sm font-medium text-white/80">Target assets</div>
-                <div className="mt-3 overflow-hidden rounded-xl border border-white/10">
+                <div className="glass-panel mt-3 overflow-hidden rounded-xl border border-white/10">
                   <div className="grid grid-cols-12 bg-black/30 px-4 py-2 text-xs text-white/55">
                     <div className="col-span-2">Type</div>
                     <div className="col-span-3">Category</div>

@@ -248,10 +248,10 @@ export default function MixerPage() {
     <main className="mx-auto max-w-6xl p-6">
       <div className="grid grid-cols-12 gap-6">
         {/* LEFT: Library */}
-        <aside className="col-span-12 md:col-span-4 rounded-xl border p-4">
+        <aside className="col-span-12 md:col-span-4 rounded-3xl border border-white/15 bg-white/[0.04] p-6 backdrop-blur-md">
           <h2 className="text-lg font-semibold">Library</h2>
           <input
-            className="mt-3 w-full rounded-lg border px-3 py-2 text-sm"
+            className="mt-3 w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-sm text-white/80 placeholder:text-white/40 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20"
             placeholder="Search…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -262,7 +262,7 @@ export default function MixerPage() {
             <div className="flex min-h-0 flex-1 flex-col">
               <div className="mb-2 flex items-baseline justify-between">
                 <div className="text-sm font-semibold">Loops</div>
-                <div className="text-xs text-gray-600">Total {loopsList.length}</div>
+                <div className="text-xs text-white/55">Total {loopsList.length}</div>
               </div>
               <div className="min-h-0 flex-1 overflow-y-auto pr-1">
                 <div className="space-y-2">
@@ -270,14 +270,14 @@ export default function MixerPage() {
                     <button
                       key={item.id}
                       onClick={() => addToMix(item)}
-                      className="w-full rounded-lg border px-3 py-2 text-left text-sm hover:bg-gray-50"
+                      className="btn-glass"
                     >
                       <div className="font-medium">{item.name}</div>
-                      <div className="text-xs text-gray-600">Loop</div>
+                      <div className="text-xs text-white/55">Loop</div>
                     </button>
                   ))}
                   {loopsList.length === 0 && (
-                    <div className="text-xs text-gray-600">No loop items.</div>
+                    <div className="text-xs text-white/55">No loop items.</div>
                   )}
                 </div>
               </div>
@@ -286,7 +286,7 @@ export default function MixerPage() {
             <div className="flex min-h-0 flex-1 flex-col">
               <div className="mb-2 flex items-baseline justify-between">
                 <div className="text-sm font-semibold">Events</div>
-                <div className="text-xs text-gray-600">Total {eventsList.length}</div>
+                <div className="text-xs text-white/55">Total {eventsList.length}</div>
               </div>
               <div className="min-h-0 flex-1 overflow-y-auto pr-1">
                 <div className="space-y-2">
@@ -294,14 +294,14 @@ export default function MixerPage() {
                     <button
                       key={item.id}
                       onClick={() => addToMix(item)}
-                      className="w-full rounded-lg border px-3 py-2 text-left text-sm hover:bg-gray-50"
+                      className="btn-glass"
                     >
                       <div className="font-medium">{item.name}</div>
-                      <div className="text-xs text-gray-600">Event</div>
+                      <div className="text-xs text-white/55">Event</div>
                     </button>
                   ))}
                   {eventsList.length === 0 && (
-                    <div className="text-xs text-gray-600">No event items.</div>
+                    <div className="text-xs text-white/55">No event items.</div>
                   )}
                 </div>
               </div>
@@ -310,28 +310,28 @@ export default function MixerPage() {
         </aside>
 
         {/* CENTER: Mixer */}
-        <section className="col-span-12 md:col-span-5 rounded-xl border p-4">
+        <section className="col-span-12 md:col-span-5 rounded-3xl border border-white/15 bg-white/[0.04] p-6 backdrop-blur-md">
           <h1 className="text-lg font-semibold">Mixer</h1>
-          <p className="mt-1 text-sm text-gray-600">Ugly is correct. Logic first.</p>
+          <p className="mt-1 text-sm text-white/55">Ugly is correct. Logic first.</p>
 
           <div className="mt-4 space-y-3">
             {tracks.map((t) => (
-              <div key={t.id} className="rounded-xl border p-3">
+              <div key={t.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
                       <div className="font-medium">{t.name}</div>
-                      <span className="text-xs text-gray-600">({t.type})</span>
+                      <span className="text-xs text-white/55">({t.type})</span>
                       <span className="text-xs">{assetStatus[t.id] ? '🟢' : '🔴'}</span>
                     </div>
-                    <div className="mt-1 text-xs text-gray-600">
+                    <div className="mt-1 text-xs text-white/55">
                       {folderIdFor(t)}/{t.assetId}.mp3
                     </div>
                   </div>
 
                   <button
                     onClick={() => removeTrack(t.id)}
-                    className="rounded-lg border px-2 py-1 text-xs hover:bg-gray-50"
+                    className="btn-glass"
                   >
                     Remove
                   </button>
@@ -339,14 +339,14 @@ export default function MixerPage() {
 
                 {/* Asset selector */}
                 <div className="mt-3">
-                  <label className="text-xs text-gray-600">Asset</label>
+                  <label className="text-xs text-white/55">Asset</label>
                   <select
-                    className="mt-1 w-full rounded-lg border border-white/15151520 bg-black text-white px-2 py-2 text-sm"
+                    className="mt-1 w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-sm text-white/80 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20"
                     value={t.assetId}
                     onChange={(e) => updateTrack(t.id, { assetId: e.target.value })}
                   >
                     {LIBRARY.find((x) => x.id === t.libraryId)?.assets.map((a) => (
-                      <option key={a.id} value={a.id} className="bg-black text-white">
+                      <option key={a.id} value={a.id} className="bg-white/[0.06] text-white/80">
                         {a.label}
                       </option>
                     ))}
@@ -355,7 +355,7 @@ export default function MixerPage() {
 
                 {/* Volume */}
                 <div className="mt-3 flex items-center gap-3">
-                  <span className="text-xs text-gray-600 w-14">Vol</span>
+                  <span className="text-xs text-white/55 w-14">Vol</span>
                   <input
                     type="range"
                     className="flex-1"
@@ -365,7 +365,7 @@ export default function MixerPage() {
                     value={t.volume}
                     onChange={(e) => updateTrack(t.id, { volume: Number(e.target.value) })}
                   />
-                  <span className="text-xs text-gray-600 w-10 text-right">
+                  <span className="text-xs text-white/55 w-10 text-right">
                     {Math.round(t.volume * 100)}%
                   </span>
                 </div>
@@ -374,33 +374,33 @@ export default function MixerPage() {
                 {t.type === 'event' && (
                   <div className="mt-3 grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-gray-600">Rate</label>
+                      <label className="text-xs text-white/55">Rate</label>
                       <select
-                        className="mt-1 w-full rounded-lg border border-white/15151520 bg-black text-white px-2 py-2 text-sm"
+                        className="mt-1 w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-sm text-white/80 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20"
                         value={t.ratePreset}
                         onChange={(e) =>
                           updateTrack(t.id, { ratePreset: e.target.value as MixTrack['ratePreset'] })
                         }
                       >
-                        <option className="bg-black text-white">Rare</option>
-                        <option className="bg-black text-white">Medium</option>
-                        <option className="bg-black text-white">Often</option>
-                        <option className="bg-black text-white">Very Often</option>
+                        <option className="bg-white/[0.06] text-white/80">Rare</option>
+                        <option className="bg-white/[0.06] text-white/80">Medium</option>
+                        <option className="bg-white/[0.06] text-white/80">Often</option>
+                        <option className="bg-white/[0.06] text-white/80">Very Often</option>
                       </select>
                     </div>
 
                     <div>
-                      <label className="text-xs text-gray-600">Speed</label>
+                      <label className="text-xs text-white/55">Speed</label>
                       <select
-                        className="mt-1 w-full rounded-lg border border-white/15151520 bg-black text-white px-2 py-2 text-sm"
+                        className="mt-1 w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-sm text-white/80 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20"
                         value={t.rateSpeed}
                         onChange={(e) =>
                           updateTrack(t.id, { rateSpeed: Number(e.target.value) as MixTrack['rateSpeed'] })
                         }
                       >
-                        <option value={0.5} className="bg-black text-white">0.5×</option>
-                        <option value={1} className="bg-black text-white">1×</option>
-                        <option value={2} className="bg-black text-white">2×</option>
+                        <option value={0.5} className="bg-white/[0.06] text-white/80">0.5×</option>
+                        <option value={1} className="bg-white/[0.06] text-white/80">1×</option>
+                        <option value={2} className="bg-white/[0.06] text-white/80">2×</option>
                       </select>
                     </div>
                   </div>
@@ -411,16 +411,16 @@ export default function MixerPage() {
 
           {/* AUDIO CONTROLS */}
           <div className="mt-6 flex gap-3">
-            <button onClick={activateAudio} className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50">
+            <button onClick={activateAudio} className="btn-glass">
               {audioOn ? 'Audio Active' : 'Activate Audio'}
             </button>
 
-            <button onClick={stopAudio} className="rounded-lg border px-4 py-2 text-sm hover:bg-gray-50">
+            <button onClick={stopAudio} className="btn-glass">
               Stop
             </button>
 
             <div className="ml-auto flex items-center gap-3">
-              <span className="text-xs text-gray-600">Master</span>
+              <span className="text-xs text-white/55">Master</span>
               <input
                 type="range"
                 className="w-40"
@@ -435,38 +435,38 @@ export default function MixerPage() {
         </section>
 
         {/* RIGHT: Export */}
-        <aside className="col-span-12 md:col-span-3 rounded-xl border p-4">
+        <aside className="col-span-12 md:col-span-3 rounded-3xl border border-white/15 bg-white/[0.04] p-6 backdrop-blur-md">
           <h2 className="text-lg font-semibold">Export</h2>
-          <p className="mt-1 text-sm text-gray-600">Export is locked on Personal.</p>
+          <p className="mt-1 text-sm text-white/55">Export is locked on Personal.</p>
 
           <div className="mt-4 space-y-3">
             <div>
-              <label className="text-xs text-gray-600">Duration</label>
-              <select className="mt-1 w-full rounded-lg border border-white/15151520 bg-black text-white px-2 py-2 text-sm">
-                <option className="bg-black text-white">10 min</option>
-                <option className="bg-black text-white">30 min</option>
-                <option className="bg-black text-white">60 min (max)</option>
+              <label className="text-xs text-white/55">Duration</label>
+              <select className="mt-1 w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-sm text-white/80 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20">
+                <option className="bg-white/[0.06] text-white/80">10 min</option>
+                <option className="bg-white/[0.06] text-white/80">30 min</option>
+                <option className="bg-white/[0.06] text-white/80">60 min (max)</option>
               </select>
             </div>
 
             <div>
-              <label className="text-xs text-gray-600">Format</label>
+              <label className="text-xs text-white/55">Format</label>
               <div className="mt-1 grid grid-cols-2 gap-2">
-                <button className="rounded-lg border px-3 py-2 text-sm text-gray-400" disabled>
+                <button className="rounded-lg border border-white/15 bg-white/[0.03] px-3 py-2 text-sm text-white/45" disabled>
                   MP3
                 </button>
-                <button className="rounded-lg border px-3 py-2 text-sm text-gray-400" disabled>
+                <button className="rounded-lg border border-white/15 bg-white/[0.03] px-3 py-2 text-sm text-white/45" disabled>
                   WAV
                 </button>
               </div>
-              <div className="mt-2 text-xs text-gray-600">🔒 Commercial license required to export.</div>
+              <div className="mt-2 text-xs text-white/55">🔒 Commercial license required to export.</div>
             </div>
 
-            <button className="w-full rounded-lg border px-4 py-2 text-sm text-gray-400" disabled>
+            <button className="w-full rounded-lg border border-white/15 px-4 py-2 text-sm text-white/45" disabled>
               Export (Locked)
             </button>
 
-            <div className="rounded-lg border border-dashed p-3 text-xs text-gray-600">
+            <div className="rounded-xl border border-dashed border-white/15 bg-white/[0.03] p-4 text-xs text-white/55">
               <div className="font-medium">Commercial unlock includes:</div>
               <ul className="mt-2 list-disc pl-4 space-y-1">
                 <li>MP3 + WAV exports</li>

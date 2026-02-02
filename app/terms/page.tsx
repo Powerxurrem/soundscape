@@ -21,12 +21,12 @@ export default function TermsPage() {
       <div className="mx-auto w-full max-w-4xl px-6 py-12">
         <section
           className={cx(
-            "rounded-[28px] border border-white/15151510 bg-white/[0.04] backdrop-blur-xl",
+            "rounded-[28px] border border-white/10 bg-white/[0.04] backdrop-blur-xl",
             "shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_30px_120px_rgba(0,0,0,0.9)]",
             "p-8 md:p-10"
           )}
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/15151510 bg-white/5 px-3 py-1 text-xs text-zinc-300">
+          <div className="pill-glass">
             <span className="h-2 w-2 rounded-full bg-emerald-400/80" />
             <span>Private beta • Legal</span>
           </div>
@@ -213,7 +213,7 @@ export default function TermsPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-white/15151510 bg-black/30 p-6 backdrop-blur-xl">
+    <section className="rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-xl">
       <h2 className="text-base font-semibold text-zinc-100">{title}</h2>
       <div className="mt-3">{children}</div>
     </section>

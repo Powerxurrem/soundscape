@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-black text-white">
+      <body className="bg-white/[0.06] text-white/80">
         {/* ===== Global background layers ===== */}
         {/* Aurora background */}
 <div
@@ -44,7 +44,7 @@ export default function RootLayout({
           <div className="mx-auto max-w-5xl px-6 py-4">
             <nav className="flex items-center justify-between">
               <div className="flex items-center gap-6 text-sm font-medium">
-                <a href="/" className="text-white  hover:opacity-80">Home</a>
+                <a href="/" className="text-white hover:opacity-80">Home</a>
                 <a href="/pricing" className="text-white/80 hover:text-white">Pricing</a>
                 <a href="/about" className="text-white/80 hover:text-white">About</a>
                 <a href="/trips" className="text-white/80 hover:text-white">Trips</a>

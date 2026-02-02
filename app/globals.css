@@ -28,7 +28,7 @@
   --glass-blur: 20px;
 
   /* base glass color (R G B) */
-  --glass-rgb: 225 169 240;
+  --glass-rgb: 90 140 255;
 
  /* glass optical knobs */
   --glass-saturate: 2;   /* 1 = neutral, >1 richer, <1 flatter */
@@ -46,11 +46,11 @@
   --glass-border-soft: rgb(255 255 255 / 0.3);
 
   /* per-tier base alpha (before master multiplier) */
-  --glass-fill-big-a: 0.14;
-  --glass-fill-section-a: 0.14;
-  --glass-fill-mini-a: 0.14;
-  --glass-fill-inset-a: 0.14;
-  --glass-fill-field-a: 0.14;
+  --glass-fill-big-a: 0.10 ;
+  --glass-fill-section-a: 0.10;
+  --glass-fill-mini-a: 0.10;
+  --glass-fill-inset-a: 0.10;
+  --glass-fill-field-a: 0.10;
 
   /* derived fills (color × transparency) */
   --glass-fill-big: rgb(var(--glass-rgb) / calc(var(--glass-fill-big-a) * var(--glass-alpha)));
@@ -60,7 +60,7 @@
   --glass-fill-field: rgb(var(--glass-rgb) / calc(var(--glass-fill-field-a) * var(--glass-alpha)));
 
   /* text color (R G B) */
-  --text-rgb: 245 225 255 ;
+  --text-rgb: 215 225 255;
 
   /* brightness tiers */
   --text-strong: rgb(var(--text-rgb) / 1.2);

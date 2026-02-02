@@ -35,6 +35,10 @@ BLUR_FIXES = [
     (re.compile(r"\bbackdrop-blur\b(?!-)"), "backdrop-blur-md"),
 ]
 
+BACKDROP_BLUR_RE = re.compile(
+    r'(?<![\\w-])backdrop-blur(?:-(?:sm|md|lg|xl|2xl))?(?![\\w-])'
+)
+
 # -----------------------
 # 2) Tokenization rules
 # -----------------------

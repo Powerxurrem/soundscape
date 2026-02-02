@@ -593,7 +593,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
           </div>
         </div>
 
-        <div className="mt-5 rounded-3xl border border-white/15 bg-white/[0.04] p-6 backdrop-blur-md">
+        <div className="glass-panel mt-5 rounded-3xl p-6">
           <div className="flex items-center justify-between">
             <div className="font-medium">Now Playing</div>
             <div className="flex items-center gap-3">
@@ -668,7 +668,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
             <div>
               <label className="text-xs text-white/55">Duration</label>
               <select
-                className="mt-1 w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-sm text-white/80 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-white/80 focus:outline-none focus:ring-2 focus:ring-white/20"
                 value={lengthMin}
                 onChange={(e) => setLengthMin(Number(e.target.value) as 10 | 30 | 60)}
               >
@@ -745,7 +745,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
 
             {exportMsg && <div className="text-xs text-white/55">{exportMsg}</div>}
 
-            <div className="rounded-xl border border-dashed border-white/15 bg-white/[0.03] p-4 text-xs text-white/55">
+            <div className="glass-panel rounded-xl border-dashed p-4 text-xs text-white/55">
               <div className="font-medium">Commercial unlock includes:</div>
               <ul className="mt-2 list-disc pl-4 space-y-1">
                 <li>MP3 + WAV exports</li>

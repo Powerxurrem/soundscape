@@ -39,7 +39,7 @@ export default function RootLayout({
 
 
         {/* ===== Header ===== */}
-        <header className="sticky top-0 z-50 bg-white/[0.04] backdrop-blur-md shadow-[0_1px_0_rgba(255,255,255,0.06)]">
+        <header className="sticky top-0 z-50 bg-white/[0.04] shadow-[0_1px_0_rgba(255,255,255,0.06)]">
 
           <div className="mx-auto max-w-5xl px-6 py-4">
             <nav className="flex items-center justify-between">

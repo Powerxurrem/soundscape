@@ -248,10 +248,10 @@ export default function MixerPage() {
     <main className="mx-auto max-w-6xl p-6">
       <div className="grid grid-cols-12 gap-6">
         {/* LEFT: Library */}
-        <aside className="col-span-12 md:col-span-4 rounded-3xl border border-white/15 bg-white/[0.04] p-6 backdrop-blur-md">
+        <aside className="glass-panel col-span-12 md:col-span-4 rounded-3xl p-6">
           <h2 className="text-lg font-semibold">Library</h2>
           <input
-            className="mt-3 w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-sm text-white/80 placeholder:text-white/40 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20"
+            className="glass-surface mt-3 w-full rounded-lg px-3 py-2 text-sm text-white/80 placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
             placeholder="Search…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -310,13 +310,13 @@ export default function MixerPage() {
         </aside>
 
         {/* CENTER: Mixer */}
-        <section className="col-span-12 md:col-span-5 rounded-3xl border border-white/15 bg-white/[0.04] p-6 backdrop-blur-md">
+        <section className="glass-panel col-span-12 md:col-span-5 rounded-3xl p-6">
           <h1 className="text-lg font-semibold">Mixer</h1>
           <p className="mt-1 text-sm text-white/55">Ugly is correct. Logic first.</p>
 
           <div className="mt-4 space-y-3">
             {tracks.map((t) => (
-              <div key={t.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+              <div key={t.id} className="glass-panel rounded-2xl p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
@@ -341,7 +341,7 @@ export default function MixerPage() {
                 <div className="mt-3">
                   <label className="text-xs text-white/55">Asset</label>
                   <select
-                    className="mt-1 w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-sm text-white/80 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20"
+                    className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-white/80 focus:outline-none focus:ring-2 focus:ring-white/20"
                     value={t.assetId}
                     onChange={(e) => updateTrack(t.id, { assetId: e.target.value })}
                   >
@@ -376,7 +376,7 @@ export default function MixerPage() {
                     <div>
                       <label className="text-xs text-white/55">Rate</label>
                       <select
-                        className="mt-1 w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-sm text-white/80 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20"
+                        className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-white/80 focus:outline-none focus:ring-2 focus:ring-white/20"
                         value={t.ratePreset}
                         onChange={(e) =>
                           updateTrack(t.id, { ratePreset: e.target.value as MixTrack['ratePreset'] })
@@ -392,7 +392,7 @@ export default function MixerPage() {
                     <div>
                       <label className="text-xs text-white/55">Speed</label>
                       <select
-                        className="mt-1 w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-sm text-white/80 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20"
+                        className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-white/80 focus:outline-none focus:ring-2 focus:ring-white/20"
                         value={t.rateSpeed}
                         onChange={(e) =>
                           updateTrack(t.id, { rateSpeed: Number(e.target.value) as MixTrack['rateSpeed'] })
@@ -435,14 +435,14 @@ export default function MixerPage() {
         </section>
 
         {/* RIGHT: Export */}
-        <aside className="col-span-12 md:col-span-3 rounded-3xl border border-white/15 bg-white/[0.04] p-6 backdrop-blur-md">
+        <aside className="glass-panel col-span-12 md:col-span-3 rounded-3xl p-6">
           <h2 className="text-lg font-semibold">Export</h2>
           <p className="mt-1 text-sm text-white/55">Export is locked on Personal.</p>
 
           <div className="mt-4 space-y-3">
             <div>
               <label className="text-xs text-white/55">Duration</label>
-              <select className="mt-1 w-full rounded-lg border border-white/15 bg-white/[0.06] px-3 py-2 text-sm text-white/80 backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-white/20">
+              <select className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-white/80 focus:outline-none focus:ring-2 focus:ring-white/20">
                 <option className="bg-white/[0.06] text-white/80">10 min</option>
                 <option className="bg-white/[0.06] text-white/80">30 min</option>
                 <option className="bg-white/[0.06] text-white/80">60 min (max)</option>
@@ -452,10 +452,10 @@ export default function MixerPage() {
             <div>
               <label className="text-xs text-white/55">Format</label>
               <div className="mt-1 grid grid-cols-2 gap-2">
-                <button className="rounded-lg border border-white/15 bg-white/[0.03] px-3 py-2 text-sm text-white/45" disabled>
+                <button className="glass-panel rounded-lg px-3 py-2 text-sm text-white/45" disabled>
                   MP3
                 </button>
-                <button className="rounded-lg border border-white/15 bg-white/[0.03] px-3 py-2 text-sm text-white/45" disabled>
+                <button className="glass-panel rounded-lg px-3 py-2 text-sm text-white/45" disabled>
                   WAV
                 </button>
               </div>
@@ -466,7 +466,7 @@ export default function MixerPage() {
               Export (Locked)
             </button>
 
-            <div className="rounded-xl border border-dashed border-white/15 bg-white/[0.03] p-4 text-xs text-white/55">
+            <div className="glass-panel rounded-xl border-dashed p-4 text-xs text-white/55">
               <div className="font-medium">Commercial unlock includes:</div>
               <ul className="mt-2 list-disc pl-4 space-y-1">
                 <li>MP3 + WAV exports</li>

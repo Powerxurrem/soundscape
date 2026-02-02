@@ -21,7 +21,7 @@ export default function TermsPage() {
       <div className="mx-auto w-full max-w-4xl px-6 py-12">
         <section
           className={cx(
-            "rounded-[28px] border border-white/10 bg-white/[0.04] backdrop-blur-xl",
+            "glass-surface rounded-[28px]",
             "shadow-[0_0_0_1px_rgba(255,255,255,0.02),0_30px_120px_rgba(0,0,0,0.9)]",
             "p-8 md:p-10"
           )}
@@ -213,7 +213,7 @@ export default function TermsPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-white/10 bg-black/30 p-6 backdrop-blur-xl">
+    <section className="rounded-2xl border border-white/10 bg-black/30 p-6">
       <h2 className="text-base font-semibold text-zinc-100">{title}</h2>
       <div className="mt-3">{children}</div>
     </section>

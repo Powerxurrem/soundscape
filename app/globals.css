@@ -23,28 +23,51 @@
    GLASS / UI TOKENS (Soundscape)
    Change these once, the whole app updates.
 -------------------------------------------------------- */
+/* -------------------------------------------------------
+   GLASS / UI TOKENS (Soundscape)
+   Change these once, the whole app updates.
+-------------------------------------------------------- */
 @layer components {
-  .glass-panel {
-    @apply backdrop-blur-md;
-  }
-
-  .glass-surface {
-    @apply backdrop-blur-md;
-  }
-
-  .glass-inset {
-    @apply backdrop-blur-md;
-  }
-
-  .pill-glass {
-    @apply backdrop-blur-md;
-  }
-
+  /* Core glass baseline: consistent blur everywhere */
+  .glass-panel,
+  .glass-surface,
+  .glass-inset,
+  .pill-glass,
   .btn-glass,
   .btn-glass-secondary {
     @apply backdrop-blur-md;
   }
+
+  /* Panels: main containers */
+  .glass-panel {
+    @apply border border-white/15 bg-white/[0.04];
+  }
+
+  /* Surfaces: slightly stronger prominence */
+  .glass-surface {
+    @apply border border-white/20 bg-white/[0.06];
+  }
+
+  /* Insets: subtle internal boxes */
+  .glass-inset {
+    @apply border border-white/10 bg-white/[0.03];
+  }
+
+  /* Pills / badges */
+  .pill-glass {
+    @apply inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1 text-xs text-white/80;
+  }
+
+  /* Buttons */
+  .btn-glass {
+    @apply rounded-xl border border-white/20 bg-white/10 px-5 py-2.5 text-sm text-white/90 hover:bg-white/15;
+  }
+
+  .btn-glass-secondary {
+    @apply rounded-xl border border-white/15 bg-white/[0.03] px-5 py-2.5 text-sm text-white/90 hover:bg-white/[0.06];
+  }
 }
+
 
 
 body {

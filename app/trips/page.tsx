@@ -209,7 +209,7 @@ export default function TripsPage() {
             aria-label="Close"
           />
 
-          <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/15 bg-black/80 p-6 shadow-[0_40px_160px_rgba(0,0,0,0.85)] backdrop-blur-md">
+          <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/15 bg-black/80 p-6 shadow-[0_40px_160px_rgba(0,0,0,0.85)]">
             {activeTrip.image && (
               <>
                 <div

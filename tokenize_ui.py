@@ -7,7 +7,7 @@ ROOT = Path(".")
 EXTS = {".tsx", ".ts", ".jsx", ".js"}
 SKIP_DIRS = {"node_modules", ".next", "dist", "build", ".git"}
 
-DRY_RUN = True  # set False to write
+DRY_RUN = False  # set False to write
 
 # ---- Glass tiers (match your globals tokens intent) ----
 SURFACE_BG = {"bg-white/[0.06]", "bg-white/[0.07]", "bg-white/[0.08]", "bg-white/[0.09]", "bg-white/[0.10]"}
@@ -151,6 +151,12 @@ def process_class_string(s: str) -> tuple[str, list[str]]:
     classes = ensure_border_keyword(s.split())
     changes: list[str] = []
 
+    # --- STEP 2: normalize blur everywhere (tokens own blur) ---
+    before = len(classes)
+    classes = [c for c in classes if not c.startswith("backdrop-blur")]
+    if len(classes) != before:
+        changes.append("removed: backdrop-blur*")
+
     # buttons first (more specific)
     classes2, btn = tokenize_buttons(classes)
     if btn:
@@ -170,6 +176,7 @@ def process_class_string(s: str) -> tuple[str, list[str]]:
             return "pill-glass", ["token: pill-glass"]
 
     return " ".join(classes), changes
+
 
 def tokenize_file(text: str) -> tuple[str, list[str]]:
     changes: list[str] = []

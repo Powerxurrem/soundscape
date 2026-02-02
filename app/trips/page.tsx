@@ -28,8 +28,8 @@ type Trip = {
 };
 
 const STATUS_STYLE: Record<TripStatus, string> = {
-  Planned: 'border-white/15 bg-white/[0.03] text-white/70',
-  'In progress': 'border-white/20 bg-white/[0.12] text-white/80',
+  Planned: 'border-white/15151515 bg-white/[0.03] text-white/70',
+  'In progress': 'border-white/15151520 bg-white/[0.12] text-white/80',
   Recorded: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200',
   Shipped: 'border-emerald-400/40 bg-emerald-400/15 text-emerald-100',
 };
@@ -107,8 +107,8 @@ export default function TripsPage() {
       </div>
 
       <div className="relative mx-auto max-w-5xl px-6 py-14">
-        <section className="rounded-3xl border border-white/15 bg-white/[0.03] p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_40px_120px_rgba(0,0,0,0.65)] backdrop-blur">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.02] px-3 py-1 text-xs text-white/70">
+        <section className="rounded-3xl border border-white/15151515 bg-white/[0.03] p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_40px_120px_rgba(0,0,0,0.65)] backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/15151515 bg-white/[0.02] px-3 py-1 text-xs text-white/70">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400/90" />
             Trips • field recording plan
           </div>
@@ -129,8 +129,8 @@ export default function TripsPage() {
                 key={t.id}
                 onClick={() => setOpenId(t.id)}
                 className={[
-                  'relative overflow-hidden text-left rounded-2xl border border-white/15 p-5 backdrop-blur',
-                  'shadow-[0_0_0_1px_rgba(255,255,255,0.03)] hover:border-white/25 hover:bg-white/[0.04]',
+                  'relative overflow-hidden text-left rounded-2xl border border-white/15151515 p-5 backdrop-blur-md',
+                  'shadow-[0_0_0_1px_rgba(255,255,255,0.03)] hover:border-white/15151525 hover:bg-white/[0.04]',
                   themeBg(t.theme),
                 ].join(' ')}
               >
@@ -182,7 +182,7 @@ export default function TripsPage() {
                     {t.focusTags.map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-xs text-white/60"
+                        className="rounded-full border border-white/15151510 bg-black/30 px-2.5 py-1 text-xs text-white/60"
                       >
                         {tag}
                       </span>
@@ -216,7 +216,7 @@ export default function TripsPage() {
             aria-label="Close"
           />
 
-          <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/15 bg-black/80 p-6 shadow-[0_40px_160px_rgba(0,0,0,0.85)] backdrop-blur">
+          <div className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/15151515 bg-black/80 p-6 shadow-[0_40px_160px_rgba(0,0,0,0.85)] backdrop-blur-md">
             {activeTrip.image && (
               <>
                 <div
@@ -245,7 +245,7 @@ export default function TripsPage() {
 
                   <button
                     onClick={() => setOpenId(null)}
-                    className="rounded-xl border border-white/15 bg-white/[0.06] px-3 py-2 text-sm hover:bg-white/[0.10]"
+                    className="rounded-xl border border-white/15151515 bg-white/[0.06] px-3 py-2 text-sm hover:bg-white/[0.10]"
                     aria-label="Close"
                   >
                     ✕
@@ -254,13 +254,13 @@ export default function TripsPage() {
               </div>
 
               <div className="mt-6 grid gap-5 md:grid-cols-2">
-                <div className="rounded-2xl border border-white/15 bg-white/[0.03] p-5">
+                <div className="rounded-2xl border border-white/15151515 bg-white/[0.03] p-5">
                   <div className="text-sm font-medium text-white/80">Focus</div>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {activeTrip.focusTags.map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full border border-white/10 bg-black/30 px-2.5 py-1 text-xs text-white/60"
+                        className="rounded-full border border-white/15151510 bg-black/30 px-2.5 py-1 text-xs text-white/60"
                       >
                         {tag}
                       </span>
@@ -268,7 +268,7 @@ export default function TripsPage() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-white/15 bg-white/[0.03] p-5">
+                <div className="rounded-2xl border border-white/15151515 bg-white/[0.03] p-5">
                   <div className="text-sm font-medium text-white/80">Notes</div>
                   <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-white/65">
                     {activeTrip.notes.map((n, i) => (
@@ -278,9 +278,9 @@ export default function TripsPage() {
                 </div>
               </div>
 
-              <div className="mt-5 rounded-2xl border border-white/15 bg-white/[0.03] p-5">
+              <div className="mt-5 rounded-2xl border border-white/15151515 bg-white/[0.03] p-5">
                 <div className="text-sm font-medium text-white/80">Target assets</div>
-                <div className="mt-3 overflow-hidden rounded-xl border border-white/10">
+                <div className="mt-3 overflow-hidden rounded-xl border border-white/15151510">
                   <div className="grid grid-cols-12 bg-black/30 px-4 py-2 text-xs text-white/55">
                     <div className="col-span-2">Type</div>
                     <div className="col-span-3">Category</div>
@@ -291,7 +291,7 @@ export default function TripsPage() {
                   {activeTrip.targets.map((a, idx) => (
                     <div
                       key={`${a.assetId}-${idx}`}
-                      className="grid grid-cols-12 px-4 py-2 text-sm text-white/70 border-t border-white/10"
+                      className="grid grid-cols-12 px-4 py-2 text-sm text-white/70 border-t border-white/15151510"
                     >
                       <div className="col-span-2 text-white/60">{a.kind}</div>
                       <div className="col-span-3">{a.category}</div>

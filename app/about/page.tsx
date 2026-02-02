@@ -12,8 +12,8 @@ export default function AboutPage() {
 
       <div className="relative mx-auto max-w-4xl px-6 py-14">
         {/* HERO */}
-        <section className="rounded-3xl border border-white/15 bg-white/[0.03] p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_40px_120px_rgba(0,0,0,0.65)] backdrop-blur">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.02] px-3 py-1 text-xs text-white/70">
+        <section className="rounded-3xl border border-white/15151515 bg-white/[0.03] p-8 shadow-[0_0_0_1px_rgba(255,255,255,0.03),0_40px_120px_rgba(0,0,0,0.65)] backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/15151515 bg-white/[0.02] px-3 py-1 text-xs text-white/70">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400/90" />
             About Soundscape
           </div>
@@ -30,7 +30,7 @@ export default function AboutPage() {
         </section>
 
         {/* WHAT IT IS */}
-        <section className="mt-10 rounded-3xl border border-white/15 bg-white/[0.03] p-8 backdrop-blur">
+        <section className="mt-10 rounded-3xl border border-white/15151515 bg-white/[0.03] p-8 backdrop-blur-md">
           <h2 className="text-2xl font-semibold tracking-tight">What Soundscape is</h2>
 
           <p className="mt-4 text-sm text-white/65 leading-relaxed">
@@ -45,7 +45,7 @@ export default function AboutPage() {
         </section>
 
         {/* PRINCIPLES */}
-        <section className="mt-10 rounded-3xl border border-white/15 bg-white/[0.03] p-8 backdrop-blur">
+        <section className="mt-10 rounded-3xl border border-white/15151515 bg-white/[0.03] p-8 backdrop-blur-md">
           <h2 className="text-2xl font-semibold tracking-tight">Design principles</h2>
 
           <ul className="mt-6 space-y-4 text-sm text-white/65">
@@ -69,7 +69,7 @@ export default function AboutPage() {
         </section>
 
         {/* REAL RECORDINGS */}
-        <section className="mt-10 rounded-3xl border border-white/15 bg-white/[0.03] p-8 backdrop-blur">
+        <section className="mt-10 rounded-3xl border border-white/15151515 bg-white/[0.03] p-8 backdrop-blur-md">
           <h2 className="text-2xl font-semibold tracking-tight">Real recordings first</h2>
 
           <p className="mt-4 text-sm text-white/65 leading-relaxed">
@@ -88,7 +88,7 @@ export default function AboutPage() {
         </section>
 
         {/* DETERMINISM */}
-        <section className="mt-10 rounded-3xl border border-white/15 bg-white/[0.03] p-8 backdrop-blur">
+        <section className="mt-10 rounded-3xl border border-white/15151515 bg-white/[0.03] p-8 backdrop-blur-md">
           <h2 className="text-2xl font-semibold tracking-tight">Deterministic by design</h2>
 
           <p className="mt-4 text-sm text-white/65 leading-relaxed">
@@ -102,7 +102,7 @@ export default function AboutPage() {
         </section>
 
         {/* WHAT IT IS NOT */}
-        <section className="mt-10 rounded-3xl border border-white/15 bg-white/[0.03] p-8 backdrop-blur">
+        <section className="mt-10 rounded-3xl border border-white/15151515 bg-white/[0.03] p-8 backdrop-blur-md">
           <h2 className="text-2xl font-semibold tracking-tight">What Soundscape is not</h2>
 
           <ul className="mt-6 space-y-2 text-sm text-white/65">
@@ -115,7 +115,7 @@ export default function AboutPage() {
         </section>
 
         {/* PRIVACY & GROWTH */}
-        <section className="mt-10 rounded-3xl border border-white/15 bg-white/[0.03] p-8 backdrop-blur">
+        <section className="mt-10 rounded-3xl border border-white/15151515 bg-white/[0.03] p-8 backdrop-blur-md">
           <h2 className="text-2xl font-semibold tracking-tight">Privacy and growth</h2>
 
           <p className="mt-4 text-sm text-white/65 leading-relaxed">

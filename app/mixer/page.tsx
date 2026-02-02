@@ -341,7 +341,7 @@ export default function MixerPage() {
                 <div className="mt-3">
                   <label className="text-xs text-gray-600">Asset</label>
                   <select
-                    className="mt-1 w-full rounded-lg border border-white/20 bg-black text-white px-2 py-2 text-sm"
+                    className="mt-1 w-full rounded-lg border border-white/15151520 bg-black text-white px-2 py-2 text-sm"
                     value={t.assetId}
                     onChange={(e) => updateTrack(t.id, { assetId: e.target.value })}
                   >
@@ -376,7 +376,7 @@ export default function MixerPage() {
                     <div>
                       <label className="text-xs text-gray-600">Rate</label>
                       <select
-                        className="mt-1 w-full rounded-lg border border-white/20 bg-black text-white px-2 py-2 text-sm"
+                        className="mt-1 w-full rounded-lg border border-white/15151520 bg-black text-white px-2 py-2 text-sm"
                         value={t.ratePreset}
                         onChange={(e) =>
                           updateTrack(t.id, { ratePreset: e.target.value as MixTrack['ratePreset'] })
@@ -392,7 +392,7 @@ export default function MixerPage() {
                     <div>
                       <label className="text-xs text-gray-600">Speed</label>
                       <select
-                        className="mt-1 w-full rounded-lg border border-white/20 bg-black text-white px-2 py-2 text-sm"
+                        className="mt-1 w-full rounded-lg border border-white/15151520 bg-black text-white px-2 py-2 text-sm"
                         value={t.rateSpeed}
                         onChange={(e) =>
                           updateTrack(t.id, { rateSpeed: Number(e.target.value) as MixTrack['rateSpeed'] })
@@ -442,7 +442,7 @@ export default function MixerPage() {
           <div className="mt-4 space-y-3">
             <div>
               <label className="text-xs text-gray-600">Duration</label>
-              <select className="mt-1 w-full rounded-lg border border-white/20 bg-black text-white px-2 py-2 text-sm">
+              <select className="mt-1 w-full rounded-lg border border-white/15151520 bg-black text-white px-2 py-2 text-sm">
                 <option className="bg-black text-white">10 min</option>
                 <option className="bg-black text-white">30 min</option>
                 <option className="bg-black text-white">60 min (max)</option>

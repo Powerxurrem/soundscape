@@ -668,7 +668,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
             <div>
               <label className="text-xs text-gray-600">Duration</label>
               <select
-                className="mt-1 w-full rounded-lg border border-white/20 bg-black text-white px-2 py-2 text-sm"
+                className="mt-1 w-full rounded-lg border border-white/15151520 bg-black text-white px-2 py-2 text-sm"
                 value={lengthMin}
                 onChange={(e) => setLengthMin(Number(e.target.value) as 10 | 30 | 60)}
               >

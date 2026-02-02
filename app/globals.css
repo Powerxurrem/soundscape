@@ -25,10 +25,10 @@
 
 :root {
   /* blur knob */
-  --glass-blur: 14px;
+  --glass-blur: 20px;
 
   /* base glass color (R G B) */
-  --glass-rgb: 168 200 200;
+  --glass-rgb: 225 169 240;
 
  /* glass optical knobs */
   --glass-saturate: 2;   /* 1 = neutral, >1 richer, <1 flatter */
@@ -38,19 +38,19 @@
      0.7 = more transparent
      1.2 = more opaque
   */
-  --glass-alpha: 2.4;
+  --glass-alpha: 1.1;
 
   /* border strength knobs */
-  --glass-border-strong: rgb(255 255 255 / 0.10);
-  --glass-border-medium: rgb(255 255 255 / 0.20);
-  --glass-border-soft: rgb(255 255 255 / 0.12);
+  --glass-border-strong: rgb(255 255 255 / 0.3);
+  --glass-border-medium: rgb(255 255 255 / 0.3);
+  --glass-border-soft: rgb(255 255 255 / 0.3);
 
   /* per-tier base alpha (before master multiplier) */
-  --glass-fill-big-a: 0.045;
-  --glass-fill-section-a: 0.060;
-  --glass-fill-mini-a: 0.055;
-  --glass-fill-inset-a: 0.035;
-  --glass-fill-field-a: 0.070;
+  --glass-fill-big-a: 0.14;
+  --glass-fill-section-a: 0.14;
+  --glass-fill-mini-a: 0.14;
+  --glass-fill-inset-a: 0.14;
+  --glass-fill-field-a: 0.14;
 
   /* derived fills (color × transparency) */
   --glass-fill-big: rgb(var(--glass-rgb) / calc(var(--glass-fill-big-a) * var(--glass-alpha)));
@@ -60,10 +60,10 @@
   --glass-fill-field: rgb(var(--glass-rgb) / calc(var(--glass-fill-field-a) * var(--glass-alpha)));
 
   /* text color (R G B) */
-  --text-rgb: 220 235 255;
+  --text-rgb: 245 225 255 ;
 
   /* brightness tiers */
-  --text-strong: rgb(var(--text-rgb) / 2);
+  --text-strong: rgb(var(--text-rgb) / 1.2);
   --text:        rgb(var(--text-rgb) / 1.2);
   --text-muted:  rgb(var(--text-rgb) / 1.2);
   --text-faint:  rgb(var(--text-rgb) / 1.21);

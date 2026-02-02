@@ -28,7 +28,7 @@
   --glass-blur: 20px;
 
   /* base glass color (R G B) */
-  --glass-rgb: 160 160 170;
+  --glass-rgb: 80 190 140;
 
  /* glass optical knobs */
   --glass-saturate: 2;   /* 1 = neutral, >1 richer, <1 flatter */
@@ -60,7 +60,7 @@
   --glass-fill-field: rgb(var(--glass-rgb) / calc(var(--glass-fill-field-a) * var(--glass-alpha)));
 
   /* text color (R G B) */
-  --text-rgb: 230 230 235 ;
+  --text-rgb: 210 245 230 ;
 
   /* brightness tiers */
   --text-strong: rgb(var(--text-rgb) / 1.2);

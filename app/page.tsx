@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createAudioEngine, type AudioEngine } from './mixer/audio/audioengine';
+import { Sparkles } from "@/components/Sparkles";
+
 
 type DemoTrack = {
   id: string;
@@ -84,63 +86,63 @@ export default function Home() {
       </div>
 
       <div className="relative mx-auto max-w-5xl px-6 py-14">
-        {/* HERO */}
-      <section className="glass-surface elev-3 rounded-3xl p-8">
-          <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
-            <div className="max-w-2xl">
-              <div className="glass-panel inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs text-app">
-                
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400/90" />
-                Engine stable • Assets deterministic
-              </div>
+{/* HERO */}
+<section className="glass-surface elev-3 relative overflow-hidden rounded-3xl p-8">
+  {/* Sparkles behind content */}
+  <div className="pointer-events-none absolute inset-0 z-0">
+    <Sparkles seed="home-hero" count={22} />
+  </div>
 
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight">Soundscape</h1>
-              <p className="mt-3 text-sm leading-relaxed text-app">
-                Calm, realistic ambient soundscapes — built to be deterministic &  offline-friendly.
-              </p>
+  {/* Content */}
+  <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+    <div className="max-w-2xl">
+      <div className="pill-glass inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs text-app">
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400/90" />
+        Engine stable • Assets deterministic
+      </div>
 
-              <div className="mt-6 flex flex-wrap gap-4">
-                <a
-                  href="/autopilot"
-                  className="btn-glass rounded-xl px-4 py-2 text-sm"
-                >
-                  Start Autopilot
-                </a>
-                <a
-                  href="/mixer"
-                  className="btn-glass rounded-xl px-4 py-2 text-sm"
-                >
-                  Open Mixer
-                </a>
-              </div>
-            </div>
+      <h1 className="mt-4 text-4xl font-semibold tracking-tight">Soundscape</h1>
+      <p className="mt-3 text-sm leading-relaxed text-app">
+        Calm, realistic ambient soundscapes — built to be deterministic &amp; offline-friendly.
+      </p>
 
-            <div className="w-full md:w-[320px]">
-              <div className="glass-panel rounded-2xl p-4">
-                <div className="text-sm font-medium">What you get</div>
+      <div className="mt-6 flex flex-wrap gap-4">
+        <a href="/autopilot" className="btn-glass rounded-xl px-4 py-2 text-sm">
+          Start Autopilot
+        </a>
+        <a href="/mixer" className="btn-glass rounded-xl px-4 py-2 text-sm">
+          Open Mixer
+        </a>
+      </div>
+    </div>
 
-                <div className="mt-3 space-y-2 text-sm text-app">
-                  <div className="flex gap-2">
-                    <span className="text-faint">•</span>
-                    <span>Real recordings first</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="text-faint">•</span>
-                    <span>Deterministic mixes (recipe export)</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="text-faint">•</span>
-                    <span>Offline &amp; private</span>
-                  </div>
-                </div>
+    <div className="w-full md:w-[320px]">
+      <div className="glass-panel rounded-2xl p-4">
+        <div className="text-sm font-medium">What you get</div>
 
-                <div className="glass-panel mt-3 rounded-xl px-3 py-2 text-[11px] text-muted">
-                  Export includes WAV + deterministic recipe. Commercial use license included.
-                </div>
-              </div>
-            </div>
+        <div className="mt-3 space-y-2 text-sm text-app">
+          <div className="flex gap-2">
+            <span className="text-faint">•</span>
+            <span>Real recordings first</span>
           </div>
-        </section>
+          <div className="flex gap-2">
+            <span className="text-faint">•</span>
+            <span>Deterministic mixes (recipe export)</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="text-faint">•</span>
+            <span>Offline &amp; private</span>
+          </div>
+        </div>
+
+        <div className="glass-panel mt-3 rounded-xl px-3 py-2 text-[11px] text-muted">
+          Export includes WAV + deterministic recipe. Commercial use license included.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
         {/* DEMO */}
         <section className="glass-surface elev-3 mt-10 rounded-3xl p-8 ,0_40px_120">

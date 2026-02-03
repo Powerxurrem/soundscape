@@ -521,7 +521,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
 
   return (
     <main className="mx-auto max-w-4xl p-6">
-      <div className="glass-panel rounded-2xl p-5">
+      <div className="glass-panel elev-3 rounded-3xl p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-xl font-semibold">Autopilot</h1>
@@ -531,16 +531,16 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
           </div>
 
           <div className="flex gap-2">
-            <button onClick={generate} className="btn-glass">
+            <button onClick={generate} className="btn-glass rounded-xl px-4 py-2 text-sm">
               Generate
             </button>
             <button
               onClick={activateAudio}
-              className="btn-glass"
+              className="btn-glass rounded-xl px-4 py-2 text-sm"
             >
               {audioOn ? 'Audio Active' : 'Activate Audio'}
             </button>
-            <button onClick={stopAudio} className="btn-glass">
+            <button onClick={stopAudio} className="btn-glass rounded-xl px-4 py-2 text-sm">
               Stop
             </button>
           </div>
@@ -649,14 +649,14 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
         {recipe && (
           <div className="mt-5">
             <div className="font-medium">Recipe</div>
-            <pre className="glass-panel mt-2 whitespace-pre-wrap rounded-xl bg-black/40 p-4 text-xs text-gray-200">
+            <pre className="glass-panel mt-2 whitespace-pre-wrap rounded-xl p-4 text-xs text-app">
               {recipe}
             </pre>
           </div>
         )}
 
         {/* EXPORT */}
-        <div className="glass-panel mt-6 rounded-2xl p-5">
+        <div className="glass-panel mt-5 rounded-3xl p-6">
           <h2 className="text-lg font-semibold">Export</h2>
           <p className="mt-1 text-sm text-faint">
             {EXPORT_TEMPORARILY_UNLOCKED
@@ -672,9 +672,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
                 value={lengthMin}
                 onChange={(e) => setLengthMin(Number(e.target.value) as 10 | 30 | 60)}
               >
-                <option value={10} className="bg-white/[0.06] text-app">10 min</option>
-                <option value={30} className="bg-white/[0.06] text-app">30 min</option>
-                <option value={60} className="bg-white/[0.06] text-app">60 min (max)</option>
+                <option value={10} className="text-app">5 min</option>
               </select>
             </div>
 
@@ -682,27 +680,27 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
               <label className="text-xs text-faint">Format</label>
               <div className="mt-1 grid grid-cols-3 gap-2">
                 <button
-                  className={`rounded-lg border border-white/15 px-3 py-2 text-sm${
-                    exportKind === 'wav' ? 'bg-white/10' : ''
-                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:bg-gray-50' : 'text-faint'}`}
+                  className={`glass-panel rounded-lg border  px-3 py-2 text-sm${
+                    exportKind === 'wav' ? 'glass-inset' : ''
+                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:glass-inset' : 'text-faint'}`}
                   disabled={!EXPORT_TEMPORARILY_UNLOCKED || isExporting}
                   onClick={() => setExportKind('wav')}
                 >
                   WAV
                 </button>
                 <button
-                  className={`rounded-lg border border-white/15 px-3 py-2 text-sm${
-                    exportKind === 'mp3' ? 'bg-white/10' : ''
-                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:bg-gray-50' : 'text-faint'}`}
+                  className={`glass-panel rounded-lg border  px-3 py-2 text-sm${
+                    exportKind === 'mp3' ? 'glass-inset' : ''
+                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:glass-inset' : 'text-faint'}`}
                   disabled={!EXPORT_TEMPORARILY_UNLOCKED || isExporting}
                   onClick={() => setExportKind('mp3')}
                 >
                   MP3
                 </button>
                 <button
-                  className={`rounded-lg border border-white/15 px-3 py-2 text-sm${
-                    exportKind === 'recipe' ? 'bg-white/10' : ''
-                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:bg-gray-50' : 'text-faint'}`}
+                  className={`glass-panel rounded-lg border  px-3 py-2 text-sm${
+                    exportKind === 'recipe' ? 'glass-inset' : ''
+                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:glass-inset' : 'text-faint'}`}
                   disabled={!EXPORT_TEMPORARILY_UNLOCKED || isExporting}
                   onClick={() => setExportKind('recipe')}
                 >
@@ -724,8 +722,8 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
             </div>
 
             <button
-              className={`w-full rounded-lg border border-white/15 px-4 py-2 text-sm${
-                EXPORT_TEMPORARILY_UNLOCKED ? 'hover:bg-gray-50' : 'text-faint'
+              className={`glass-panel w-full rounded-lg border  px-4 py-2 text-sm${
+                EXPORT_TEMPORARILY_UNLOCKED ? 'hover:glass-inset' : 'text-faint'
               }`}
               disabled={!EXPORT_TEMPORARILY_UNLOCKED || isExporting}
               onClick={() => {
@@ -745,7 +743,7 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
 
             {exportMsg && <div className="text-xs text-faint">{exportMsg}</div>}
 
-            <div className="glass-panel rounded-xl-dashed p-4 text-xs text-faint">
+            <div className="glass-panel mt-5 rounded-3xl p-6 text-xs text-faint">
               <div className="font-medium">Commercial unlock includes:</div>
               <ul className="mt-2 list-disc pl-4 space-y-1">
                 <li>MP3 + WAV exports</li>

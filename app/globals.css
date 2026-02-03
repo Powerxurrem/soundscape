@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* -------------------------------------------------------
+   Base theme tokens (Next/Tailwind)
+-------------------------------------------------------- */
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -20,37 +24,58 @@
 }
 
 /* -------------------------------------------------------
+   SPARKLES (separate visual system — NOT glass)
+-------------------------------------------------------- */
+
+:root {
+  /* twinkle timing knobs (used by Sparkles.tsx style=animation) */
+  --sparkle-twinkle-min: 2s;
+  --sparkle-twinkle-step: 0.6s;
+
+  /* visual knobs */
+  --sparkle-opacity: 0.10;
+  --sparkle-size-min: 0.6px;
+  --sparkle-size-max: 1.8px;
+  --sparkle-blur: 0.6px;
+}
+
+/* -------------------------------------------------------
    GLASS / UI TOKENS (Soundscape)
 -------------------------------------------------------- */
 
 :root {
-  /* blur knob */
-  --glass-blur: 20px;
+  /* --------------------
+     Glass optics knobs
+  -------------------- */
 
-  /* base glass color (R G B) */
-  --glass-rgb: 80 190 140;
+  /* keep the pipeline intact; set to 0px to "disable" blur */
+  --glass-blur: 0px;
 
- /* glass optical knobs */
-  --glass-saturate: 2;   /* 1 = neutral, >1 richer, <1 flatter */
-  --glass-contrast: 2;   /* 1 = neutral, >1 crisper */  
-  /* master transparency knob
-     1   = current
-     0.7 = more transparent
-     1.2 = more opaque
-  */
-  --glass-alpha: 1.1;
+  /* base glass tint (R G B) */
+  --glass-rgb: 120 88 170;
 
-  /* border strength knobs */
-  --glass-border-strong: rgb(255 255 255 / 0.3);
-  --glass-border-medium: rgb(255 255 255 / 0.3);
-  --glass-border-soft: rgb(255 255 255 / 0.3);
+  /* optics */
+  --glass-saturate: 1; /* 1 = neutral, >1 richer */
+  --glass-contrast: 1; /* 1 = neutral, >1 crisper */
 
-  /* per-tier base alpha (before master multiplier) */
-  --glass-fill-big-a: 0.10 ;
-  --glass-fill-section-a: 0.10;
-  --glass-fill-mini-a: 0.10;
-  --glass-fill-inset-a: 0.10;
-  --glass-fill-field-a: 0.10;
+  /* master transparency multiplier */
+  --glass-alpha: 1;
+
+  /* --------------------
+     Borders (tiered)
+  -------------------- */
+  --glass-border-strong: rgb(255 255 255 / 0.5);
+  --glass-border-medium: rgb(255 255 255 / 0.5);
+  --glass-border-soft: rgb(255 255 255 / 0.5);
+
+  /* --------------------
+     Per-tier base alpha (before master multiplier)
+  -------------------- */
+  --glass-fill-big-a: 0.10;
+  --glass-fill-section-a: 0.05;
+  --glass-fill-mini-a: 0.05;
+  --glass-fill-inset-a: 0.01;
+  --glass-fill-field-a: 0.01;
 
   /* derived fills (color × transparency) */
   --glass-fill-big: rgb(var(--glass-rgb) / calc(var(--glass-fill-big-a) * var(--glass-alpha)));
@@ -59,23 +84,44 @@
   --glass-fill-inset: rgb(var(--glass-rgb) / calc(var(--glass-fill-inset-a) * var(--glass-alpha)));
   --glass-fill-field: rgb(var(--glass-rgb) / calc(var(--glass-fill-field-a) * var(--glass-alpha)));
 
-  /* text color (R G B) */
-  --text-rgb: 210 245 230 ;
+  /* --------------------
+     Glass state overlays (for hover/active/press)
+     Purpose: replace bg-white/.. and hover:bg-.. inside glass UI
+     These are OVERLAYS (stack on top of the glass fill).
+  -------------------- */
+  --glass-state-rgb: 255 255 255; /* highlight tint (white) */
+  --glass-hover-a: 0.06;
+  --glass-active-a: 0.10;
+  --glass-press-a: 0.14;
 
-  /* brightness tiers */
-  --text-strong: rgb(var(--text-rgb) / 1.2);
-  --text:        rgb(var(--text-rgb) / 1.2);
-  --text-muted:  rgb(var(--text-rgb) / 1.2);
-  --text-faint:  rgb(var(--text-rgb) / 1.21);
+  --glass-overlay-hover: rgb(var(--glass-state-rgb) / var(--glass-hover-a));
+  --glass-overlay-active: rgb(var(--glass-state-rgb) / var(--glass-active-a));
+  --glass-overlay-press: rgb(var(--glass-state-rgb) / var(--glass-press-a));
+
+  /* --------------------
+     Text tokens
+  -------------------- */
+  --text-rgb: 210 245 230;
+
+  --text-strong: rgb(var(--text-rgb) / 1);
+  --text: rgb(var(--text-rgb) / 0.92);
+  --text-muted: rgb(var(--text-rgb) / 0.72);
+  --text-faint: rgb(var(--text-rgb) / 0.52);
 }
 
+/* -------------------------------------------------------
+   Components
+-------------------------------------------------------- */
+
 @layer components {
-  /* --------------------
-     Glass blur (shared)
-  -------------------- */
+  /* Shared glass optics */
   .glass-panel,
   .glass-surface,
-  .glass-inset {
+  .glass-inset,
+  .pill-glass,
+  .btn-glass,
+  .btn-glass-secondary,
+  .field-glass {
     backdrop-filter:
       blur(var(--glass-blur))
       saturate(var(--glass-saturate))
@@ -86,6 +132,21 @@
       contrast(var(--glass-contrast));
   }
 
+  /* --------------------
+     State helpers (overlay layer)
+     Use on tabs/rows/pills/buttons:
+       className="btn-glass hover:glass-hover"
+       className={isActive ? "glass-active" : "hover:glass-hover"}
+  -------------------- */
+  .glass-hover {
+    background-image: linear-gradient(var(--glass-overlay-hover), var(--glass-overlay-hover));
+  }
+  .glass-active {
+    background-image: linear-gradient(var(--glass-overlay-active), var(--glass-overlay-active));
+  }
+  .glass-press {
+    background-image: linear-gradient(var(--glass-overlay-press), var(--glass-overlay-press));
+  }
 
   /* --------------------
      Glass surfaces
@@ -126,30 +187,60 @@
   /* --------------------
      Elevation tokens
   -------------------- */
-  .elev-0 { box-shadow: none; }
+  .elev-0 {
+    box-shadow: none;
+  }
 
   .elev-1 {
     box-shadow:
-      0 0 0 1px rgba(255,255,255,0.03),
-      0 16px 60px rgba(0,0,0,0.45);
+      0 0 0 1px rgba(255, 255, 255, 0.03),
+      0 16px 60px rgba(0, 0, 0, 0.45);
   }
 
   .elev-2 {
     box-shadow:
-      0 0 0 1px rgba(255,255,255,0.03),
-      0 40px 120px rgba(0,0,0,0.65);
+      0 0 0 1px rgba(255, 255, 255, 0.03),
+      0 40px 120px rgba(0, 0, 0, 0.65);
   }
 
   .elev-3 {
-    box-shadow:
-      0 40px 160px rgba(0,0,0,0.85);
+    box-shadow: 0 40px 160px rgba(0, 0, 0, 0.85);
   }
 
   /* --------------------
      Text tokens
   -------------------- */
-  .text-app { color: var(--text); }
-  .text-strong { color: var(--text-strong); }
-  .text-muted { color: var(--text-muted); }
-  .text-faint { color: var(--text-faint); }
+  .text-app {
+    color: var(--text);
+  }
+  .text-strong {
+    color: var(--text-strong);
+  }
+  .text-muted {
+    color: var(--text-muted);
+  }
+  .text-faint {
+    color: var(--text-faint);
+  }
+}
+
+/* -------------------------------------------------------
+   Sparkle animation (deterministic twinkle)
+-------------------------------------------------------- */
+
+@keyframes sparkle-twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .sparkle {
+    animation: none !important;
+  }
 }

@@ -105,11 +105,8 @@ export default function TripsPage() {
       </div>
 
       <div className="relative mx-auto max-w-5xl px-6 py-14">
-        <section className="glass-panel rounded-3xl p-8 elev-2">
-          <div className="pill-glass">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400/90" />
-            Trips • field recording plan
-          </div>
+        <section className="glass-panel rounded-3xl p-8 elev-3">
+
 
           <h1 className="mt-4 text-4xl font-semibold tracking-tight">Trips</h1>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">

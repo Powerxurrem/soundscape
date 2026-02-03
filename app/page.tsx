@@ -85,10 +85,11 @@ export default function Home() {
 
       <div className="relative mx-auto max-w-5xl px-6 py-14">
         {/* HERO */}
-      <section className="glass-surface elev-2 rounded-3xl p-8">
+      <section className="glass-surface elev-3 rounded-3xl p-8">
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div className="max-w-2xl">
               <div className="glass-panel inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs text-app">
+                
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400/90" />
                 Engine stable • Assets deterministic
               </div>
@@ -98,16 +99,16 @@ export default function Home() {
                 Calm, realistic ambient soundscapes — built to be deterministic &  offline-friendly.
               </p>
 
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="mt-6 flex flex-wrap gap-4">
                 <a
                   href="/autopilot"
-                  className="btn-glass"
+                  className="btn-glass rounded-xl px-4 py-2 text-sm"
                 >
                   Start Autopilot
                 </a>
                 <a
                   href="/mixer"
-                  className="btn-glass-secondary"
+                  className="btn-glass rounded-xl px-4 py-2 text-sm"
                 >
                   Open Mixer
                 </a>
@@ -142,25 +143,25 @@ export default function Home() {
         </section>
 
         {/* DEMO */}
-        <section className="glass-surface mt-10 rounded-3xl p-8 ,0_40px_120">
+        <section className="glass-surface elev-3 mt-10 rounded-3xl p-8 ,0_40px_120">
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">Demo</h2>
               <p className="mt-2 text-sm text-muted">Rain + Fireplace. One click. No setup.</p>
             </div>
 
-            <div className="flex gap-2">
+            <div className="glass-panel mt-3 rounded-xl px-3 py-2 text-[11px] text-muted">
               {!isOn ? (
                 <button
                   onClick={startDemo}
-                  className="btn-glass"
+                  className="btn-inset"
                 >
                   Play
                 </button>
               ) : (
                 <button
                   onClick={stopDemo}
-                  className="btn-glass"
+                  className="btn-inset"
                 >
                   Stop
                 </button>

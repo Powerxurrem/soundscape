@@ -21,12 +21,8 @@ export default function TermsPage() {
       <div className="mx-auto w-full max-w-4xl px-6 py-12">
 <section className="glass-surface elev-3 rounded-[28px] p-8 md:p-10">
 
-          <div className="pill-glass">
-            <span className="h-2 w-2 rounded-full bg-emerald-400/80" />
-            <span>Private beta • Legal</span>
-          </div>
 
-          <h1 className="mt-5 text-3xl font-semibold tracking-tight md:text-4xl">
+          <h1 className=" text-3xl font-semibold tracking-tight md:text-4xl">
             Terms &amp; Conditions
           </h1>
           <p className="mt-2 text-sm text-muted">
@@ -208,7 +204,7 @@ export default function TermsPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-<section className="glass-inset rounded-2xl p-6">
+<section className="glass-inset elev-3 rounded-2xl p-6">
 
       <h2 className="text-base font-semibold text-strong">{title}</h2>
       <div className="mt-3">{children}</div>

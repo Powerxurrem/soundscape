@@ -248,7 +248,7 @@ export default function MixerPage() {
     <main className="mx-auto max-w-6xl p-6">
       <div className="grid grid-cols-12 gap-6">
         {/* LEFT: Library */}
-        <aside className="glass-panel col-span-12 md:col-span-4 rounded-3xl p-6">
+        <aside className="glass-panel elev-3 col-span-12 md:col-span-4 rounded-3xl p-6">
           <h2 className="text-lg font-semibold">Library</h2>
           <input
             className="glass-surface mt-3 w-full rounded-lg px-3 py-2 text-sm text-app placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
@@ -313,7 +313,7 @@ export default function MixerPage() {
         </aside>
 
         {/* CENTER: Mixer */}
-        <section className="glass-panel col-span-12 md:col-span-5 rounded-3xl p-6">
+        <section className="glass-panel elev-3 col-span-12 md:col-span-5 rounded-3xl p-6">
           <h1 className="text-lg font-semibold">Mixer</h1>
           <p className="mt-1 text-sm text-faint">Ugly is correct. Logic first.</p>
 
@@ -345,7 +345,7 @@ export default function MixerPage() {
                 <div className="mt-3">
                   <label className="text-xs text-faint">Asset</label>
                   <select
-                    className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-app focus:outline-none focus:ring-2 focus:ring-white/20"
+                    className="glass-surface mt-2 w-full rounded-lg px-3 py-2 text-sm text-app focus:outline-none focus:ring-2 focus:ring-white/20"
                     value={t.assetId}
                     onChange={(e) => updateTrack(t.id, { assetId: e.target.value })}
                   >
@@ -441,7 +441,7 @@ export default function MixerPage() {
         </section>
 
         {/* RIGHT: Export */}
-        <aside className="glass-panel col-span-12 md:col-span-3 rounded-3xl p-6">
+        <aside className="glass-panel elev-3 col-span-12 md:col-span-3 rounded-3xl p-6">
           <h2 className="text-lg font-semibold">Export</h2>
           <p className="mt-1 text-sm text-faint">Export is locked on Personal.</p>
 

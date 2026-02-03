@@ -12,7 +12,7 @@ export default function AboutPage() {
 
       <div className="relative mx-auto max-w-4xl px-6 py-14">
         {/* HERO */}
-        <section className="glass-panel rounded-3xl p-8 ,0_40px_120px_rgba(0,0,0,0.65)]">
+        <section className="glass-panel elev-3 elev-3 elev-3 elev-3 rounded-3xl p-8 ,0_40px_120px_rgba(0,0,0,0.65)]">
 
 
           <h1 className="mt-4 text-4xl font-semibold tracking-tight">
@@ -27,7 +27,7 @@ export default function AboutPage() {
         </section>
 
         {/* WHAT IT IS */}
-        <section className="glass-panel mt-10 rounded-3xl p-8">
+        <section className="glass-panel elev-3 elev-3 elev-3 elev-3 mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">What Soundscape is</h2>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
@@ -42,7 +42,7 @@ export default function AboutPage() {
         </section>
 
         {/* PRINCIPLES */}
-        <section className="glass-panel mt-10 rounded-3xl p-8">
+        <section className="glass-panel elev-3 elev-3 elev-3 elev-3 mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">Design principles</h2>
 
           <ul className="mt-6 space-y-4 text-sm text-muted">
@@ -66,7 +66,7 @@ export default function AboutPage() {
         </section>
 
         {/* REAL RECORDINGS */}
-        <section className="glass-panel mt-10 rounded-3xl p-8">
+        <section className="glass-panel elev-3 elev-3 elev-3 mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">Real recordings first</h2>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
@@ -85,7 +85,7 @@ export default function AboutPage() {
         </section>
 
         {/* DETERMINISM */}
-        <section className="glass-panel mt-10 rounded-3xl p-8">
+        <section className="glass-panel elev-3 elev-3 elev-3 mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">Deterministic by design</h2>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
@@ -99,7 +99,7 @@ export default function AboutPage() {
         </section>
 
         {/* WHAT IT IS NOT */}
-        <section className="glass-panel mt-10 rounded-3xl p-8">
+        <section className="glass-panel elev-3 elev-3 elev-3 mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">What Soundscape is not</h2>
 
           <ul className="mt-6 space-y-2 text-sm text-muted">
@@ -112,7 +112,7 @@ export default function AboutPage() {
         </section>
 
         {/* PRIVACY & GROWTH */}
-        <section className="glass-panel mt-10 rounded-3xl p-8">
+        <section className="glass-panel elev-3 elev-3 elev-3 mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">Privacy and growth</h2>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
@@ -126,11 +126,7 @@ export default function AboutPage() {
           </p>
         </section>
 
-        {/* CLOSING */}
-        <section className="mt-10 text-xs text-faint">
-          Soundscape is built to be boring to maintain and pleasant to use.<br />
-          If that sounds like your kind of tool, you’re in the right place.
-        </section>
+
       </div>
     </main>
   );

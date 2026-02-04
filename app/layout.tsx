@@ -45,12 +45,12 @@ export default function RootLayout({
             <nav className="flex items-center justify-between">
               <div className="flex items-center gap-6 text-sm font-medium">
                 <a href="/" className="text-white hover:opacity-80">Home</a>
-                <a href="/pricing" className="text-app hover:text-white">Pricing</a>
-                <a href="/about" className="text-app hover:text-white">About</a>
-                <a href="/trips" className="text-app hover:text-white">Trips</a>
-                <a href="/mixer" className="text-app hover:text-white">Mixer</a>
-                <a href="/autopilot" className="text-app hover:text-white">Autopilot</a>
-                <a href="/terms" className="text-app hover:text-white">Terms</a>
+                <a href="/pricing" className="text-app hover:text-strong">Pricing</a>
+                <a href="/about" className="text-app hover:text-strong">About</a>
+                <a href="/trips" className="text-app hover:text-strong">Trips</a>
+                <a href="/mixer" className="text-app hover:text-strong">Mixer</a>
+                <a href="/autopilot" className="text-app hover:text-strong">Autopilot</a>
+                <a href="/terms" className="text-app hover:text-strong">Terms</a>
               </div>
             </nav>
           </div>

@@ -33,14 +33,15 @@
   ------------------------------------------------------ */
 
   /* keep the pipeline intact; set to 0px to "disable" blur */
-  --glass-blur: 0px;
+  --glass-blur: 24px;
 
   /* base glass tint (R G B) */
   --glass-rgb: 16 12 26;
+  --glass-rgb-big: 10 10 14; /* near-black */
 
   /* optics */
-  --glass-saturate: 1;
-  --glass-contrast: 1;
+  --glass-saturate: 1.5;
+  --glass-contrast: 2;
 
   /* master transparency multiplier */
   --glass-alpha: 2;
@@ -48,17 +49,17 @@
   /* borders (gold) */
   --glass-border-strong: rgb(var(--gold-rgb) / 0.45);
   --glass-border-medium: rgb(var(--gold-rgb) / 0.32);
-  --glass-border-soft: rgb(var(--gold-rgb) / 0.24);
+  --glass-border-soft: rgb(var(--gold-rgb) / 0.40);
 
   /* per-tier base alpha (before master multiplier) */
-  --glass-fill-big-a: 0.28;
+  --glass-fill-big-a: 0.3;
   --glass-fill-section-a: 0.2;
-  --glass-fill-mini-a: 0.2;
+  --glass-fill-mini-a: 0.3;
   --glass-fill-inset-a: 0.2;
   --glass-fill-field-a: 0.2;
 
   /* derived fills (color × transparency) */
-  --glass-fill-big: rgb(var(--glass-rgb-big) / calc(var(--glass-fill-big-a) * var(--glass-alpha)));
+  --glass-fill-big:  rgb(var(--glass-rgb-big) / calc(var(--glass-fill-big-a) * var(--glass-alpha)));
   --glass-fill-section: rgb(var(--glass-rgb) / calc(var(--glass-fill-section-a) * var(--glass-alpha)));
   --glass-fill-mini: rgb(var(--glass-rgb) / calc(var(--glass-fill-mini-a) * var(--glass-alpha)));
   --glass-fill-inset: rgb(var(--glass-rgb) / calc(var(--glass-fill-inset-a) * var(--glass-alpha)));
@@ -67,8 +68,8 @@
   /* state overlays (stack on top of existing fill) */
   --glass-state-rgb: 255 255 255;
   --glass-hover-a: 0.06;
-  --glass-active-a: 0.10;
-  --glass-press-a: 0.14;
+  --glass-active-a: 0.25;
+  --glass-press-a: 0.2 ;
 
   --glass-overlay-hover: rgb(var(--glass-state-rgb) / var(--glass-hover-a));
   --glass-overlay-active: rgb(var(--glass-state-rgb) / var(--glass-active-a));

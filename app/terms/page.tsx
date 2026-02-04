@@ -19,7 +19,7 @@ export default function TermsPage() {
       </div>
 
       <div className="mx-auto w-full max-w-4xl px-6 py-12">
-<section className="glass-surface elev-3 rounded-[28px] p-8 md:p-10">
+<section className="glass-panel  rounded-[28px] p-8 md:p-10">
 
 
           <h1 className=" text-3xl font-semibold tracking-tight md:text-4xl">
@@ -192,9 +192,7 @@ export default function TermsPage() {
               </p>
             </Section>
 
-            <div className="pt-2 text-xs text-faint">
-              Tip: Link this page in your footer as <span className="text-app">/terms</span>.
-            </div>
+
           </div>
         </section>
       </div>
@@ -204,7 +202,7 @@ export default function TermsPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-<section className="glass-inset elev-3 rounded-2xl p-6">
+<section className="glass-panel rounded-2xl p-6">
 
       <h2 className="text-base font-semibold text-strong">{title}</h2>
       <div className="mt-3">{children}</div>

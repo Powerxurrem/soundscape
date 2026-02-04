@@ -140,12 +140,12 @@ export default function TripsPage() {
                     <div
                       aria-hidden
                       className={['absolute inset-0 transition-colors duration-300',
-                        isActive ? 'bg-black/35' : 'bg-black/55',].join(' ')}
+                        isActive ? "glass-active" : "hover:glass-hover",].join(' ')}
                     />
                     <div
                       aria-hidden
                       className={['absolute inset-0 transition-opacity duration-300',
-                        isActive ? 'bg-white/[0.06]' : 'bg-white/[0.03]',].join(' ')}
+                        isActive ? "glass-active" : "hover:glass-hover",].join(' ')}
                     />
                   </>
                 )}
@@ -170,7 +170,7 @@ export default function TripsPage() {
                     {t.focusTags.map((tag) => (
                       <span
                         key={tag}
-                        className="glass-panel rounded-full bg-black/30 px-2.5 py-1 text-xs text-muted"
+                        className="glass-panel rounded-full  px-2.5 py-1 text-xs text-muted"
                       >
                         {tag}
                       </span>
@@ -204,7 +204,7 @@ export default function TripsPage() {
             aria-label="Close"
           />
 
-          <div className="glass-panel relative w-full max-w-3xl overflow-hidden rounded-3xl bg-black/80 p-6 elev-3">
+          <div className="glass-panel relative w-full max-w-3xl overflow-hidden rounded-3xl  p-6 elev-3">
             {activeTrip.image && (
               <>
                 <div
@@ -233,7 +233,7 @@ export default function TripsPage() {
 
                   <button
                     onClick={() => setOpenId(null)}
-                    className="glass-surface rounded-xl px-3 py-2 text-sm hover:bg-white/[0.10]"
+                    className="glass-surface rounded-xl px-3 py-2 text-sm hover:"
                     aria-label="Close"
                   >
                     ✕
@@ -248,7 +248,7 @@ export default function TripsPage() {
                     {activeTrip.focusTags.map((tag) => (
                       <span
                         key={tag}
-                        className="glass-panel rounded-full bg-black/30 px-2.5 py-1 text-xs text-muted"
+                        className="glass-panel rounded-full  px-2.5 py-1 text-xs text-muted"
                       >
                         {tag}
                       </span>

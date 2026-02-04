@@ -248,10 +248,10 @@ export default function MixerPage() {
     <main className="mx-auto max-w-6xl p-6">
       <div className="grid grid-cols-12 gap-6">
         {/* LEFT: Library */}
-        <aside className="glass-panel elev-3 col-span-12 md:col-span-4 rounded-3xl p-6">
+        <aside className="glass-panel  col-span-12 md:col-span-4 rounded-3xl p-6">
           <h2 className="text-lg font-semibold">Library</h2>
           <input
-            className="glass-surface mt-3 w-full rounded-lg px-3 py-2 text-sm text-app placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
+            className="glass-surface mt-3 w-full rounded-lg px-3 py-2 text-sm text-app placeholder:text-faint focus:outline-none focus:ring-2 focus:ring-white/20"
             placeholder="Search…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -313,7 +313,7 @@ export default function MixerPage() {
         </aside>
 
         {/* CENTER: Mixer */}
-        <section className="glass-panel elev-3 col-span-12 md:col-span-5 rounded-3xl p-6">
+        <section className="glass-panel  col-span-12 md:col-span-5 rounded-3xl p-6">
           <h1 className="text-lg font-semibold">Mixer</h1>
           <p className="mt-1 text-sm text-faint">Ugly is correct. Logic first.</p>
 
@@ -350,7 +350,7 @@ export default function MixerPage() {
                     onChange={(e) => updateTrack(t.id, { assetId: e.target.value })}
                   >
                     {LIBRARY.find((x) => x.id === t.libraryId)?.assets.map((a) => (
-                      <option key={a.id} value={a.id} className="bg-white/[0.06] text-app">
+                      <option key={a.id} value={a.id} className="text-app">
                         {a.label}
                       </option>
                     ))}
@@ -386,10 +386,10 @@ export default function MixerPage() {
                           updateTrack(t.id, { ratePreset: e.target.value as MixTrack['ratePreset'] })
                         }
                       >
-                        <option className="bg-white/[0.06] text-app">Rare</option>
-                        <option className="bg-white/[0.06] text-app">Medium</option>
-                        <option className="bg-white/[0.06] text-app">Often</option>
-                        <option className="bg-white/[0.06] text-app">Very Often</option>
+                        <option className="text-app">Rare</option>
+                        <option className="text-app">Medium</option>
+                        <option className="text-app">Often</option>
+                        <option className="text-app">Very Often</option>
                       </select>
                     </div>
 
@@ -402,9 +402,9 @@ export default function MixerPage() {
                           updateTrack(t.id, { rateSpeed: Number(e.target.value) as MixTrack['rateSpeed'] })
                         }
                       >
-                        <option value={0.5} className="bg-white/[0.06] text-app">0.5×</option>
-                        <option value={1} className="bg-white/[0.06] text-app">1×</option>
-                        <option value={2} className="bg-white/[0.06] text-app">2×</option>
+                        <option value={0.5} className="text-app">0.5×</option>
+                        <option value={1} className="text-app">1×</option>
+                        <option value={2} className="text-app">2×</option>
                       </select>
                     </div>
                   </div>
@@ -441,7 +441,7 @@ export default function MixerPage() {
         </section>
 
         {/* RIGHT: Export */}
-        <aside className="glass-panel elev-3 col-span-12 md:col-span-3 rounded-3xl p-6">
+        <aside className="glass-panel  col-span-12 md:col-span-3 rounded-3xl p-6">
           <h2 className="text-lg font-semibold">Export</h2>
           <p className="mt-1 text-sm text-faint">Export is locked on Personal.</p>
 
@@ -449,9 +449,9 @@ export default function MixerPage() {
             <div>
               <label className="text-xs text-faint">Duration</label>
               <select className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-app focus:outline-none focus:ring-2 focus:ring-white/20">
-                <option className="bg-white/[0.06] text-app">10 min</option>
-                <option className="bg-white/[0.06] text-app">30 min</option>
-                <option className="bg-white/[0.06] text-app">60 min (max)</option>
+                <option className="text-app">10 min</option>
+                <option className="text-app">30 min</option>
+                <option className="text-app">60 min (max)</option>
               </select>
             </div>
 
@@ -486,5 +486,7 @@ export default function MixerPage() {
     </main>
   );
 }
+
+
 
 

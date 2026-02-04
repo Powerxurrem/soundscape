@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createAudioEngine, type AudioEngine } from './mixer/audio/audioengine';
-import { Sparkles } from "@/components/Sparkles";
+import { Sparkles } from "./components/Sparkles";
+
+
 
 
 type DemoTrack = {
@@ -87,7 +89,7 @@ export default function Home() {
 
       <div className="relative mx-auto max-w-5xl px-6 py-14">
 {/* HERO */}
-<section className="glass-surface elev-3 relative overflow-hidden rounded-3xl p-8">
+<section className="glass-panel elev-3 relative overflow-hidden rounded-3xl p-8">
   {/* Sparkles behind content */}
   <div className="pointer-events-none absolute inset-0 z-0">
     <Sparkles seed="home-hero" count={22} />
@@ -102,7 +104,7 @@ export default function Home() {
       </div>
 
       <h1 className="mt-4 text-4xl font-semibold tracking-tight">Soundscape</h1>
-      <p className="mt-3 text-sm leading-relaxed text-app">
+      <p className="mt-3 text-sm leading-relaxed text-muted">
         Calm, realistic ambient soundscapes — built to be deterministic &amp; offline-friendly.
       </p>
 
@@ -145,7 +147,7 @@ export default function Home() {
 
 
         {/* DEMO */}
-        <section className="glass-surface elev-3 mt-10 rounded-3xl p-8 ,0_40px_120">
+        <section className="glass-panel elev-3 mt-10 rounded-3xl p-8 ,0_40px_120">
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">Demo</h2>
@@ -241,7 +243,7 @@ export default function Home() {
                   <div className="mt-1 text-xs text-muted">Trips shows what’s recorded vs generated.</div>
                   <a
                     href="/trips"
-                    className="mt-3 inline-flex items-center gap-2 text-xs text-muted hover:text-white"
+                    className="mt-3 inline-flex items-center gap-2 text-xs text-muted hover:text-strong"
                   >
                     View Trips
                   </a>

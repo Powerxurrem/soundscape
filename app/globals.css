@@ -109,6 +109,7 @@
   .pill-glass,
   .btn-glass,
   .btn-glass-secondary,
+  .range-gold { accent-color: rgb(var(--gold-rgb)); }
   .field-glass {
     backdrop-filter:
       blur(var(--glass-blur))

@@ -96,9 +96,7 @@ function makeId(prefix: string) {
 // - events: allow ids like "birds_events" but folder is "birds"
 function folderIdFor(track: { type: TrackType; libraryId: string }) {
   if (track.type !== 'event') return track.libraryId;
-  return track.libraryId.endsWith('_events')
-    ? track.libraryId.replace(/_events$/, '')
-    : track.libraryId;
+  return track.libraryId.endsWith('_events') ? track.libraryId.replace(/_events$/, '') : track.libraryId;
 }
 
 function assetUrlFor(track: { type: TrackType; libraryId: string }, assetId: string) {
@@ -115,6 +113,11 @@ export default function MixerPage() {
 
   const [assetStatus, setAssetStatus] = useState<Record<string, boolean>>({});
   const [query, setQuery] = useState('');
+
+  // UI-only placeholders for export panel
+  const [credits] = useState(0);
+  const [exportFormat, setExportFormat] = useState<'wav' | 'recipe'>('wav');
+
   const [tracks, setTracks] = useState<MixTrack[]>([
     {
       id: makeId('t'),
@@ -175,16 +178,11 @@ export default function MixerPage() {
     return LIBRARY.filter((i) => i.name.toLowerCase().includes(q));
   }, [query]);
 
-  const loopsList = useMemo(
-    () => filteredLibrary.filter((i) => i.type === 'loop'),
-    [filteredLibrary]
-  );
-  const eventsList = useMemo(
-    () => filteredLibrary.filter((i) => i.type === 'event'),
-    [filteredLibrary]
-  );
+  const loopsList = useMemo(() => filteredLibrary.filter((i) => i.type === 'loop'), [filteredLibrary]);
+  const eventsList = useMemo(() => filteredLibrary.filter((i) => i.type === 'event'), [filteredLibrary]);
 
   function addToMix(item: LibraryItem) {
+    // only one instance of each loop
     if (item.type === 'loop' && tracks.some((t) => t.type === 'loop' && t.libraryId === item.id)) return;
 
     const next: MixTrack = {
@@ -194,7 +192,6 @@ export default function MixerPage() {
       type: item.type,
       assetId: item.defaultAssetId,
       volume: item.type === 'loop' ? 0.5 : 0.35,
-
       ...(item.type === 'event'
         ? {
             ratePreset: 'Rare' as const,
@@ -244,11 +241,18 @@ export default function MixerPage() {
     };
   }, [tracks]);
 
+  // placeholder actions
+  function exportMix() {
+    // hook later
+    // eslint-disable-next-line no-console
+    console.log('Export clicked', { exportFormat, credits, tracks });
+  }
+
   return (
     <main className="mx-auto max-w-6xl p-6">
       <div className="grid grid-cols-12 gap-6">
         {/* LEFT: Library */}
-        <aside className="glass-panel  col-span-12 md:col-span-4 rounded-3xl p-6">
+        <aside className="glass-panel col-span-12 md:col-span-4 rounded-3xl p-6">
           <h2 className="text-lg font-semibold">Library</h2>
           <input
             className="glass-surface mt-3 w-full rounded-lg px-3 py-2 text-sm text-app placeholder:text-faint focus:outline-none focus:ring-2 focus:ring-white/20"
@@ -257,63 +261,54 @@ export default function MixerPage() {
             onChange={(e) => setQuery(e.target.value)}
           />
 
-          {/* Two segments: Loops + Events, each scrolls */}
-          <div className="mt-4 flex h-[calc(100vh-260px)] flex-col gap-4 min-h-0">
-            <div className="flex min-h-0 flex-1 flex-col">
-              <div className="mb-2 flex items-baseline justify-between">
-                <div className="text-sm font-semibold">Loops</div>
-                <div className="text-xs text-faint">Total {loopsList.length}</div>
-              </div>
-              <div className="min-h-0 flex-1 overflow-y-auto pr-1">
-                <div className="space-y-2">
-                  {loopsList.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => addToMix(item)}
-                      className="btn-glass w-full text-left rounded-lg px-3 py-2"
-
-                    >
-                <div className="font-medium text-strong">{item.name}</div>
-                <div className="text-xs text-muted">Loop</div>
-
-                    </button>
-                  ))}
-                  {loopsList.length === 0 && (
-                    <div className="text-xs text-faint">No loop items.</div>
-                  )}
-                </div>
-              </div>
+          {/* Library list (single scroll) */}
+          <div className="mt-4 max-h-[calc(100vh-260px)] overflow-y-auto pr-1">
+            {/* Loops */}
+            <div className="mb-2 flex items-baseline justify-between">
+              <div className="text-sm font-semibold">Loops</div>
+              <div className="text-xs text-faint">Total {loopsList.length}</div>
             </div>
 
-            <div className="flex min-h-0 flex-1 flex-col">
-              <div className="mb-2 flex items-baseline justify-between">
-                <div className="text-sm font-semibold">Events</div>
-                <div className="text-xs text-faint">Total {eventsList.length}</div>
-              </div>
-              <div className="min-h-0 flex-1 overflow-y-auto pr-1">
-                <div className="space-y-2">
-                  {eventsList.map((item) => (
-                    <button
-                      key={item.id}
-                      onClick={() => addToMix(item)}
-                      className="btn-glass w-full text-left rounded-lg px-3 py-2"
+            <div className="space-y-2">
+              {loopsList.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => addToMix(item)}
+                  className="btn-glass w-full rounded-lg px-3 py-2 text-left"
+                >
+                  <div className="font-medium text-strong">{item.name}</div>
+                  <div className="text-xs text-muted">Loop</div>
+                </button>
+              ))}
+              {loopsList.length === 0 && <div className="text-xs text-faint">No loop items.</div>}
+            </div>
 
-                    >
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-xs text-faint">Event</div>
-                    </button>
-                  ))}
-                  {eventsList.length === 0 && (
-                    <div className="text-xs text-faint">No event items.</div>
-                  )}
-                </div>
-              </div>
+            <div className="my-5 h-px opacity-40" style={{ background: 'var(--glass-border-soft)' }} />
+
+            {/* Events */}
+            <div className="mb-2 flex items-baseline justify-between">
+              <div className="text-sm font-semibold">Events</div>
+              <div className="text-xs text-faint">Total {eventsList.length}</div>
+            </div>
+
+            <div className="space-y-2">
+              {eventsList.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => addToMix(item)}
+                  className="btn-glass w-full rounded-lg px-3 py-2 text-left"
+                >
+                  <div className="font-medium text-strong">{item.name}</div>
+                  <div className="text-xs text-muted">Event</div>
+                </button>
+              ))}
+              {eventsList.length === 0 && <div className="text-xs text-faint">No event items.</div>}
             </div>
           </div>
         </aside>
 
         {/* CENTER: Mixer */}
-        <section className="glass-panel  col-span-12 md:col-span-5 rounded-3xl p-6">
+        <section className="glass-panel col-span-12 md:col-span-5 rounded-3xl p-6">
           <h1 className="text-lg font-semibold">Mixer</h1>
           <p className="mt-1 text-sm text-faint">Ugly is correct. Logic first.</p>
 
@@ -332,16 +327,11 @@ export default function MixerPage() {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => removeTrack(t.id)}
-                    className="btn-glass w-full text-left rounded-lg px-3 py-2"
-
-                  >
+                  <button onClick={() => removeTrack(t.id)} className="btn-glass rounded-lg px-3 py-2 text-left">
                     Remove
                   </button>
                 </div>
 
-                {/* Asset selector */}
                 <div className="mt-3">
                   <label className="text-xs text-faint">Asset</label>
                   <select
@@ -357,24 +347,20 @@ export default function MixerPage() {
                   </select>
                 </div>
 
-                {/* Volume */}
                 <div className="mt-3 flex items-center gap-3">
-                  <span className="text-xs text-faint w-14">Vol</span>
+                  <span className="w-14 text-xs text-faint">Vol</span>
                   <input
                     type="range"
-                    className="flex-1"
+                    className="range-gold flex-1"
                     min={0}
                     max={1}
                     step={0.01}
                     value={t.volume}
                     onChange={(e) => updateTrack(t.id, { volume: Number(e.target.value) })}
                   />
-                  <span className="text-xs text-faint w-10 text-right">
-                    {Math.round(t.volume * 100)}%
-                  </span>
+                  <span className="w-10 text-right text-xs text-faint">{Math.round(t.volume * 100)}%</span>
                 </div>
 
-                {/* Event controls */}
                 {t.type === 'event' && (
                   <div className="mt-3 grid grid-cols-2 gap-3">
                     <div>
@@ -399,12 +385,20 @@ export default function MixerPage() {
                         className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-app focus:outline-none focus:ring-2 focus:ring-white/20"
                         value={t.rateSpeed}
                         onChange={(e) =>
-                          updateTrack(t.id, { rateSpeed: Number(e.target.value) as MixTrack['rateSpeed'] })
+                          updateTrack(t.id, {
+                            rateSpeed: Number(e.target.value) as MixTrack['rateSpeed'],
+                          })
                         }
                       >
-                        <option value={0.5} className="text-app">0.5×</option>
-                        <option value={1} className="text-app">1×</option>
-                        <option value={2} className="text-app">2×</option>
+                        <option value={0.5} className="text-app">
+                          0.5×
+                        </option>
+                        <option value={1} className="text-app">
+                          1×
+                        </option>
+                        <option value={2} className="text-app">
+                          2×
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -413,15 +407,12 @@ export default function MixerPage() {
             ))}
           </div>
 
-          {/* AUDIO CONTROLS */}
           <div className="mt-6 flex gap-3">
-            <button onClick={activateAudio} className="btn-glass w-full text-left rounded-lg px-3 py-2"
->
+            <button onClick={activateAudio} className="btn-glass w-full rounded-lg px-3 py-2 text-left">
               {audioOn ? 'Audio Active' : 'Activate Audio'}
             </button>
 
-            <button onClick={stopAudio} className="btn-glass w-full text-left rounded-lg px-3 py-2"
->
+            <button onClick={stopAudio} className="btn-glass w-full rounded-lg px-3 py-2 text-left">
               Stop
             </button>
 
@@ -429,7 +420,7 @@ export default function MixerPage() {
               <span className="text-xs text-faint">Master</span>
               <input
                 type="range"
-                className="w-40"
+                className="range-gold w-40"
                 min={0}
                 max={1}
                 step={0.01}
@@ -440,53 +431,43 @@ export default function MixerPage() {
           </div>
         </section>
 
-        {/* RIGHT: Export */}
-        <aside className="glass-panel  col-span-12 md:col-span-3 rounded-3xl p-6">
-          <h2 className="text-lg font-semibold">Export</h2>
-          <p className="mt-1 text-sm text-faint">Export is locked on Personal.</p>
-
-          <div className="mt-4 space-y-3">
-            <div>
-              <label className="text-xs text-faint">Duration</label>
-              <select className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-app focus:outline-none focus:ring-2 focus:ring-white/20">
-                <option className="text-app">10 min</option>
-                <option className="text-app">30 min</option>
-                <option className="text-app">60 min (max)</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="text-xs text-faint">Format</label>
-              <div className="mt-1 grid grid-cols-2 gap-2">
-                <button className="glass-panel rounded-lg px-3 py-2 text-sm text-faint" disabled>
-                  MP3
-                </button>
-                <button className="glass-panel rounded-lg px-3 py-2 text-sm text-faint" disabled>
-                  WAV
-                </button>
-              </div>
-              <div className="mt-2 text-xs text-faint">🔒 Commercial license required to export.</div>
-            </div>
-
-            <button className="glass-panel w-full rounded-lg px-4 py-2 text-sm text-faint" disabled>
-              Export (Locked)
-            </button>
-
-            <div className="glass-panel rounded-2xl p-4">
-              <div className="font-medium">Commercial unlock includes:</div>
-              <ul className="mt-2 list-disc pl-4 space-y-1">
-                <li>MP3 + WAV exports</li>
-                <li>License certificate per export</li>
-                <li>Monthly export minutes</li>
-              </ul>
-            </div>
+      {/* RIGHT: Export */}
+      <aside className="glass-panel col-span-12 md:col-span-3 rounded-3xl p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold">Export</h2>
+            <p className="mt-1 text-xs text-faint">5 minutes per export • costs 1 credit</p>
           </div>
-        </aside>
-      </div>
-    </main>
-  );
+          <div className="pill-glass px-3 py-1 text-xs text-app">0 credits</div>
+        </div>
+
+        <button className="btn-glass btn-gold mt-4 w-full rounded-xl px-4 py-3 text-sm">
+          Export 5 min
+        </button>
+
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <button className="btn-glass rounded-lg px-3 py-2 text-sm">Buy credits</button>
+          <a href="/pricing" className="btn-glass rounded-lg px-3 py-2 text-sm text-center">Pricing</a>
+        </div>
+
+        <div className="mt-4">
+          <div className="text-xs text-faint">Format</div>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            <button className="btn-glass glass-active rounded-lg px-3 py-2 text-sm">WAV</button>
+            <button className="btn-glass hover:glass-hover rounded-lg px-3 py-2 text-sm">Recipe</button>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <div className="text-xs text-faint">Includes</div>
+          <div className="mt-2 flex flex-wrap gap-2 text-xs">
+            <span className="pill-glass px-2.5 py-1 text-muted">WAV + recipe</span>
+            <span className="pill-glass px-2.5 py-1 text-muted">License cert</span>
+            <span className="pill-glass px-2.5 py-1 text-muted">Deterministic</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+);
 }
-
-
-
-

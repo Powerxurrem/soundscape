@@ -38,23 +38,22 @@ export default function RootLayout({
 />
 
 
-        {/* ===== Header ===== */}
-        <header className="sticky top-0 z-50 bg-white/[0.04] shadow-[0_1px_0_rgba(255,255,255,0.06)]">
+<header className="glass-panel z-50 bg-white/[0.04] shadow-[0_1px_0_rgba(255,255,255,0.06)]">
+  <div className="mx-auto max-w-5xl px-6 py-4">
+    <nav className="flex items-center justify-between">
+      <div className="flex items-center gap-6 text-sm font-medium">
+        <a href="/" className="nav-link text-white">Home</a>
+        <a href="/pricing" className="nav-link">Pricing</a>
+        <a href="/about" className="nav-link">About</a>
+        <a href="/trips" className="nav-link">Trips</a>
+        <a href="/mixer" className="nav-link">Mixer</a>
+        <a href="/autopilot" className="nav-link">Autopilot</a>
+        <a href="/terms" className="nav-link">Terms</a>
+      </div>
+    </nav>
+  </div>
+</header>
 
-          <div className="mx-auto max-w-5xl px-6 py-4">
-            <nav className="flex items-center justify-between">
-              <div className="flex items-center gap-6 text-sm font-medium">
-                <a href="/" className="text-white hover:opacity-80">Home</a>
-                <a href="/pricing" className="text-app hover:text-strong">Pricing</a>
-                <a href="/about" className="text-app hover:text-strong">About</a>
-                <a href="/trips" className="text-app hover:text-strong">Trips</a>
-                <a href="/mixer" className="text-app hover:text-strong">Mixer</a>
-                <a href="/autopilot" className="text-app hover:text-strong">Autopilot</a>
-                <a href="/terms" className="text-app hover:text-strong">Terms</a>
-              </div>
-            </nav>
-          </div>
-        </header>
 
         {/* ===== Main ===== */}
         <main>

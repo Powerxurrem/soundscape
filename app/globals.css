@@ -67,7 +67,7 @@
 
   /* state overlays (stack on top of existing fill) */
   --glass-state-rgb: 255 255 255;
-  --glass-hover-a: 0.06;
+  --glass-hover-a: 0.2;
   --glass-active-a: 0.25;
   --glass-press-a: 0.2 ;
 
@@ -120,7 +120,61 @@
       saturate(var(--glass-saturate))
       contrast(var(--glass-contrast));
   }
+  /* --- Top nav links --- */
+  .nav-link {
+    position: relative;
+    padding: 0.25rem 0;
+    color: var(--text);
+    text-decoration: none;
+    transition:
+      color 160ms ease,
+      filter 160ms ease;
+  }
 
+  /* subtle gold underline (hidden by default) */
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgb(var(--gold-rgb) / 0.9),
+      transparent
+    );
+    opacity: 0;
+    transform: scaleX(0.6);
+    transition:
+      opacity 160ms ease,
+      transform 160ms ease;
+  }
+
+  /* hover */
+  .nav-link:hover {
+    color: var(--text-strong);
+    filter: drop-shadow(0 0 10px rgb(var(--gold-rgb) / 0.35));
+  }
+
+  .nav-link:hover::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  /* keyboard focus */
+  .nav-link:focus-visible {
+    outline: none;
+    color: var(--text-strong);
+    filter: drop-shadow(0 0 14px rgb(var(--gold-rgb) / 0.45));
+  }
+
+  .nav-link:focus-visible::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
   /* State helpers (overlay layer) — does NOT replace base background */
   .glass-hover {
     background-image: linear-gradient(var(--glass-overlay-hover), var(--glass-overlay-hover));
@@ -155,6 +209,72 @@
     background: var(--glass-fill-mini);
     border: 1px solid var(--glass-border-soft);
   }
+ /* --- Interactive glow for anything clickable --- */
+  .btn-glass,
+  .btn-glass-secondary,
+  .pill-glass {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+
+    /* smooth feel */
+    transition:
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      border-color 160ms ease,
+      background-image 160ms ease,
+      filter 160ms ease;
+  }
+
+  /* hover = brighter border + subtle gold glow + soft white sheen */
+  .btn-glass:hover,
+  .btn-glass-secondary:hover,
+  .pill-glass:hover {
+    border-color: rgb(var(--gold-rgb) / 0.70);
+    background-image: linear-gradient(var(--glass-overlay-hover), var(--glass-overlay-hover));
+    box-shadow:
+      0 0 0 1px rgb(var(--gold-rgb) / 0.20),
+      0 0 22px rgb(var(--gold-rgb) / 0.16),
+      0 18px 60px rgba(0, 0, 0, 0.40);
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+  }
+
+  /* press = push down + tighter glow */
+  .btn-glass:active,
+  .btn-glass-secondary:active,
+  .pill-glass:active {
+    background-image: linear-gradient(var(--glass-overlay-press), var(--glass-overlay-press));
+    transform: translateY(0px);
+    box-shadow:
+      0 0 0 1px rgb(var(--gold-rgb) / 0.18),
+      0 0 14px rgb(var(--gold-rgb) / 0.14),
+      0 10px 30px rgba(0, 0, 0, 0.35);
+    filter: brightness(1.03);
+  }
+
+  /* keyboard focus = clear gold ring (accessibility + feels premium) */
+  .btn-glass:focus-visible,
+  .btn-glass-secondary:focus-visible,
+  .pill-glass:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px rgb(var(--gold-rgb) / 0.55),
+      0 0 0 6px rgb(var(--gold-rgb) / 0.16),
+      0 18px 60px rgba(0, 0, 0, 0.45);
+  }
+
+  /* disabled = no hover/press glow */
+  .btn-glass:disabled,
+  .btn-glass-secondary:disabled,
+  .pill-glass:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    background-image: none;
+    filter: none;
+  }
 
   /* Form fields */
   .field-glass {
@@ -186,7 +306,7 @@
   .text-strong { color: var(--text-strong); }
   .text-muted { color: var(--text-muted); }
   .text-faint { color: var(--text-faint); }
-}
+
 
 /* -------------------------------------------------------
    Sparkle animation (deterministic twinkle)

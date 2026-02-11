@@ -40,11 +40,11 @@
   --glass-rgb-big: 10 10 14; /* near-black */
 
   /* optics */
-  --glass-saturate: 1.5;
-  --glass-contrast: 2;
+  --glass-saturate: 1;
+  --glass-contrast: 1;
 
   /* master transparency multiplier */
-  --glass-alpha: 2;
+  --glass-alpha: 2 ;
 
   /* borders (gold) */
   --glass-border-strong: rgb(var(--gold-rgb) / 0.45);
@@ -53,10 +53,10 @@
 
   /* per-tier base alpha (before master multiplier) */
   --glass-fill-big-a: 0.3;
-  --glass-fill-section-a: 0.2;
+  --glass-fill-section-a: 0.3;
   --glass-fill-mini-a: 0.3;
-  --glass-fill-inset-a: 0.2;
-  --glass-fill-field-a: 0.2;
+  --glass-fill-inset-a: 0.3;
+  --glass-fill-field-a: 0.3;
 
   /* derived fills (color × transparency) */
   --glass-fill-big:  rgb(var(--glass-rgb-big) / calc(var(--glass-fill-big-a) * var(--glass-alpha)));

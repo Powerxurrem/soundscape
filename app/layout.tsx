@@ -29,11 +29,11 @@ export default function RootLayout({
         rgba(0,0,0,0.35),
         rgba(0,0,0,0.45)
       ),
-      url(/bg/aurora_wide_converted.jpg)
+      url(/bg/cabin_2.jpg)
     `,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    filter: 'brightness(0.8) contrast(1) saturate(1.2)',
+    filter: 'brightness(1.4) contrast(1) saturate(1.2)',
   }}
 />
 
@@ -43,11 +43,10 @@ export default function RootLayout({
     <nav className="flex items-center justify-between">
       <div className="flex items-center gap-6 text-sm font-medium">
         <a href="/" className="nav-link text-white">Home</a>
-        <a href="/pricing" className="nav-link">Pricing</a>
-        <a href="/about" className="nav-link">About</a>
-        <a href="/trips" className="nav-link">Trips</a>
         <a href="/mixer" className="nav-link">Mixer</a>
         <a href="/autopilot" className="nav-link">Autopilot</a>
+        <a href="/pricing" className="nav-link">Pricing</a>
+        <a href="/about" className="nav-link">About</a>
         <a href="/terms" className="nav-link">Terms</a>
       </div>
     </nav>

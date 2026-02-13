@@ -16,11 +16,13 @@ export async function POST(req: Request) {
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(
-      rawBody,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
+    const whsec = process.env.STRIPE_WEBHOOK_SECRET;
+if (!whsec) {
+  return NextResponse.json({ error: "Missing STRIPE_WEBHOOK_SECRET (Vercel env var)" }, { status: 500 });
+}
+
+event = stripe.webhooks.constructEvent(rawBody, sig, whsec);
+
   } catch (err: any) {
     return NextResponse.json({ error: `Webhook signature failed: ${err.message}` }, { status: 400 });
   }

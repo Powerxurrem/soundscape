@@ -91,9 +91,38 @@ function makeId(prefix: string) {
   return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
 }
 
+// Seed format like autopilot
+function makeSeed() {
+  return `${Date.now()}_${Math.floor(Math.random() * 1_000_000_000)}`;
+}
+function getOrCreateDeviceId() {
+  const key = "soundscape_device_id";
+  let v = localStorage.getItem(key);
+  if (!v) {
+    v = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+    localStorage.setItem(key, v);
+  }
+  return v;
+}
+
+async function fetchCreditsBalance() {
+  const deviceId = getOrCreateDeviceId();
+
+  const res = await fetch("/api/credits/balance", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ deviceId }),
+    cache: "no-store",
+  });
+
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error ?? "Balance failed");
+
+  return Number(data?.credits ?? 0);
+}
+
 // Map UI library IDs to folder names.
-// - loops: folder == libraryId
-// - events: allow ids like "birds_events" but folder is "birds"
 function folderIdFor(track: { type: TrackType; libraryId: string }) {
   if (track.type !== 'event') return track.libraryId;
   return track.libraryId.endsWith('_events') ? track.libraryId.replace(/_events$/, '') : track.libraryId;
@@ -110,13 +139,32 @@ export default function MixerPage() {
   const audioRef = useRef<AudioEngine | null>(null);
   const [audioOn, setAudioOn] = useState(false);
   const [masterVol, setMasterVol] = useState(0.8);
+  async function refreshCredits() {
+    try {
+      setCreditsLoading(true);
+      const c = await fetchCreditsBalance();
+      setCredits(c);
+    } catch (e) {
+      console.warn("Failed to load credits", e);
+    } finally {
+      setCreditsLoading(false);
+    }
+  }
 
   const [assetStatus, setAssetStatus] = useState<Record<string, boolean>>({});
   const [query, setQuery] = useState('');
 
-  // UI-only placeholders for export panel
-  const [credits] = useState(0);
+  // Export / Scene
+  const [seed, setSeed] = useState<string>(() => makeSeed());
+  const [durationMin, setDurationMin] = useState<5 | 15 | 30>(5);
   const [exportFormat, setExportFormat] = useState<'wav' | 'recipe'>('wav');
+
+  // UI-only placeholder credits (we’ll wire real credits later)
+  const [credits, setCredits] = useState<number>(0);
+  const [creditsLoading, setCreditsLoading] = useState<boolean>(true);
+
+
+  const creditsCost = useMemo(() => Math.max(1, Math.round(durationMin / 5)), [durationMin]);
 
   const [tracks, setTracks] = useState<MixTrack[]>([
     {
@@ -146,6 +194,27 @@ export default function MixerPage() {
       audioRef.current?.stopAll();
     };
   }, []);
+
+  useEffect(() => {
+  let alive = true;
+
+  (async () => {
+    try {
+      setCreditsLoading(true);
+      const c = await fetchCreditsBalance();
+      if (alive) setCredits(c);
+    } catch (e) {
+      console.warn("Failed to load credits", e);
+      if (alive) setCredits(0);
+    } finally {
+      if (alive) setCreditsLoading(false);
+    }
+  })();
+
+  return () => {
+    alive = false;
+  };
+}, []);
 
   async function activateAudio() {
     if (!audioRef.current) audioRef.current = createAudioEngine();
@@ -241,12 +310,56 @@ export default function MixerPage() {
     };
   }, [tracks]);
 
+  function buildSceneObject() {
+    return {
+      version: 1,
+      kind: 'soundscape_scene',
+      seed,
+      durationMin,
+      masterVol,
+      tracks: tracks.map((t) => ({
+        libraryId: t.libraryId,
+        name: t.name,
+        type: t.type,
+        assetId: t.assetId,
+        volume: t.volume,
+        ratePreset: t.ratePreset,
+        rateSpeed: t.rateSpeed,
+        randomizeVariants: t.randomizeVariants,
+      })),
+      createdAt: new Date().toISOString(),
+    };
+  }
+
+  async function copyScene() {
+    try {
+      const scene = buildSceneObject();
+      await navigator.clipboard.writeText(JSON.stringify(scene, null, 2));
+      // eslint-disable-next-line no-console
+      console.log('Scene copied');
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('Clipboard failed', e);
+      alert('Could not copy scene.');
+    }
+  }
+
   // placeholder actions
   function exportMix() {
-    // hook later
+    // hook later (consume credit + render WAV / output recipe)
     // eslint-disable-next-line no-console
-    console.log('Export clicked', { exportFormat, credits, tracks });
+    console.log('Export clicked', {
+      exportFormat,
+      credits,
+      creditsCost,
+      durationMin,
+      seed,
+      masterVol,
+      scene: buildSceneObject(),
+    });
   }
+
+  const canExport = credits >= creditsCost; // placeholder until we wire credits
 
   return (
     <main className="mx-auto max-w-6xl p-6">
@@ -261,9 +374,7 @@ export default function MixerPage() {
             onChange={(e) => setQuery(e.target.value)}
           />
 
-          {/* Library list (single scroll) */}
           <div className="mt-4 max-h-[calc(100vh-260px)] overflow-y-auto pr-1">
-            {/* Loops */}
             <div className="mb-2 flex items-baseline justify-between">
               <div className="text-sm font-semibold">Loops</div>
               <div className="text-xs text-faint">Total {loopsList.length}</div>
@@ -285,7 +396,6 @@ export default function MixerPage() {
 
             <div className="my-5 h-px opacity-40" style={{ background: 'var(--glass-border-soft)' }} />
 
-            {/* Events */}
             <div className="mb-2 flex items-baseline justify-between">
               <div className="text-sm font-semibold">Events</div>
               <div className="text-xs text-faint">Total {eventsList.length}</div>
@@ -385,20 +495,12 @@ export default function MixerPage() {
                         className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-app focus:outline-none focus:ring-2 focus:ring-white/20"
                         value={t.rateSpeed}
                         onChange={(e) =>
-                          updateTrack(t.id, {
-                            rateSpeed: Number(e.target.value) as MixTrack['rateSpeed'],
-                          })
+                          updateTrack(t.id, { rateSpeed: Number(e.target.value) as MixTrack['rateSpeed'] })
                         }
                       >
-                        <option value={0.5} className="text-app">
-                          0.5×
-                        </option>
-                        <option value={1} className="text-app">
-                          1×
-                        </option>
-                        <option value={2} className="text-app">
-                          2×
-                        </option>
+                        <option value={0.5} className="text-app">0.5×</option>
+                        <option value={1} className="text-app">1×</option>
+                        <option value={2} className="text-app">2×</option>
                       </select>
                     </div>
                   </div>
@@ -431,43 +533,143 @@ export default function MixerPage() {
           </div>
         </section>
 
-      {/* RIGHT: Export */}
-      <aside className="glass-panel col-span-12 md:col-span-3 rounded-3xl p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold">Export</h2>
-            <p className="mt-1 text-xs text-faint">5 minutes per export • costs 1 credit</p>
+        {/* RIGHT: Export */}
+        <aside className="glass-panel col-span-12 md:col-span-3 rounded-3xl p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold">Export</h2>
+              <p className="mt-1 text-xs text-faint">1 credit = 5 minutes • cost updates by duration</p>
+            </div>
+<div className="flex items-center gap-2">
+  <div className="pill-glass px-3 py-1 text-xs text-app">
+    {creditsLoading ? "…" : `${credits} credits`}
+  </div>
+  <button
+    onClick={refreshCredits}
+    className="btn-glass rounded-lg px-2.5 py-1 text-xs"
+    title="Refresh credits"
+  >
+    ↻
+  </button>
+</div>
+
+
           </div>
-          <div className="pill-glass px-3 py-1 text-xs text-app">0 credits</div>
-        </div>
 
-        <button className="btn-glass btn-gold mt-4 w-full rounded-xl px-4 py-3 text-sm">
-          Export 5 min
-        </button>
-
-        <div className="mt-3 grid grid-cols-2 gap-2">
-          <button className="btn-glass rounded-lg px-3 py-2 text-sm">Buy credits</button>
-          <a href="/pricing" className="btn-glass rounded-lg px-3 py-2 text-sm text-center">Pricing</a>
-        </div>
-
-        <div className="mt-4">
-          <div className="text-xs text-faint">Format</div>
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            <button className="btn-glass glass-active rounded-lg px-3 py-2 text-sm">WAV</button>
-            <button className="btn-glass hover:glass-hover rounded-lg px-3 py-2 text-sm">Recipe</button>
+          {/* Seed */}
+          <div className="mt-4">
+            <div className="flex items-center justify-between">
+              <div className="text-xs text-faint">Seed</div>
+              <button
+                onClick={() => setSeed(makeSeed())}
+                className="btn-glass rounded-lg px-2.5 py-1 text-xs"
+                title="New seed"
+              >
+                🎲 New
+              </button>
+            </div>
+            <input
+              className="glass-surface mt-2 w-full rounded-lg px-3 py-2 text-sm text-app placeholder:text-faint focus:outline-none focus:ring-2 focus:ring-white/20"
+              value={seed}
+              onChange={(e) => setSeed(e.target.value)}
+              placeholder="Seed…"
+            />
+            <div className="mt-2 flex gap-2">
+              <button onClick={copyScene} className="btn-glass w-full rounded-lg px-3 py-2 text-sm">
+                Copy scene
+              </button>
+            </div>
           </div>
-        </div>
 
-        <div className="mt-4">
-          <div className="text-xs text-faint">Includes</div>
-          <div className="mt-2 flex flex-wrap gap-2 text-xs">
-            <span className="pill-glass px-2.5 py-1 text-muted">WAV + recipe</span>
-            <span className="pill-glass px-2.5 py-1 text-muted">License cert</span>
-            <span className="pill-glass px-2.5 py-1 text-muted">Deterministic</span>
+          {/* Duration */}
+          <div className="mt-4">
+            <div className="flex items-center justify-between">
+              <div className="text-xs text-faint">Duration</div>
+              <div className="text-xs text-faint">Cost: {creditsCost} credit{creditsCost === 1 ? '' : 's'}</div>
+            </div>
+
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              <button
+                className={`btn-glass rounded-lg px-3 py-2 text-sm ${durationMin === 5 ? 'glass-active' : ''}`}
+                onClick={() => setDurationMin(5)}
+              >
+                5m
+              </button>
+              <button
+                className={`btn-glass rounded-lg px-3 py-2 text-sm ${durationMin === 15 ? 'glass-active' : ''}`}
+                onClick={() => setDurationMin(15)}
+              >
+                15m
+              </button>
+              <button
+                className={`btn-glass rounded-lg px-3 py-2 text-sm ${durationMin === 30 ? 'glass-active' : ''}`}
+                onClick={() => setDurationMin(30)}
+              >
+                30m
+              </button>
+            </div>
+
+            <div className="mt-2 text-[11px] text-faint">
+              (We’ll unlock 60m after stability tests.)
+            </div>
           </div>
-        </div>
-      </aside>
-    </div>
-  </main>
-);
+
+          {/* Export button */}
+          <button
+            onClick={exportMix}
+            disabled={!canExport}
+            className="btn-glass btn-gold mt-4 w-full rounded-xl px-4 py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Export {durationMin} min
+          </button>
+
+          {!canExport && (
+            <div className="mt-2 text-xs text-faint">
+              Need {Math.max(0, creditsCost - credits)} more credit{creditsCost - credits === 1 ? '' : 's'}.
+            </div>
+          )}
+
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <a href="/pricing" className="btn-glass rounded-lg px-3 py-2 text-sm text-center">
+              Buy credits
+            </a>
+
+            <a href="/pricing" className="btn-glass rounded-lg px-3 py-2 text-sm text-center">
+              Pricing
+            </a>
+          </div>
+
+          {/* Format */}
+          <div className="mt-4">
+            <div className="text-xs text-faint">Format</div>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <button
+                onClick={() => setExportFormat('wav')}
+                className={`btn-glass rounded-lg px-3 py-2 text-sm ${exportFormat === 'wav' ? 'glass-active' : ''}`}
+              >
+                WAV
+              </button>
+              <button
+                onClick={() => setExportFormat('recipe')}
+                className={`btn-glass rounded-lg px-3 py-2 text-sm ${
+                  exportFormat === 'recipe' ? 'glass-active' : ''
+                }`}
+              >
+                Scene
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <div className="text-xs text-faint">Includes</div>
+            <div className="mt-2 flex flex-wrap gap-2 text-xs">
+              <span className="pill-glass px-2.5 py-1 text-muted">WAV + scene</span>
+              <span className="pill-glass px-2.5 py-1 text-muted">License cert</span>
+              <span className="pill-glass px-2.5 py-1 text-muted">Seeded</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  );
 }

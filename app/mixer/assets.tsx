@@ -14,7 +14,7 @@ export const ASSETS: Asset[] = [
   // --- RAIN (loops) — keep 2 variants
   {
     id: 'rain_soft_loop_01',
-    label: 'Soft Rain',
+    label: 'Soft Rain', 
     type: 'loop',
     category: 'Rain',
     file: '/assets/loops/rain/rain_soft_loop_01.mp3',

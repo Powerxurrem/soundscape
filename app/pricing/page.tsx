@@ -1,25 +1,92 @@
 'use client';
 
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { getOrCreateDeviceId } from "@/lib/deviceId";
+
 export default function PricingPage() {
-  async function goToCheckout(pack: "trial" | "starter" | "creator" | "studio") {
-  try {
-    const res = await fetch("/api/checkout", {
+  const sp = useSearchParams();
+  const [credits, setCredits] = useState<number | null>(null);
+  const [creditsMsg, setCreditsMsg] = useState<string | null>(null);
+
+  async function refreshBalance() {
+    const device_id = getOrCreateDeviceId();
+    const token = localStorage.getItem("soundscape_entitlement_token");
+    if (!token) {
+      setCredits(0);
+      return;
+    }
+
+    const r = await fetch("/api/credits/balance", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pack }),
+      body: JSON.stringify({ token, device_id }),
     });
 
-    const data = await res.json();
-
-    if (data?.url) {
-      window.location.href = data.url;
-    } else {
-      alert(data?.error ?? "Checkout failed.");
-    }
-  } catch (err) {
-    alert("Checkout error.");
+    const j = await r.json();
+    setCredits(Number(j?.credits ?? 0));
   }
-}
+
+  useEffect(() => {
+    const run = async () => {
+      const success = sp.get("success");
+      const session_id = sp.get("session_id");
+      const canceled = sp.get("canceled");
+
+      if (canceled === "1") {
+        setCreditsMsg("Checkout canceled.");
+        await refreshBalance();
+        return;
+      }
+
+      const device_id = getOrCreateDeviceId();
+
+      // If returning from Stripe, claim credits
+      if (success === "1" && session_id) {
+        setCreditsMsg("Adding credits...");
+        const r = await fetch("/api/credits/claim", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id, device_id }),
+        });
+
+        const j = await r.json();
+        if (!r.ok) {
+          setCreditsMsg(j?.error ?? "Claim failed.");
+          await refreshBalance();
+          return;
+        }
+
+        localStorage.setItem("soundscape_entitlement_token", j.token);
+        setCreditsMsg("Credits added ✅");
+      }
+
+      await refreshBalance();
+    };
+
+    run().catch((e) => setCreditsMsg(e?.message ?? "Error"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sp]);
+
+  async function goToCheckout(pack: "trial" | "starter" | "creator" | "studio") {
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pack }),
+      });
+
+      const data = await res.json();
+
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data?.error ?? "Checkout failed.");
+      }
+    } catch (err) {
+      alert("Checkout error.");
+    }
+  }
 
   return (
     <main className="min-h-screen bg-transparent text-strong">
@@ -69,6 +136,20 @@ export default function PricingPage() {
             <div className="w-full md:w-[320px]">
               <div className="glass-panel rounded-2xl p-4">
                 <div className="text-sm font-medium">Includes</div>
+
+                {/* ✅ Credits status */}
+                <div className="mt-3 glass-panel rounded-xl px-4 py-2">
+                  <div className="text-xs text-faint">Your credits</div>
+                  <div className="mt-1 flex items-baseline justify-between">
+                    <div className="text-sm font-medium">
+                      {credits === null ? "—" : `${credits}`}
+                    </div>
+                    {creditsMsg && (
+                      <div className="text-xs text-muted">{creditsMsg}</div>
+                    )}
+                  </div>
+                </div>
+
                 <div className="mt-3 space-y-2 text-sm text-app">
                   <div className="glass-panel rounded-xl px-4 py-2">✅ WAV exports</div>
                   <div className="glass-panel rounded-xl px-4 py-2">✅ Recipe export (deterministic)</div>
@@ -92,7 +173,6 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* changed to 4 cols on large screens */}
           <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {/* Trial / 1 */}
             <div className="glass-panel rounded-2xl p-6 flex h-full flex-col">
@@ -138,34 +218,28 @@ export default function PricingPage() {
               </button>
             </div>
 
-{/* 10 (highlight) */}
-<div className="glass-panel rounded-2xl p-6 flex h-full flex-col ring-1 ring-white/10">
-  {/* header row */}
-  <div className="flex items-center justify-between">
-    <div className="text-sm text-muted">Creator</div>
+            {/* 10 (highlight) */}
+            <div className="glass-panel rounded-2xl p-6 flex h-full flex-col ring-1 ring-white/10">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted">Creator</div>
+                <span className="glass-surface rounded-full px-3 py-1 text-xs text-app">
+                  Most common
+                </span>
+              </div>
 
-    <span className="glass-surface rounded-full px-3 py-1 text-xs text-app">
-      Most common
-    </span>
-  </div>
+              <div className="mt-2 text-3xl font-semibold tracking-tight">10 credits</div>
+              <div className="mt-1 text-xs text-faint">= 50 minutes export total</div>
 
-  {/* title */}
-  <div className="mt-2 text-3xl font-semibold tracking-tight">10 credits</div>
-  <div className="mt-1 text-xs text-faint">= 50 minutes export total</div>
+              <div className="mt-4 text-2xl font-semibold py-1 text-strong leading-none">€18</div>
+              <div className="mt-1 text-xs text-faint">Best starting point</div>
 
-  {/* price */}
-  <div className="mt-4 text-2xl font-semibold py-1  text-strong leading-none">€18</div>
-  <div className="mt-1 text-xs text-faint">Best starting point</div>
-
-  {/* CTA */}
-  <button
-    className="mt-3 btn-glass rounded-xl px-4 py-2 text-sm self-start"
-    onClick={() => goToCheckout("creator")}
-  >
-    Buy 10 credits
-  </button>
-</div>
-
+              <button
+                className="mt-3 btn-glass rounded-xl px-4 py-2 text-sm self-start"
+                onClick={() => goToCheckout("creator")}
+              >
+                Buy 10 credits
+              </button>
+            </div>
 
             {/* 25 */}
             <div className="glass-panel rounded-2xl p-6 flex h-full flex-col">
@@ -191,7 +265,6 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* FAQ / terms-lite */}
           <div className="mt-8 grid gap-5 lg:grid-cols-2">
             <div className="glass-panel rounded-2xl p-6">
               <div className="text-sm font-medium">What do I get when I export?</div>

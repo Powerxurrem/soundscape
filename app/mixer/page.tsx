@@ -543,12 +543,29 @@ const [exportProg, setExportProg] = useState<{ done: number; total: number } | n
 
   // placeholder actions
 async function exportMix() {
+  let jobId: string | null = null;
+
   try {
     setExporting(true);
     setExportProg(null);
 
-    const t0 = performance.now();
+    // 1) reserve credits server-side
+    const startRes = await fetch("/api/export/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+      body: JSON.stringify({ durationMin, seed }),
+    });
+    const startJson = await startRes.json();
 
+    if (!startRes.ok) {
+      alert(startJson?.error ?? "Could not start export");
+      return;
+    }
+
+    jobId = startJson.jobId;
+
+    // 2) render locally
     const wav = await exportWavChunked({
       tracks,
       seed,
@@ -557,10 +574,15 @@ async function exportMix() {
       onProgress: (done, total) => setExportProg({ done, total }),
     });
 
-    const t1 = performance.now();
-    console.log("Export render time (ms):", Math.round(t1 - t0));
-    console.log("WAV size (MB):", (wav.size / 1e6).toFixed(1));
+    // 3) mark completed
+    await fetch("/api/export/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+      body: JSON.stringify({ jobId }),
+    });
 
+    // download
     const url = URL.createObjectURL(wav);
     const a = document.createElement("a");
     a.href = url;
@@ -569,14 +591,30 @@ async function exportMix() {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+
+    // refresh credits UI
+    refreshCredits();
   } catch (e: any) {
     console.error(e);
+
+    // 4) cancel reservation on failure
+    if (jobId) {
+      await fetch("/api/export/cancel", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        body: JSON.stringify({ jobId }),
+      }).catch(() => {});
+      refreshCredits();
+    }
+
     alert(`Export failed: ${e?.message ?? "unknown error"}`);
   } finally {
     setExporting(false);
     setExportProg(null);
   }
 }
+
 const exportPct = useMemo(() => {
   if (!exportProg || exportProg.total <= 0) return 0;
   return Math.max(0, Math.min(100, Math.round((exportProg.done / exportProg.total) * 100)));

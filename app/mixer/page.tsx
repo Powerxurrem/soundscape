@@ -577,6 +577,10 @@ async function exportMix() {
     setExportProg(null);
   }
 }
+const exportPct = useMemo(() => {
+  if (!exportProg || exportProg.total <= 0) return 0;
+  return Math.max(0, Math.min(100, Math.round((exportProg.done / exportProg.total) * 100)));
+}, [exportProg]);
 
   
   const canExport = credits >= creditsCost; // placeholder until we wire credits
@@ -842,6 +846,28 @@ async function exportMix() {
           >
             Export {durationMin} min
           </button>
+{exporting && (
+  <div className="mt-3">
+    <div className="mb-1 flex items-center justify-between text-[11px] text-faint">
+      <span>Rendering</span>
+      <span>{exportPct}%</span>
+    </div>
+
+    <div className="h-2 w-full overflow-hidden rounded-full border border-white/10 bg-white/5">
+      <div
+        className="h-full rounded-full"
+        style={{
+          width: `${exportPct}%`,
+          background: "linear-gradient(90deg, rgba(245, 190, 80, 0.2), rgba(245, 190, 80, 0.7))",
+        }}
+      />
+    </div>
+
+    <div className="mt-1 text-[11px] text-faint">
+      Chunk {exportProg ? `${exportProg.done}/${exportProg.total}` : "…"}
+    </div>
+  </div>
+)}
 
           {!canExport && (
             <div className="mt-2 text-xs text-faint">

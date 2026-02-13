@@ -95,15 +95,6 @@ function makeId(prefix: string) {
 function makeSeed() {
   return `${Date.now()}_${Math.floor(Math.random() * 1_000_000_000)}`;
 }
-function getOrCreateDeviceId() {
-  const key = "soundscape_device_id";
-  let v = localStorage.getItem(key);
-  if (!v) {
-    v = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
-    localStorage.setItem(key, v);
-  }
-  return v;
-}
 
 async function fetchCreditsBalance() {
 const res = await fetch("/api/credits/balance", {
@@ -127,6 +118,214 @@ function assetUrlFor(track: { type: TrackType; libraryId: string }, assetId: str
   const base = track.type === 'loop' ? 'loops' : 'events';
   const folder = folderIdFor(track);
   return `/assets/${base}/${folder}/${assetId}.mp3`;
+}
+// ---------- Export helpers (chunked offline WAV) ----------
+
+function mulberry32(seed: number) {
+  return function () {
+    let t = (seed += 0x6d2b79f5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seedToInt(s: string) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+function eventsPerMinute(p: MixTrack["ratePreset"]) {
+  switch (p) {
+    case "Rare": return 1;
+    case "Medium": return 2;
+    case "Often": return 4;
+    case "Very Often": return 8;
+    default: return 1;
+  }
+}
+
+function buildEventTimes(seed: string, trackId: string, durationSec: number, ratePreset: MixTrack["ratePreset"]) {
+  const rng = mulberry32(seedToInt(`${seed}:${trackId}`));
+  const epm = eventsPerMinute(ratePreset);
+  const interval = 60 / epm;
+  const times: number[] = [];
+  let t = rng() * interval;
+
+  while (t < durationSec) {
+    const jitter = (rng() - 0.5) * interval * 0.6;
+    t += Math.max(2, interval + jitter);
+    if (t < durationSec) times.push(t);
+  }
+  return times;
+}
+
+async function loadAndDecode(ctx: BaseAudioContext, url: string) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to fetch ${url}`);
+  const arr = await res.arrayBuffer();
+  return await ctx.decodeAudioData(arr);
+}
+
+function writeWavHeader(view: DataView, sampleRate: number, numChannels: number, numSamples: number) {
+  const bytesPerSample = 2;
+  const blockAlign = numChannels * bytesPerSample;
+  const byteRate = sampleRate * blockAlign;
+  const dataSize = numSamples * blockAlign;
+
+  const writeStr = (offset: number, s: string) => {
+    for (let i = 0; i < s.length; i++) view.setUint8(offset + i, s.charCodeAt(i));
+  };
+
+  writeStr(0, "RIFF");
+  view.setUint32(4, 36 + dataSize, true);
+  writeStr(8, "WAVE");
+  writeStr(12, "fmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, byteRate, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, 16, true);
+  writeStr(36, "data");
+  view.setUint32(40, dataSize, true);
+}
+
+function audioBufferToPCM16(buffer: AudioBuffer) {
+  const numChannels = buffer.numberOfChannels;
+  const length = buffer.length;
+  const out = new Int16Array(length * numChannels);
+
+  for (let i = 0; i < length; i++) {
+    for (let ch = 0; ch < numChannels; ch++) {
+      let s = buffer.getChannelData(ch)[i];
+      s = Math.max(-1, Math.min(1, s));
+      out[i * numChannels + ch] = s < 0 ? s * 0x8000 : s * 0x7fff;
+    }
+  }
+  return out;
+}
+
+async function renderChunk({
+  tracks,
+  seed,
+  masterVol,
+  durationSec,
+  chunkStartSec,
+  chunkSec,
+}: {
+  tracks: MixTrack[];
+  seed: string;
+  masterVol: number;
+  durationSec: number;
+  chunkStartSec: number;
+  chunkSec: number;
+}) {
+  const sampleRate = 44100;
+  const chunkLenSec = Math.min(chunkSec, durationSec - chunkStartSec);
+  const offline = new OfflineAudioContext(2, Math.ceil(chunkLenSec * sampleRate), sampleRate);
+
+  const master = offline.createGain();
+  master.gain.value = masterVol;
+  master.connect(offline.destination);
+
+  const buffers: Record<string, AudioBuffer> = {};
+  for (const t of tracks) {
+    const url = assetUrlFor(t, t.assetId);
+    const key = `${t.type}:${t.libraryId}:${t.assetId}`;
+    if (!buffers[key]) buffers[key] = await loadAndDecode(offline, url);
+  }
+
+  for (const t of tracks) {
+    const gain = offline.createGain();
+    gain.gain.value = t.volume;
+    gain.connect(master);
+
+    const key = `${t.type}:${t.libraryId}:${t.assetId}`;
+    const buf = buffers[key];
+
+    if (t.type === "loop") {
+      const src = offline.createBufferSource();
+      src.buffer = buf;
+      src.loop = true;
+
+      const offset = (chunkStartSec % buf.duration);
+      src.connect(gain);
+      src.start(0, offset);
+    } else {
+      const times = buildEventTimes(seed, t.id, durationSec, t.ratePreset ?? "Rare");
+      for (const atSec of times) {
+        if (atSec < chunkStartSec || atSec >= chunkStartSec + chunkLenSec) continue;
+        const src = offline.createBufferSource();
+        src.buffer = buf;
+        src.connect(gain);
+        src.start(atSec - chunkStartSec);
+      }
+    }
+  }
+
+  return await offline.startRendering();
+}
+
+async function exportWavChunked({
+  tracks,
+  seed,
+  masterVol,
+  durationMin,
+  onProgress,
+}: {
+  tracks: MixTrack[];
+  seed: string;
+  masterVol: number;
+  durationMin: number;
+  onProgress?: (done: number, total: number) => void;
+}) {
+  const durationSec = durationMin * 60;
+  const chunkSec = 60; // 1-minute chunks
+  const sampleRate = 44100;
+  const numChannels = 2;
+
+  const pcmChunks: Int16Array[] = [];
+  const totalChunks = Math.ceil(durationSec / chunkSec);
+
+  for (let i = 0; i < totalChunks; i++) {
+    const chunkStartSec = i * chunkSec;
+    const buf = await renderChunk({
+      tracks,
+      seed,
+      masterVol,
+      durationSec,
+      chunkStartSec,
+      chunkSec,
+    });
+
+    pcmChunks.push(audioBufferToPCM16(buf));
+    onProgress?.(i + 1, totalChunks);
+  }
+
+  const totalPcmLen = pcmChunks.reduce((sum, a) => sum + a.length, 0);
+  const pcmAll = new Int16Array(totalPcmLen);
+  let off = 0;
+  for (const c of pcmChunks) {
+    pcmAll.set(c, off);
+    off += c.length;
+  }
+
+  const header = new ArrayBuffer(44);
+  const view = new DataView(header);
+  const numSamples = pcmAll.length / numChannels;
+  writeWavHeader(view, sampleRate, numChannels, numSamples);
+
+  const wavBytes = new Uint8Array(44 + pcmAll.byteLength);
+  wavBytes.set(new Uint8Array(header), 0);
+  wavBytes.set(new Uint8Array(pcmAll.buffer), 44);
+
+  return new Blob([wavBytes], { type: "audio/wav" });
 }
 
 export default function MixerPage() {
@@ -157,6 +356,9 @@ export default function MixerPage() {
   // UI-only placeholder credits (we’ll wire real credits later)
   const [credits, setCredits] = useState<number>(0);
   const [creditsLoading, setCreditsLoading] = useState<boolean>(true);
+  const [exporting, setExporting] = useState(false);
+const [exportProg, setExportProg] = useState<{ done: number; total: number } | null>(null);
+
 
 
   const creditsCost = useMemo(() => Math.max(1, Math.round(durationMin / 5)), [durationMin]);
@@ -340,20 +542,43 @@ export default function MixerPage() {
   }
 
   // placeholder actions
-  function exportMix() {
-    // hook later (consume credit + render WAV / output recipe)
-    // eslint-disable-next-line no-console
-    console.log('Export clicked', {
-      exportFormat,
-      credits,
-      creditsCost,
-      durationMin,
+async function exportMix() {
+  try {
+    setExporting(true);
+    setExportProg(null);
+
+    const t0 = performance.now();
+
+    const wav = await exportWavChunked({
+      tracks,
       seed,
       masterVol,
-      scene: buildSceneObject(),
+      durationMin,
+      onProgress: (done, total) => setExportProg({ done, total }),
     });
-  }
 
+    const t1 = performance.now();
+    console.log("Export render time (ms):", Math.round(t1 - t0));
+    console.log("WAV size (MB):", (wav.size / 1e6).toFixed(1));
+
+    const url = URL.createObjectURL(wav);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `soundscape_${durationMin}m_${seed}.wav`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  } catch (e: any) {
+    console.error(e);
+    alert(`Export failed: ${e?.message ?? "unknown error"}`);
+  } finally {
+    setExporting(false);
+    setExportProg(null);
+  }
+}
+
+  
   const canExport = credits >= creditsCost; // placeholder until we wire credits
 
   return (
@@ -624,43 +849,33 @@ export default function MixerPage() {
             </div>
           )}
 
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            <a href="/pricing" className="btn-glass rounded-lg px-3 py-2 text-sm text-center">
-              Buy credits
-            </a>
-
-            <a href="/pricing" className="btn-glass rounded-lg px-3 py-2 text-sm text-center">
-              Pricing
-            </a>
-          </div>
-
           {/* Format */}
           <div className="mt-4">
             <div className="text-xs text-faint">Format</div>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setExportFormat('wav')}
-                className={`btn-glass rounded-lg px-3 py-2 text-sm ${exportFormat === 'wav' ? 'glass-active' : ''}`}
-              >
+            <div className="mt-2 flex flex-wrap gap-2 text-xs">
+              <span className="pill-glass pointer-events-none select-none cursor-default px-2.5 py-1 text-muted">
                 WAV
-              </button>
-              <button
-                onClick={() => setExportFormat('recipe')}
-                className={`btn-glass rounded-lg px-3 py-2 text-sm ${
-                  exportFormat === 'recipe' ? 'glass-active' : ''
-                }`}
-              >
+              </span>
+              <span className="pill-glass pointer-events-none select-none cursor-default px-2.5 py-1 text-muted">
                 Scene
-              </button>
+              </span>
             </div>
           </div>
+
 
           <div className="mt-4">
             <div className="text-xs text-faint">Includes</div>
             <div className="mt-2 flex flex-wrap gap-2 text-xs">
-              <span className="pill-glass px-2.5 py-1 text-muted">WAV + scene</span>
-              <span className="pill-glass px-2.5 py-1 text-muted">License cert</span>
-              <span className="pill-glass px-2.5 py-1 text-muted">Seeded</span>
+               <span className="pill-glass pointer-events-none select-none cursor-default px-2.5 py-1 text-muted">
+                WAV + scene
+              </span>
+              <span className="pill-glass pointer-events-none select-none cursor-default px-2.5 py-1 text-muted">
+                License cert
+              </span>
+              <span className="pill-glass pointer-events-none select-none cursor-default px-2.5 py-1 text-muted">
+                Seeded
+              </span>
+
             </div>
           </div>
         </aside>

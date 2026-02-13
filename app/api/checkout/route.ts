@@ -9,12 +9,19 @@ function getStripe() {
   return new Stripe(key, { apiVersion: "2024-06-20" as any });
 }
 
-const PRICE_ID_BY_PACK: Record<string, string> = {
-  trial: process.env.STRIPE_PRICE_TRIAL!,     
-  starter: process.env.STRIPE_PRICE_STARTER!, 
-  creator: process.env.STRIPE_PRICE_CREATOR!, 
-  studio: process.env.STRIPE_PRICE_STUDIO!,   
-};
+function getPriceIdByPack() {
+  const map: Record<string, string | undefined> = {
+    trial: process.env.STRIPE_PRICE_TRIAL,
+    starter: process.env.STRIPE_PRICE_STARTER,
+    creator: process.env.STRIPE_PRICE_CREATOR,
+    studio: process.env.STRIPE_PRICE_STUDIO,
+  };
+
+  for (const [k, v] of Object.entries(map)) {
+    if (!v) throw new Error(`Missing env var: STRIPE_PRICE_${k.toUpperCase()}`);
+  }
+  return map as Record<string, string>;
+}
 
 const CREDITS_BY_PACK: Record<string, number> = {
   trial: 1,
@@ -23,13 +30,10 @@ const CREDITS_BY_PACK: Record<string, number> = {
   studio: 25,
 };
 
-for (const [k, v] of Object.entries(PRICE_ID_BY_PACK)) {
-  if (!v) throw new Error(`Missing env var for price: ${k}`);
-}
-
 export async function POST(req: Request) {
   try {
     const stripe = getStripe();
+    const PRICE_ID_BY_PACK = getPriceIdByPack();
 
     const { pack } = await req.json();
     const price = PRICE_ID_BY_PACK[pack];

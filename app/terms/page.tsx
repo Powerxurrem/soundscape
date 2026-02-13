@@ -101,8 +101,9 @@ export default function TermsPage() {
               </ul>
 
               <p className="mt-3">
-                Violation of these restrictions may result in termination of access and revocation
-                of licenses.
+                Violation of these restrictions may result in termination of access and may invalidate the license
+for exported audio that is used in violation of these Terms.
+
               </p>
             </Section>
 
@@ -119,33 +120,47 @@ export default function TermsPage() {
               </p>
             </Section>
 
-            <Section title="5. Ownership">
-              <p>
-                All Assets, recordings, and rendered audio are{" "}
-                <b className="text-strong">owned by Soundscape</b>.
-              </p>
-              <p className="mt-3">
-                Users receive a <b className="text-strong">license to use exported audio</b>, not
-                ownership or authorship rights.
-              </p>
-              <p className="mt-3">
-                Soundscape retains the right to resolve disputes, including false copyright or
-                Content ID claims involving exported audio.
-              </p>
-            </Section>
+<Section title="5. Ownership">
+  <p>
+    All Assets and recordings available through the Service remain the{" "}
+    <b className="text-strong">property of Soundscape</b>.
+  </p>
 
-            <Section title="6. Credits, Payments & Refunds">
-              <ul className="mt-3 list-disc space-y-2 pl-5">
-                <li>Credits are required to export audio.</li>
-                <li>1 credit equals 5 minutes of exported audio.</li>
-                <li>Credits do not expire.</li>
-                <li>
-                  <b className="text-strong">All purchases are final. No refunds are provided</b>,
-                  including after export.
-                </li>
-                <li>Prices and credit packs may change for future purchases.</li>
-              </ul>
-            </Section>
+  <p className="mt-3">
+    When you export audio, you receive a{" "}
+    <b className="text-strong">non-exclusive license</b> to use that exported file as described in{" "}
+    <b className="text-strong">Section 2</b>. You do not acquire ownership of the underlying Assets
+    or the Service.
+  </p>
+
+  <p className="mt-3">
+    Soundscape retains all intellectual property rights in the{" "}
+    <b className="text-strong">Assets</b> and the <b className="text-strong">Service</b>.
+  </p>
+
+  <p className="mt-3">
+    Soundscape reserves the right to respond to and resolve copyright or Content ID disputes
+    involving exported audio.
+  </p>
+</Section>
+
+
+<Section title="6. Credits, Payments & Refunds">
+  <ul className="mt-3 list-disc space-y-2 pl-5">
+    <li>Credits are required to export audio.</li>
+    <li>1 credit equals 5 minutes of exported audio.</li>
+    <li>Credits do not expire.</li>
+    <li>
+      By completing a purchase, you agree that <b className="text-strong">digital services begin immediately</b>{" "}
+      and you waive any statutory right of withdrawal once credits are used.
+    </li>
+    <li>
+      <b className="text-strong">Refunds are not provided after credits have been used.</b>
+    </li>
+    <li>Prices and credit packs may change for future purchases.</li>
+  </ul>
+</Section>
+
 
             <Section title="7. Beta Status & Availability">
               <p>Soundscape is currently provided in a private beta.</p>
@@ -157,17 +172,21 @@ export default function TermsPage() {
               </ul>
             </Section>
 
-            <Section title="8. Termination">
-              <p>
-                We reserve the right to suspend or terminate access to the Service if these Terms
-                are violated.
-              </p>
-              <p className="mt-3">Upon termination:</p>
-              <ul className="mt-3 list-disc space-y-2 pl-5">
-                <li>licenses granted under these Terms may be revoked</li>
-                <li>misuse of exported audio may invalidate granted rights</li>
-              </ul>
-            </Section>
+<Section title="8. Termination">
+  <p>
+    We reserve the right to suspend or terminate access to the Service if these Terms are violated.
+  </p>
+
+  <p className="mt-3">
+    Upon termination, access to the Service may be suspended.
+  </p>
+
+  <p className="mt-3">
+    Previously granted licenses for exported audio remain valid unless the export was obtained or
+    used in violation of these Terms.
+  </p>
+</Section>
+
 
             <Section title="9. Limitation of Liability">
               <p>To the maximum extent permitted by law:</p>

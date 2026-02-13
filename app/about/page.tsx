@@ -117,12 +117,17 @@ export default function AboutPage() {
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
             Soundscape does not track usage and does not require a traditional account.
-            Purchases are linked to an email address so credits can always be restored.
           </p>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
-            The asset library grows over time as new real-world recordings are added.
-            Growth is intentional and curated, not algorithmic.
+            When purchasing credits, payments are processed securely by Stripe. Stripe may collect information such as name, email address, and payment details to complete the transaction. Soundscape does not store full payment details on its own servers.
+          </p>
+
+          <p className="mt-4 text-sm text-muted leading-relaxed">
+            Purchases are associated with an email address through Stripe to allow receipt delivery and purchase support.
+          </p>
+          <p className="mt-4 text-sm text-muted leading-relaxed">
+            The asset library grows over time as new real-world recordings are added. Growth is intentional and curated, not algorithmic.
           </p>
         </section>
 

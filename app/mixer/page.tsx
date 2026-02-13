@@ -236,7 +236,7 @@ async function renderChunk({
   chunkStartSec: number;
   chunkSec: number;
 }) {
-  const sampleRate = 22050;
+  const sampleRate = 44100;
   const chunkLenSec = Math.min(chunkSec, durationSec - chunkStartSec);
   const offline = new OfflineAudioContext(2, Math.ceil(chunkLenSec * sampleRate), sampleRate);
 

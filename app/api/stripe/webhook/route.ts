@@ -27,7 +27,7 @@ export async function POST(req: Request) {
   try {
     event = stripe.webhooks.constructEvent(rawBody, sig, whsec);
   } catch (err: any) {
-    return NextResponse.json({ error: `Webhook signature failed: ${err.message}` }, { status: 400 });
+    return NextResponse.json({ error: `Webhook signature failed: ${err.message}` }, { status: 400 }); 
   }
 
   if (event.type === "checkout.session.completed") {

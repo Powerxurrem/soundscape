@@ -20,44 +20,54 @@ export async function POST(req: Request) {
   if (!supabaseKey) return NextResponse.json({ error: "Missing SUPABASE_SERVICE_ROLE_KEY" }, { status: 500 });
 
   const rawBody = await req.text();
-
   const stripe = new Stripe(stripeKey, { apiVersion: "2024-06-20" as any });
 
   let event: Stripe.Event;
   try {
     event = stripe.webhooks.constructEvent(rawBody, sig, whsec);
   } catch (err: any) {
-    return NextResponse.json({ error: `Webhook signature failed: ${err.message}` }, { status: 400 }); 
+    return NextResponse.json({ error: `Webhook signature failed: ${err.message}` }, { status: 400 });
   }
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
+if (event.type === "checkout.session.completed") {
+  const session = event.data.object as Stripe.Checkout.Session;
 
-    const pack = session.metadata?.pack ?? "";
-    const credits = Number(session.metadata?.credits ?? "");
+  const pack = session.metadata?.pack ?? "";
+  const credits = Number(session.metadata?.credits ?? "");
 
-    if (!pack || !Number.isFinite(credits) || credits <= 0) {
-      return NextResponse.json({ error: "Missing/invalid session metadata" }, { status: 400 });
-    }
-
-    const stripe_session_id = session.id;
-    const customer_email = session.customer_details?.email ?? null;
-
-    const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } });
-
-    const { error } = await supabase.from("purchases").upsert(
-      {
-        stripe_session_id,
-        pack,
-        credits,
-        status: "paid",
-        customer_email,
-      },
-      { onConflict: "stripe_session_id" }
-    );
-
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (!pack || !Number.isFinite(credits) || credits <= 0) {
+    return NextResponse.json({ error: "Missing/invalid session metadata" }, { status: 400 });
   }
+
+  const device_id =
+    session.metadata?.deviceId ??
+    session.client_reference_id ??
+    null;
+
+  if (!device_id) {
+    return NextResponse.json({ error: "Missing deviceId on session" }, { status: 400 });
+  }
+
+  const stripe_session_id = session.id;
+  const customer_email = session.customer_details?.email ?? null;
+
+  const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } });
+
+  const { error } = await supabase.from("purchases").upsert(
+    {
+      stripe_session_id,
+      pack,
+      credits,
+      status: "paid",
+      customer_email,
+      device_id,
+    },
+    { onConflict: "stripe_session_id" }
+  );
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+}
+
 
   return NextResponse.json({ received: true });
 }

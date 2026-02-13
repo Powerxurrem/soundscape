@@ -1,5 +1,10 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import crypto from "crypto";
+
+const COOKIE_NAME = "soundscape_device_id";
+const newDeviceId = () => crypto.randomUUID();
 
 export const runtime = "nodejs";
 
@@ -48,6 +53,10 @@ export async function POST(req: Request) {
       req.headers.get("origin") ??
       "http://localhost:3000";
 
+    const jar = await cookies();
+    let deviceId = jar.get(COOKIE_NAME)?.value;
+    if (!deviceId) deviceId = newDeviceId();
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: [{ price, quantity: 1 }],
@@ -60,16 +69,30 @@ export async function POST(req: Request) {
         product: "soundscape",
         pack,
         credits: String(credits),
+        deviceId,
       },
 
-      client_reference_id: `soundscape_${pack}_${Date.now()}`,
+      client_reference_id: deviceId, // <-- comma matters
 
       success_url: `${origin}/pricing?success=1&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/pricing?canceled=1`,
       automatic_tax: { enabled: true },
     });
 
-    return NextResponse.json({ url: session.url });
+    // ✅ Set cookie on response so browser keeps this deviceId
+    const res = NextResponse.json({ url: session.url });
+    res.cookies.set({
+      name: COOKIE_NAME,
+      value: deviceId,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: true,
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      // optional if you ever hit non-www too:
+      // domain: ".soundscape.run",
+    });
+    return res;
   } catch (e: any) {
     return NextResponse.json(
       { error: e?.message ?? "Checkout error" },
@@ -77,3 +100,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

@@ -28,64 +28,74 @@ type MixTrack = {
   randomizeVariants?: boolean;
 };
 
-// UI Library (MINIMAL SHIP SET)
 const LIBRARY: LibraryItem[] = [
-  // --- LOOPS ---
   {
-    id: 'rain',
-    name: 'Rain',
-    type: 'loop',
-    defaultAssetId: 'rain_soft_loop_01',
+    id: "rain",
+    name: "Rain",
+    type: "loop",
+    defaultAssetId: "rain_soft_loop_01",
     assets: [
-      { id: 'rain_soft_loop_01', label: 'Soft Rain' },
-      { id: 'rain_medium_loop_01', label: 'Medium Rain' },
+      { id: "rain_soft_loop_01", label: "Rain" },
     ],
   },
   {
-    id: 'wind',
-    name: 'Wind',
-    type: 'loop',
-    defaultAssetId: 'wind_soft_trees_loop_01',
-    assets: [{ id: 'wind_soft_trees_loop_01', label: 'Soft Trees Wind' }],
+    id: "fireplace",
+    name: "Fireplace",
+    type: "loop",
+    defaultAssetId: "fireplace_cozy_loop_01",
+    assets: [
+      { id: "fireplace_cozy_loop_01", label: "Cozy Fireplace (Loop)" },
+      { id: "fireplace_cozy_open_01", label: "Fireplace (Open)" },
+    ],
   },
   {
-    id: 'fireplace',
-    name: 'Fireplace',
-    type: 'loop',
-    defaultAssetId: 'fireplace_cozy_loop_01',
-    assets: [{ id: 'fireplace_cozy_loop_01', label: 'Cozy Fireplace' }],
+    id: "wind", // folder name
+    name: "Dunes Wind",
+    type: "loop",
+    defaultAssetId: "dunes_wind",
+    assets: [
+      { id: "dunes_wind", label: "Dunes Wind" },
+    ],
   },
   {
-    id: 'water',
-    name: 'Water',
-    type: 'loop',
-    defaultAssetId: 'water_stream_with_distant_birds_01',
-    assets: [{ id: 'water_stream_with_distant_birds_01', label: 'Stream + Distant Birds' }],
+    id: "sea",
+    name: "Sea",
+    type: "loop",
+    defaultAssetId: "sea_loop_01",
+    assets: [
+      { id: "sea_loop_01", label: "Sea" },
+    ],
   },
   {
-    id: 'birds',
-    name: 'Birds',
-    type: 'loop',
-    defaultAssetId: 'birds_morning_chirp_01',
-    assets: [{ id: 'birds_morning_chirp_01', label: 'Morning Chirps' }],
+    id: "water",
+    name: "Water Stream",
+    type: "loop",
+    defaultAssetId: "water_stream_with_distant_birds_01",
+    assets: [
+      { id: "water_stream_with_distant_birds_01", label: "Water Stream" },
+    ],
   },
   {
-    id: 'insects',
-    name: 'Insects',
-    type: 'loop',
-    defaultAssetId: 'insects_soft_night_loop_01',
-    assets: [{ id: 'insects_soft_night_loop_01', label: 'Soft Night Insects' }],
+    id: "forest",
+    name: "Forest",
+    type: "loop",
+    defaultAssetId: "Forest_birds_01", // match exact casing
+    assets: [
+      { id: "Forest_birds_01", label: "Forest Birds" },
+    ],
   },
 
-  // --- EVENTS ---
+  // Optional: keep thunder event
   {
-    id: 'thunder',
-    name: 'Thunder',
-    type: 'event',
-    defaultAssetId: 'thunder_distant_roll_01',
-    assets: [{ id: 'thunder_distant_roll_01', label: 'Distant Roll' }],
+    id: "thunder",
+    name: "Thunder",
+    type: "event",
+    defaultAssetId: "thunder_distant_roll_01",
+    assets: [{ id: "thunder_distant_roll_01", label: "Distant Roll" }],
   },
 ];
+
+
 
 function makeId(prefix: string) {
   return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
@@ -226,7 +236,7 @@ async function renderChunk({
   chunkStartSec: number;
   chunkSec: number;
 }) {
-  const sampleRate = 44100;
+  const sampleRate = 22050;
   const chunkLenSec = Math.min(chunkSec, durationSec - chunkStartSec);
   const offline = new OfflineAudioContext(2, Math.ceil(chunkLenSec * sampleRate), sampleRate);
 

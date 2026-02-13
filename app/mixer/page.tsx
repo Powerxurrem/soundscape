@@ -106,15 +106,10 @@ function getOrCreateDeviceId() {
 }
 
 async function fetchCreditsBalance() {
-  const deviceId = getOrCreateDeviceId();
-
-  const res = await fetch("/api/credits/balance", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ deviceId }),
-    cache: "no-store",
-  });
-
+const res = await fetch("/api/credits/balance", {
+  method: "POST",
+  cache: "no-store",
+});
 
   const data = await res.json();
   if (!res.ok) throw new Error(data?.error ?? "Balance failed");

@@ -1,37 +1,57 @@
 import { NextResponse } from "next/server";
-import { verifyEntitlementToken, sha256Hex } from "@/lib/cryptoTokens";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { cookies } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
+import crypto from "crypto";
 
-export const runtime = "nodejs";
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY! // service key on server only
+);
 
-export async function POST(req: Request) {
-  try {
-    const { token, device_id } = await req.json();
-    if (!token || !device_id) {
-      return NextResponse.json({ credits: 0 }, { status: 200 });
-    }
+const COOKIE_NAME = "soundscape_device_id";
 
-    const payload = verifyEntitlementToken<{ entitlement_id: string; device_id_hash: string }>(token);
-    if (!payload?.entitlement_id || !payload?.device_id_hash) {
-      return NextResponse.json({ credits: 0 }, { status: 200 });
-    }
+function newDeviceId() {
+  // simple + unique enough
+  return crypto.randomUUID();
+}
 
-    const device_id_hash = sha256Hex(device_id);
-    if (device_id_hash !== payload.device_id_hash) {
-      return NextResponse.json({ credits: 0 }, { status: 200 });
-    }
+export async function POST() {
+  const jar = await cookies();
 
-    const db = supabaseAdmin();
-    const { data, error } = await db
-      .from("entitlements")
-      .select("credits_remaining")
-      .eq("id", payload.entitlement_id)
-      .maybeSingle();
+  let deviceId = jar.get(COOKIE_NAME)?.value;
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-    return NextResponse.json({ credits: data?.credits_remaining ?? 0 });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message ?? "Balance error" }, { status: 500 });
+  // If missing, mint one and set cookie
+  if (!deviceId) {
+    deviceId = newDeviceId();
   }
+
+  // Fetch credits for this deviceId (adjust table/column names)
+  // Example assumes a `credits_balance` view/table keyed by device_id
+  const { data, error } = await supabase
+    .from("credits_balance")
+    .select("credits")
+    .eq("device_id", deviceId)
+    .maybeSingle();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  const res = NextResponse.json({
+    deviceId,
+    credits: data?.credits ?? 0,
+  });
+
+  // Always set cookie (keeps it consistent + refreshes expiry)
+  res.cookies.set({
+    name: COOKIE_NAME,
+    value: deviceId,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: true,
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365, // 1 year
+  });
+
+  return res;
 }

@@ -12,8 +12,9 @@ export async function POST(req: Request) {
     }
 
     const db = supabaseAdmin();
+    const device_id_hash = sha256Hex(device_id);
 
-    // 1) ensure purchase exists + is paid
+    // 1) purchase must exist + be paid
     const { data: purchase, error: pErr } = await db
       .from("purchases")
       .select("stripe_session_id, credits, status")
@@ -25,7 +26,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Purchase not found or not paid" }, { status: 400 });
     }
 
-    // 2) prevent double-claim
+    // 2) If already claimed, return a token for THIS device entitlement
+    //    (we'll also ensure the device has an entitlement)
     const { data: existingClaim, error: cErr } = await db
       .from("claims")
       .select("entitlement_id")
@@ -34,38 +36,64 @@ export async function POST(req: Request) {
 
     if (cErr) return NextResponse.json({ error: cErr.message }, { status: 500 });
 
-    const device_id_hash = sha256Hex(device_id);
+    // 3) Find or create entitlement for this device (one per device)
+    const { data: existingEnt, error: entFindErr } = await db
+      .from("entitlements")
+      .select("id, credits_remaining")
+      .eq("device_id_hash", device_id_hash)
+      .maybeSingle();
 
-    // If already claimed, just return token for the original entitlement
+    if (entFindErr) return NextResponse.json({ error: entFindErr.message }, { status: 500 });
+
+    let entitlement_id = existingEnt?.id;
+
+    if (!entitlement_id) {
+      // Create entitlement for this device
+      const { data: ent, error: insErr } = await db
+        .from("entitlements")
+        .insert({ device_id_hash, credits_remaining: 0 })
+        .select("id, credits_remaining")
+        .single();
+
+      if (insErr) return NextResponse.json({ error: insErr.message }, { status: 500 });
+
+      entitlement_id = ent.id;
+    }
+
+    // If already claimed, don't add credits again
     if (existingClaim?.entitlement_id) {
-      const token = signEntitlementToken({
-        entitlement_id: existingClaim.entitlement_id,
-        device_id_hash,
-      });
+      const token = signEntitlementToken({ entitlement_id, device_id_hash });
       return NextResponse.json({ token });
     }
 
-    // 3) create entitlement and claim (transaction-ish)
-    const { data: ent, error: eErr } = await db
+    // 4) Add credits to device entitlement
+    // Read current credits to avoid relying on client state
+    const { data: entNow, error: entNowErr } = await db
       .from("entitlements")
-      .insert({ device_id_hash, credits_remaining: purchase.credits })
-      .select("id")
+      .select("credits_remaining")
+      .eq("id", entitlement_id)
       .single();
 
-    if (eErr) return NextResponse.json({ error: eErr.message }, { status: 500 });
+    if (entNowErr) return NextResponse.json({ error: entNowErr.message }, { status: 500 });
 
-    const { error: insClaimErr } = await db.from("claims").insert({
+    const newCredits = (entNow.credits_remaining ?? 0) + purchase.credits;
+
+    const { error: updErr } = await db
+      .from("entitlements")
+      .update({ credits_remaining: newCredits })
+      .eq("id", entitlement_id);
+
+    if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 });
+
+    // 5) Record claim (prevents double-claim)
+    const { error: claimErr } = await db.from("claims").insert({
       stripe_session_id: session_id,
-      entitlement_id: ent.id,
+      entitlement_id,
     });
 
-    if (insClaimErr) return NextResponse.json({ error: insClaimErr.message }, { status: 500 });
+    if (claimErr) return NextResponse.json({ error: claimErr.message }, { status: 500 });
 
-    const token = signEntitlementToken({
-      entitlement_id: ent.id,
-      device_id_hash,
-    });
-
+    const token = signEntitlementToken({ entitlement_id, device_id_hash });
     return NextResponse.json({ token });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message ?? "Claim error" }, { status: 500 });

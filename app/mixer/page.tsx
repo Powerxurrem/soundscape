@@ -547,7 +547,7 @@ export default function MixerPage() {
   <button
     onClick={refreshCredits}
     className="btn-glass rounded-lg px-2.5 py-1 text-xs"
-    title="Refresh credits" 
+    title="Refresh credits"
   >
     ↻
   </button>

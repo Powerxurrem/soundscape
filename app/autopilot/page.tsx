@@ -371,7 +371,70 @@ if (secondaryBed) {
     return assetUrlFor(t, t.assetId);
   }
 
-  async function onExportWavAndRecipe() {
+  function wavHeader16({
+  numChannels,
+  sampleRate,
+  numFrames,
+}: {
+  numChannels: number;
+  sampleRate: number;
+  numFrames: number;
+}) {
+  const bytesPerSample = 2;
+  const blockAlign = numChannels * bytesPerSample;
+  const byteRate = sampleRate * blockAlign;
+  const dataSize = numFrames * blockAlign;
+
+  const buffer = new ArrayBuffer(44);
+  const view = new DataView(buffer);
+
+  const writeString = (offset: number, str: string) => {
+    for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+  };
+
+  writeString(0, 'RIFF');
+  view.setUint32(4, 36 + dataSize, true);
+  writeString(8, 'WAVE');
+
+  writeString(12, 'fmt ');
+  view.setUint32(16, 16, true); // PCM
+  view.setUint16(20, 1, true); // PCM
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, byteRate, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, 16, true); // 16-bit
+
+  writeString(36, 'data');
+  view.setUint32(40, dataSize, true);
+
+  return buffer;
+}
+
+function audioBufferToPcm16LE(ab: AudioBuffer) {
+  const numChannels = ab.numberOfChannels;
+  const length = ab.length;
+
+  const out = new ArrayBuffer(length * numChannels * 2);
+  const view = new DataView(out);
+
+  const chans: Float32Array[] = [];
+  for (let c = 0; c < numChannels; c++) chans.push(ab.getChannelData(c));
+
+  let offset = 0;
+  for (let i = 0; i < length; i++) {
+    for (let c = 0; c < numChannels; c++) {
+      let s = chans[c][i];
+      s = Math.max(-1, Math.min(1, s));
+      const int16 = s < 0 ? s * 0x8000 : s * 0x7fff;
+      view.setInt16(offset, int16, true);
+      offset += 2;
+    }
+  }
+  return out;
+}
+
+async function onExportWavAndRecipe() {
   let jobId: string | null = null;
 
   if (!EXPORT_TEMPORARILY_UNLOCKED) return;
@@ -379,19 +442,20 @@ if (secondaryBed) {
   if (tracks.length === 0) return alert('Generate a mix first.');
 
   const seedForExport = String(seed).trim() || `${Date.now()}`;
+
   const chunkSec = 60;
   const totalSec = exportDurationMin * 60;
   const chunks = Math.ceil(totalSec / chunkSec);
 
+  const sampleRate = 44100;
+  const numChannels = 2;
 
   setExportMsg('');
   setIsExporting(true);
   setExportStage('starting');
-  setExportProgress(0.05);
-
+  setExportProgress(0.02);
 
   try {
-    // start server-side charge/lock
     const startRes = await fetch('/api/export/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -401,24 +465,17 @@ if (secondaryBed) {
 
     const startJson = await startRes.json();
     if (!startRes.ok) {
+      setExportStage('error');
       setExportMsg(startJson?.error ?? 'Could not start export');
       return;
     }
     jobId = startJson.jobId;
-      setExportStage('loading');
-      setExportProgress(0.15);
 
+    setExportStage('loading');
+    setExportProgress(0.08);
 
-    // render wav locally
-    const durationSec = exportDurationMin * 60;
-    const sampleRate = 44100;
-    const frames = Math.floor(durationSec * sampleRate);
-
-    const off = new OfflineAudioContext(2, frames, sampleRate);
-
-    const master = off.createGain();
-    master.gain.value = clamp01(masterVol);
-    master.connect(off.destination);
+    // Decode buffers once (use a small offline ctx just for decoding)
+    const decodeCtx = new OfflineAudioContext(1, 1, sampleRate);
 
     const urls = Array.from(new Set(tracks.map((t) => assetUrlFor(t, t.assetId))));
     const buffers = new Map<string, AudioBuffer>();
@@ -426,50 +483,88 @@ if (secondaryBed) {
     await Promise.all(
       urls.map(async (u) => {
         try {
-          buffers.set(u, await fetchAudioBuffer(off, u));
+          buffers.set(u, await fetchAudioBuffer(decodeCtx, u));
         } catch {
           console.warn('Missing audio for export:', u);
         }
       })
     );
 
-    for (const t of tracks.filter((x) => x.type === 'loop')) {
-      const u = assetUrlFor(t, t.assetId);
-      const buf = buffers.get(u);
-      if (!buf) continue;
+    // Chunk render -> PCM concat
+    setExportStage('rendering');
+    const pcmParts: ArrayBuffer[] = [];
+    const totalFrames = Math.floor(totalSec * sampleRate);
 
-      const src = off.createBufferSource();
-      src.buffer = buf;
-      src.loop = true;
+    const LOOP_PAD = 0.02;
 
-      const LOOP_PAD = 0.02;
-      src.loopStart = LOOP_PAD;
-      src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
+    for (let i = 0; i < chunks; i++) {
+      const chunkStart = i * chunkSec;
+      const chunkLenSec = Math.min(chunkSec, totalSec - chunkStart);
+      const chunkFrames = Math.floor(chunkLenSec * sampleRate);
 
-      const g = off.createGain();
-      g.gain.value = clamp01(t.volume);
+      const off = new OfflineAudioContext(numChannels, chunkFrames, sampleRate);
 
-      src.connect(g);
-      g.connect(master);
-      src.start(0);
+      const master = off.createGain();
+      master.gain.value = clamp01(masterVol);
+      master.connect(off.destination);
+
+      for (const t of tracks.filter((x) => x.type === 'loop')) {
+        const u = assetUrlFor(t, t.assetId);
+        const buf = buffers.get(u);
+        if (!buf) continue;
+
+        const src = off.createBufferSource();
+        src.buffer = buf;
+        src.loop = true;
+
+        // loop boundaries with padding
+        const loopStart = LOOP_PAD;
+        const loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
+        src.loopStart = loopStart;
+        src.loopEnd = loopEnd;
+
+        // Make loop continuous across chunks by offsetting start position
+        const loopSpan = Math.max(0.001, loopEnd - loopStart);
+        const rel = (chunkStart % loopSpan);
+        const offset = loopStart + rel;
+
+        const g = off.createGain();
+        g.gain.value = clamp01(t.volume);
+
+        src.connect(g);
+        g.connect(master);
+
+        // start at t=0 for this chunk, but read from the correct offset
+        src.start(0, offset);
+      }
+
+      const renderedChunk = await off.startRendering();
+
+      // Progress update: 10%..85% during chunk render/encode
+      const p = (i + 1) / chunks;
+      setExportProgress(0.10 + p * 0.75);
+
+      // Encode chunk to PCM16 (no WAV header per chunk)
+      pcmParts.push(audioBufferToPcm16LE(renderedChunk));
     }
-      setExportStage('rendering');
-      setExportProgress(0.45);
 
-    const rendered = await off.startRendering();
-      setExportStage('encoding');
-      setExportProgress(0.85);
-    const wav = encodeWav16(rendered);
+    setExportStage('encoding');
+    setExportProgress(0.88);
+
+    const header = wavHeader16({ numChannels, sampleRate, numFrames: totalFrames });
+    const wavBlob = new Blob([header, ...pcmParts], { type: 'audio/wav' });
+
+    setExportStage('downloading');
+    setExportProgress(0.95);
 
     const baseName = `soundscape_${mood.toLowerCase()}_${exportDurationMin}m_${seedForExport}`;
-      setExportStage('downloading');
-      setExportProgress(0.95);
-
-    downloadBlob(wav, `${baseName}.wav`);
+    downloadBlob(wavBlob, `${baseName}.wav`);
 
     const recipeText = buildRecipeTextFor(seedForExport);
     downloadBlob(new Blob([recipeText], { type: 'text/plain' }), `${baseName}.txt`);
 
+    setExportStage('done');
+    setExportProgress(1);
     setExportMsg('Downloaded WAV + recipe.');
 
     await fetch('/api/export/complete', {
@@ -490,11 +585,13 @@ if (secondaryBed) {
       }).catch(() => {});
     }
 
+    setExportStage('error');
     setExportMsg('Export failed. Check console.');
   } finally {
     setIsExporting(false);
   }
 }
+
 
   const nowPlaying = useMemo(() => {
     if (tracks.length === 0) return 'Generate a mix to start.';

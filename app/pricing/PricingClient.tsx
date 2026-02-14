@@ -9,23 +9,28 @@ export default function PricingPage() {
   const [credits, setCredits] = useState<number | null>(null);
   const [creditsMsg, setCreditsMsg] = useState<string | null>(null);
 
-  async function refreshBalance() {
-    const device_id = getOrCreateDeviceId();
-    const token = localStorage.getItem("soundscape_entitlement_token");
-    if (!token) {
-      setCredits(0);
-      return;
+async function refreshBalance() {
+  try {
+    const res = await fetch("/api/credits", { cache: "no-store" });
+
+    const text = await res.text();
+    let json: any = {};
+    try {
+      json = text ? JSON.parse(text) : {};
+    } catch {
+      json = {};
     }
 
-    const r = await fetch("/api/credits/balance", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, device_id }),
-    });
+    if (!res.ok) throw new Error(json?.error ?? text ?? "Failed to load credits");
 
-    const j = await r.json();
-    setCredits(Number(j?.credits ?? 0));
+    setCredits(Number(json?.credits ?? 0));
+  } catch (e: any) {
+    console.warn("Credits unavailable", e);
+    setCredits(0);
+    setCreditsMsg(e?.message ?? "Credits unavailable");
   }
+}
+
 
   useEffect(() => {
     const run = async () => {

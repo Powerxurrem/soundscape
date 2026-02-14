@@ -1,3 +1,4 @@
+// app/api/export/start/route.ts
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
@@ -14,75 +15,77 @@ const supabase = createClient(
 const COOKIE_NAME = "soundscape_device_id";
 const newDeviceId = () => crypto.randomUUID();
 
-function costForDurationMin(durationMin: number) {
-  // same logic as UI
-  return Math.max(1, Math.round(durationMin / 5));
-}
-
 export async function POST(req: Request) {
   const jar = await cookies();
   let deviceId = jar.get(COOKIE_NAME)?.value;
+  const hadCookie = !!deviceId;
   if (!deviceId) deviceId = newDeviceId();
 
-  const body = await req.json().catch(() => ({}));
+  const body = await req.json().catch(() => ({} as any));
   const durationMin = Number(body.durationMin);
   const seed = typeof body.seed === "string" ? body.seed : null;
 
+  const idempotencyKey =
+    typeof body.idempotencyKey === "string" && body.idempotencyKey.trim().length > 0
+      ? body.idempotencyKey.trim()
+      : null;
+
+  if (!idempotencyKey) {
+    return NextResponse.json({ error: "Missing idempotencyKey" }, { status: 400 });
+  }
+
   // lock allowed durations for v1
-  if (![5, 15, 30].includes(durationMin)) {
+  if (![5, 15, 30, 60].includes(durationMin)) {
     return NextResponse.json({ error: "Invalid duration" }, { status: 400 });
   }
 
-  const creditsCost = costForDurationMin(durationMin);
-
-  // read current balance
-  const { data: bal, error: balErr } = await supabase
-    .from("credits_balance")
-    .select("credits")
-    .eq("device_id", deviceId)
-    .maybeSingle();
-
-  if (balErr) return NextResponse.json({ error: balErr.message }, { status: 500 });
-
-  const credits = Number(bal?.credits ?? 0);
-  if (credits < creditsCost) {
-    return NextResponse.json(
-      { error: "Insufficient credits", credits, creditsCost },
-      { status: 402 }
-    );
-  }
-
-  // reserve credits
-  const { data: job, error: insErr } = await supabase
-    .from("export_jobs")
-    .insert({
-      device_id: deviceId,
-      credits: creditsCost,
-      duration_min: durationMin,
-      seed,
-      status: "reserved",
-    })
-    .select("id")
-    .single();
-
-  if (insErr) return NextResponse.json({ error: insErr.message }, { status: 500 });
-
-  const res = NextResponse.json({
-    jobId: job.id,
-    creditsCost,
+  // Atomic reserve (race-proof) + idempotent via (device_id, idempotency_key) unique index
+  const { data, error } = await supabase.rpc("reserve_export_job", {
+    p_device_id: deviceId,
+    p_duration_min: durationMin,
+    p_seed: seed,
+    p_idempotency_key: idempotencyKey,
   });
 
-  // ensure cookie exists
+  if (error) {
+    const msg = error.message ?? "Unknown error";
+
+    if (msg.includes("INSUFFICIENT_CREDITS")) {
+      return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
+    }
+    if (msg.includes("INVALID_DURATION")) {
+      return NextResponse.json({ error: "Invalid duration" }, { status: 400 });
+    }
+
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+
+const row = Array.isArray(data) ? data[0] : (data as any);
+
+if (!row || !row.job_id) {
+  console.error("reserve_export_job returned no row:", { data });
+  return NextResponse.json(
+    { error: "reserve_export_job returned no row", data },
+    { status: 500 }
+  );
+}
+
+const res = NextResponse.json({
+  jobId: row.job_id,
+  creditsCost: row.credits_cost,
+});
+
+
+  // ensure cookie exists (and keep it refreshed)
+  // NOTE: secure must be false on localhost http
   res.cookies.set({
     name: COOKIE_NAME,
     value: deviceId,
     httpOnly: true,
     sameSite: "lax",
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     path: "/",
     maxAge: 60 * 60 * 24 * 365,
-    // optional if you ever bounce between www/non-www:
-    // domain: ".soundscape.run",
   });
 
   return res;

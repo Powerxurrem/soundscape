@@ -12,71 +12,76 @@ export default function AboutPage() {
 
       <div className="relative mx-auto max-w-4xl px-6 py-14">
         {/* HERO */}
-        <section className="glass-panel elev-3 elev-3 elev-3 elev-3 rounded-3xl p-8 ,0_40px_120px_rgba(0,0,0,0.65)]">
-
-
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight">
+        <section className="glass-panel elev-3 rounded-3xl p-8">
+          <h1 className="text-4xl font-semibold tracking-tight">
             Built to be quiet, reliable, and real
           </h1>
 
-          <p className="mt-4 text-sm leading-relaxed text-muted max-w-2xl">
-            Soundscape is a deterministic ambient sound generator.
-            It creates calm, realistic soundscapes from real recordings — without accounts,
-            subscriptions, or attention-seeking features.
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">
+            Soundscape is a deterministic ambient sound engine built from real-world recordings.
+            It generates calm, realistic soundscapes without accounts, subscriptions, or algorithmic feeds.
+          </p>
+
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+            You choose a mood. You generate a mix. You export exactly what you need.
+            Nothing changes unless you change it.
           </p>
         </section>
 
         {/* WHAT IT IS */}
-        <section className="glass-panel elev-3 elev-3 elev-3 elev-3 mt-10 rounded-3xl p-8">
+        <section className="glass-panel elev-3 mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">What Soundscape is</h2>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
-            Soundscape is a utility. You choose a mood, generate a mix, and export what you need.
-            The system behaves the same every time, and nothing changes unless you change it.
+            Soundscape is a focused utility. Playback is free. Exports create licensed audio files you can use
+            in videos, games, applications, podcasts, or client work.
           </p>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
-            Playback is free. Exporting creates a licensed audio file you can use in your projects.
-            No profiles, no subscriptions, no hidden behavior.
+            There are no profiles to manage and no dashboards to monitor. The system behaves predictably and
+            consistently.
           </p>
         </section>
 
         {/* PRINCIPLES */}
-        <section className="glass-panel elev-3 elev-3 elev-3 elev-3 mt-10 rounded-3xl p-8">
+        <section className="glass-panel elev-3 mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">Design principles</h2>
 
           <ul className="mt-6 space-y-4 text-sm text-muted">
             <li>
-              <span className="font-medium text-app">Low effort over cleverness</span><br />
+              <span className="font-medium text-app">Low effort over cleverness</span>
+              <br />
               The system should work without configuration or explanation.
             </li>
             <li>
-              <span className="font-medium text-app">Determinism over randomness</span><br />
+              <span className="font-medium text-app">Determinism over randomness</span>
+              <br />
               The same inputs always produce the same result.
             </li>
             <li>
-              <span className="font-medium text-app">Silence over dashboards</span><br />
-              No accounts to manage. No metrics to watch.
+              <span className="font-medium text-app">Signal over features</span>
+              <br />
+              Remove friction. Remove noise. Keep what matters.
             </li>
             <li>
-              <span className="font-medium text-app">Shipping over optimizing</span><br />
+              <span className="font-medium text-app">Shipping over optimizing</span>
+              <br />
               Real output matters more than theoretical perfection.
             </li>
           </ul>
         </section>
 
         {/* REAL RECORDINGS */}
-        <section className="glass-panel elev-3 elev-3 elev-3 mt-10 rounded-3xl p-8">
+        <section className="glass-panel elev-3 mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">Real recordings first</h2>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
-            Many ambient tools rely entirely on generated audio.
-            Soundscape does not.
+            Soundscape uses real-world field recordings.
           </p>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
-            Real-world recordings — wind, water, fire, insects — carry imperfections that synthetic
-            audio often removes. Those imperfections are part of what makes a soundscape feel believable.
+            Wind moves unevenly. Fire crackles imperfectly. Water shifts and drifts. Synthetic systems often
+            smooth these details away. We keep them.
           </p>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
@@ -85,56 +90,61 @@ export default function AboutPage() {
         </section>
 
         {/* DETERMINISM */}
-        <section className="glass-panel elev-3 elev-3 elev-3 mt-10 rounded-3xl p-8">
+        <section className="glass-panel elev-3 mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">Deterministic by design</h2>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
-            When you generate a soundscape, the system produces a specific result — not a suggestion.
+            Every generated mix is reproducible. Exports include a small recipe description so mixes can be
+            recreated and verified later.
           </p>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
-            Exports include a small recipe file that describes the mix.
-            This makes soundscapes reproducible, debuggable, and stable over time.
+            No hidden variation. No silent updates to past results.
           </p>
         </section>
 
         {/* WHAT IT IS NOT */}
-        <section className="glass-panel elev-3 elev-3 elev-3 mt-10 rounded-3xl p-8">
+        <section className="glass-panel elev-3 mt-10 rounded-3xl p-8">
           <h2 className="text-2xl font-semibold tracking-tight">What Soundscape is not</h2>
 
           <ul className="mt-6 space-y-2 text-sm text-muted">
-            <li>• A DAW or music production tool</li>
+            <li>• A DAW or music production suite</li>
             <li>• A generative music feed</li>
-            <li>• A subscription platform</li>
+            <li>• A subscription content platform</li>
             <li>• A social or content network</li>
-            <li>• A constantly changing system</li>
+            <li>• An infinite, constantly changing system</li>
           </ul>
         </section>
 
-        {/* PRIVACY & GROWTH */}
-        <section className="glass-panel elev-3 elev-3 elev-3 mt-10 rounded-3xl p-8">
-          <h2 className="text-2xl font-semibold tracking-tight">Privacy and growth</h2>
+        {/* PRIVACY & PAYMENTS */}
+        <section className="glass-panel elev-3 mt-10 rounded-3xl p-8">
+          <h2 className="text-2xl font-semibold tracking-tight">Privacy and payments</h2>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
-            Soundscape does not track usage and does not require a traditional account.
+            Soundscape does not track usage and does not require accounts.
           </p>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
-            When purchasing credits, payments are processed securely by Stripe. Stripe may collect information such as name, email address, and payment details to complete the transaction. Soundscape does not store full payment details on its own servers.
+            When purchasing credits, payments are securely processed by Stripe. Stripe may collect necessary
+            information (such as name and email) to complete the transaction. Soundscape does not store full
+            payment details.
           </p>
 
           <p className="mt-4 text-sm text-muted leading-relaxed">
-            Purchases are associated with an email address through Stripe to allow receipt delivery and purchase support.
-          </p>
-          <p className="mt-4 text-sm text-muted leading-relaxed">
-            The asset library grows over time as new real-world recordings are added. Growth is intentional and curated, not algorithmic.
+            Purchases are associated with Stripe transaction data for receipt delivery and support.
           </p>
         </section>
 
+        {/* GROWTH */}
+        <section className="glass-panel elev-3 mt-10 rounded-3xl p-8">
+          <h2 className="text-2xl font-semibold tracking-tight">Growth philosophy</h2>
 
+          <p className="mt-4 text-sm text-muted leading-relaxed">
+            The asset library grows intentionally. New recordings are added through curated real-world capture
+            — not algorithmic generation. Expansion is deliberate. Quality comes before quantity.
+          </p>
+        </section>
       </div>
     </main>
   );
 }
-
-

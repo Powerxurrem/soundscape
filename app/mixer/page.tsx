@@ -45,7 +45,7 @@ const LIBRARY: LibraryItem[] = [
     defaultAssetId: "fireplace_cozy_loop_01",
     assets: [
       { id: "fireplace_cozy_loop_01", label: "Cozy Fireplace (Loop)" },
-      { id: "fireplace_cozy_open_01", label: "Fireplace (Open)" },
+      { id: "fireplace_cozy_open_01", label: "Open Fireplace (Loop)" },
     ],
   },
   {
@@ -85,14 +85,7 @@ const LIBRARY: LibraryItem[] = [
     ],
   },
 
-  // Optional: keep thunder event
-  {
-    id: "thunder",
-    name: "Thunder",
-    type: "event",
-    defaultAssetId: "thunder_distant_roll_01",
-    assets: [{ id: "thunder_distant_roll_01", label: "Distant Roll" }],
-  },
+
 ];
 
 
@@ -374,25 +367,8 @@ const [exportProg, setExportProg] = useState<{ done: number; total: number } | n
   const creditsCost = useMemo(() => Math.max(1, Math.round(durationMin / 5)), [durationMin]);
 
   const [tracks, setTracks] = useState<MixTrack[]>([
-    {
-      id: makeId('t'),
-      libraryId: 'rain',
-      name: 'Rain',
-      type: 'loop',
-      assetId: 'rain_soft_loop_01',
-      volume: 0.5,
-    },
-    {
-      id: makeId('t'),
-      libraryId: 'thunder',
-      name: 'Thunder',
-      type: 'event',
-      assetId: 'thunder_distant_roll_01',
-      volume: 0.35,
-      ratePreset: 'Rare',
-      rateSpeed: 1,
-      randomizeVariants: false,
-    },
+
+
   ]);
 
   // Cleanup

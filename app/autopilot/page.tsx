@@ -70,6 +70,7 @@ async function headOk(url: string) {
   }
 }
 
+
 // ---- URL rules (locked) ----
 function assetUrlFor(track: { type: TrackType; libraryId: string }, assetId: string) {
   const base = track.type === 'loop' ? 'loops' : 'events';
@@ -159,7 +160,6 @@ export default function AutopilotPage() {
   const [masterVol, setMasterVol] = useState(0.8);
 
   const [mood, setMood] = useState<Mood>('Focus');
-  const [lengthMin, setLengthMin] = useState<10 | 30 | 60>(10);
   const [seed, setSeed] = useState<string>(() => `${Date.now()}`);
 
   const [tracks, setTracks] = useState<MixTrack[]>([]);
@@ -167,7 +167,7 @@ export default function AutopilotPage() {
   const [recipe, setRecipe] = useState<string>('');
 
   // export control plane
-  const [exportKind, setExportKind] = useState<'wav' | 'mp3' | 'recipe'>('recipe');
+  const [exportDurationMin, setExportDurationMin] = useState<5 | 15 | 30>(5);
   const [isExporting, setIsExporting] = useState(false);
   const [exportMsg, setExportMsg] = useState('');
 
@@ -188,6 +188,13 @@ export default function AutopilotPage() {
     }
   }
 
+  async function toggleAudio() {
+    if (audioOn) {
+      stopAudio();
+    } else {
+      await activateAudio();
+    }
+  }
   function stopAudio() {
     audioRef.current?.stopAll();
     setAudioOn(false);
@@ -225,43 +232,42 @@ export default function AutopilotPage() {
     };
   }, [tracks]);
 
-  function randomizeSeed() {
-    setSeed(`${Date.now()}_${Math.floor(Math.random() * 1e9)}`);
+
+  function makeNewSeed() {
+  return `${Date.now()}_${Math.floor(Math.random() * 1e9)}`;
   }
 
-  async function generate() {
-    const s = seed.trim() || `${Date.now()}`;
-    const rand = mulberry32(fnv1a32(`${mood}|${lengthMin}|${s}`));
 
-    // minimal buckets (your current reality)
-    const beds = ['rain', 'water', 'wind', 'fireplace'] as const;
-    const textures = ['birds', 'insects'] as const;
+async function generate(seedOverride?: string) {
+  const chosen = seedOverride ?? makeNewSeed();
+  setSeed(chosen);
 
-    const allowThunder = mood === 'Nature' && chance(rand, 0.6);
-    const includeTexture = mood !== 'Cozy' && chance(rand, mood === 'Sleep' ? 0.25 : 0.6);
-    const includeSecondBed = chance(rand, mood === 'Cozy' ? 0.35 : 0.55);
+  const s = String(chosen).trim() || `${Date.now()}`;
+  const rand = mulberry32(fnv1a32(`${mood}|${exportDurationMin}|${s}`));
 
-    let primaryBed: (typeof beds)[number];
-    if (mood === 'Cozy') primaryBed = 'fireplace';
-    else if (mood === 'Focus') primaryBed = pickOne(rand, ['rain', 'water'] as const);
-    else if (mood === 'Sleep') primaryBed = pickOne(rand, ['rain', 'wind'] as const);
-    else primaryBed = pickOne(rand, ['water', 'wind', 'rain'] as const);
+  // minimal buckets (your current reality)
+  const beds = ['rain', 'water', 'wind', 'fireplace', 'sea', 'forest'] as const;
+const FIREPLACE_VARIANTS = [
+  'fireplace_cozy_loop_01',
+  'fireplace_cozy_open_01',
+] as const;
 
-    let secondaryBed: (typeof beds)[number] | null = null;
-    if (includeSecondBed) {
-      const options = beds.filter((b) => b !== primaryBed);
-      secondaryBed = mood === 'Sleep'
+  const includeSecondBed = chance(rand, mood === 'Cozy' ? 0.35 : 0.55);
+
+  let primaryBed: (typeof beds)[number];
+  if (mood === 'Cozy') primaryBed = 'fireplace';
+  else if (mood === 'Focus') primaryBed = pickOne(rand, ['rain', 'water'] as const);
+  else if (mood === 'Sleep') primaryBed = pickOne(rand, ['rain', 'wind'] as const);
+  else primaryBed = pickOne(rand, ['water', 'wind', 'rain'] as const);
+
+  let secondaryBed: (typeof beds)[number] | null = null;
+  if (includeSecondBed) {
+    const options = beds.filter((b) => b !== primaryBed);
+    secondaryBed =
+      mood === 'Sleep'
         ? (pickOne(rand, options.filter((b) => b !== 'fireplace')) || null)
         : (pickOne(rand, options) || null);
-    }
-
-    let texture: (typeof textures)[number] | null = null;
-    if (includeTexture) {
-      texture = mood === 'Sleep'
-        ? (chance(rand, 0.7) ? 'insects' : 'birds')
-        : pickOne(rand, [...textures]);
-    }
-    if (mood === 'Cozy') texture = null;
+  }
 
     const next: MixTrack[] = [];
 
@@ -271,97 +277,64 @@ export default function AutopilotPage() {
       next.push({
         id: makeId('t'),
         libraryId,
-        name:
-          libraryId === 'rain'
-            ? 'Rain'
-            : libraryId === 'wind'
-              ? 'Wind'
-              : libraryId === 'water'
-                ? 'Water'
-                : libraryId === 'fireplace'
-                  ? 'Fireplace'
-                  : libraryId === 'birds'
-                    ? 'Birds'
-                    : 'Insects',
+  name:
+    libraryId === 'rain' ? 'Rain'
+  : libraryId === 'wind' ? 'Dunes Wind'
+  : libraryId === 'water' ? 'Water Stream'
+  : libraryId === 'fireplace' ? 'Fireplace'
+  : libraryId === 'sea' ? 'Sea'
+  : libraryId === 'forest' ? 'Forest'
+  : libraryId,
+
         type: 'loop',
         assetId,
         volume: clamp01(volume),
       });
       return true;
     }
-
-    async function addThunder() {
-      const libraryId = 'thunder';
-      const assetId = 'thunder_distant_roll_01';
-      const url = assetUrlFor({ type: 'event', libraryId }, assetId);
-      if (!(await headOk(url))) return false;
-      next.push({
-        id: makeId('t'),
-        libraryId,
-        name: 'Thunder',
-        type: 'event',
-        assetId,
-        volume: 0.28,
-        ratePreset: 'Rare',
-        rateSpeed: 1,
-        randomizeVariants: false,
-      });
-      return true;
-    }
-
     const base = mood === 'Sleep' ? 0.42 : mood === 'Cozy' ? 0.55 : 0.5;
 
-    // primary bed
-    if (primaryBed === 'rain') {
-      const rainVariant = chance(rand, 0.5) ? 'rain_soft_loop_01' : 'rain_medium_loop_01';
-      await addLoop('rain', rainVariant, base);
-    } else if (primaryBed === 'water') {
-      await addLoop('water', 'water_stream_with_distant_birds_01', base);
-    } else if (primaryBed === 'wind') {
-      await addLoop('wind', 'wind_soft_trees_loop_01', base);
-    } else {
-      await addLoop('fireplace', 'fireplace_cozy_loop_01', mood === 'Sleep' ? 0.38 : 0.58);
-    }
+// primary bed
+if (primaryBed === 'rain') {
+  await addLoop('rain', 'rain_soft_loop_01', base);
+} else if (primaryBed === 'water') {
+  await addLoop('water', 'water_stream_with_distant_birds_01', base);
+} else if (primaryBed === 'wind') {
+  await addLoop('wind', 'dunes_wind', base);
+} else if (primaryBed === 'fireplace') {
+  const fireplaceAsset = pickOne(rand, [...FIREPLACE_VARIANTS]);
+  await addLoop('fireplace', fireplaceAsset, mood === 'Sleep' ? 0.38 : 0.58);
+} else if (primaryBed === 'sea') {
+  await addLoop('sea', 'sea_loop_01', base);
+} else {
+  await addLoop('forest', 'Forest_birds_01', base);
+}
 
-    // secondary bed
-    if (secondaryBed) {
-      if (secondaryBed === 'rain') {
-        const rainVariant = chance(rand, 0.5) ? 'rain_soft_loop_01' : 'rain_medium_loop_01';
-        await addLoop('rain', rainVariant, base * 0.65);
-      } else if (secondaryBed === 'water') {
-        await addLoop('water', 'water_stream_with_distant_birds_01', base * 0.65);
-      } else if (secondaryBed === 'wind') {
-        await addLoop('wind', 'wind_soft_trees_loop_01', base * 0.65);
-      } else {
-        await addLoop('fireplace', 'fireplace_cozy_loop_01', base * 0.5);
-      }
-    }
+// secondary bed
+if (secondaryBed) {
+  if (secondaryBed === 'rain') {
+    await addLoop('rain', 'rain_soft_loop_01', base * 0.65);
+  } else if (secondaryBed === 'water') {
+    await addLoop('water', 'water_stream_with_distant_birds_01', base * 0.65);
+  } else if (secondaryBed === 'wind') {
+    await addLoop('wind', 'dunes_wind', base * 0.65);
+  } else if (secondaryBed === 'fireplace') {
+    const fireplaceAsset = pickOne(rand, [...FIREPLACE_VARIANTS]);
+    await addLoop('fireplace', fireplaceAsset, base * 0.5);
+  } else if (secondaryBed === 'sea') {
+    await addLoop('sea', 'sea_loop_01', base * 0.65);
+  } else {
+    await addLoop('forest', 'Forest_birds_01', base * 0.65);
+  }
+}
 
-    // texture
-    if (texture === 'birds') {
-      await addLoop('birds', 'birds_morning_chirp_01', mood === 'Sleep' ? 0.18 : 0.28);
-    } else if (texture === 'insects') {
-      // temp placeholder you mentioned
-      await addLoop('insects', 'insects_soft_night_loop_01', mood === 'Sleep' ? 0.22 : 0.25);
-    }
 
-    if (allowThunder) await addThunder();
 
-    if (next.length === 0) {
-      next.push({
-        id: makeId('t'),
-        libraryId: 'rain',
-        name: 'Rain',
-        type: 'loop',
-        assetId: 'rain_soft_loop_01',
-        volume: 0.5,
-      });
-    }
 
     setTracks(next);
 
     const lines = [
-      `Mood=${mood} • Length=${lengthMin}m • Seed=${s}`,
+      `Mood=${mood} • Length=${exportDurationMin}m • Seed=${s}`,
       ...next.map((t) => {
         const vol = `${Math.round(t.volume * 100)}%`;
         const ev = t.type === 'event' ? ` • ${t.ratePreset ?? 'Rare'} @ ${t.rateSpeed ?? 1}×` : '';
@@ -375,144 +348,130 @@ export default function AutopilotPage() {
     }
   }
 
-  function buildRecipeText() {
-    const s = seed.trim() || `${Date.now()}`;
+  function buildRecipeTextFor(seedValue: string) {
+    const s = String(seedValue).trim() || `${Date.now()}`;
     const lines = [
-      `Mood=${mood} • Length=${lengthMin}m • Seed=${s}`,
+      `Mood=${mood} • Length=${exportDurationMin}m • Seed=${s}`,
       ...tracks.map((t) => {
         const vol = `${Math.round(t.volume * 100)}%`;
-        const ev = t.type === 'event' ? ` • ${t.ratePreset ?? 'Rare'} @ ${t.rateSpeed ?? 1}×` : '';
-        return `- ${t.name} (${t.type}) • ${t.libraryId}/${t.assetId}.mp3 • vol ${vol}${ev}`;
+        return `- ${t.name} (${t.type}) • ${t.libraryId}/${t.assetId}.mp3 • vol ${vol}`;
       }),
     ];
     return lines.join('\n');
-  }
-
-  async function onExportRecipe() {
-    if (!EXPORT_TEMPORARILY_UNLOCKED) return;
-    if (isExporting) return;
-    if (tracks.length === 0) return alert('Generate a mix first.');
-
-    setExportMsg('');
-    setIsExporting(true);
-    try {
-      const text = buildRecipeText();
-      downloadBlob(
-        new Blob([text], { type: 'text/plain' }),
-        `soundscape_${mood.toLowerCase()}_${lengthMin}m_${seed}.txt`
-      );
-      setExportMsg('Downloaded recipe.');
-    } finally {
-      setIsExporting(false);
-    }
-  }
-
-  function onExportMp3() {
-    alert('MP3 export not implemented yet. Use WAV for now.');
   }
 
   function urlForTrack(t: MixTrack) {
     return assetUrlFor(t, t.assetId);
   }
 
-  async function onExportWav() {
-    if (!EXPORT_TEMPORARILY_UNLOCKED) return;
-    if (isExporting) return;
-    if (tracks.length === 0) return alert('Generate a mix first.');
+  async function onExportWavAndRecipe() {
+  let jobId: string | null = null;
 
-    setExportMsg('');
-    setIsExporting(true);
+  if (!EXPORT_TEMPORARILY_UNLOCKED) return;
+  if (isExporting) return;
+  if (tracks.length === 0) return alert('Generate a mix first.');
 
-    try {
-      const durationSec = lengthMin * 60;
-      const sampleRate = 44100;
-      const frames = Math.floor(durationSec * sampleRate);
+  const seedForExport = String(seed).trim() || `${Date.now()}`;
 
-      const off = new OfflineAudioContext(2, frames, sampleRate);
+  setExportMsg('');
+  setIsExporting(true);
 
-      const master = off.createGain();
-      master.gain.value = clamp01(masterVol);
-      master.connect(off.destination);
+  try {
+    // start server-side charge/lock
+    const startRes = await fetch('/api/export/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+      body: JSON.stringify({ durationMin: exportDurationMin, seed: seedForExport }),
+    });
 
-      // load buffers (skip missing)
-      const urls = Array.from(new Set(tracks.map((t) => urlForTrack(t))));
-      const buffers = new Map<string, AudioBuffer>();
-      await Promise.all(
-        urls.map(async (u) => {
-          try {
-            buffers.set(u, await fetchAudioBuffer(off, u));
-          } catch {
-            console.warn('Missing audio for export:', u);
-          }
-        })
-      );
-
-      // loops
-      for (const t of tracks.filter((x) => x.type === 'loop')) {
-        const u = urlForTrack(t);
-        const buf = buffers.get(u);
-        if (!buf) continue;
-
-        const src = off.createBufferSource();
-        src.buffer = buf;
-        src.loop = true;
-
-// avoid mp3 padding / decode edge artifacts
-const LOOP_PAD = 0.02; // 20 ms
-src.loopStart = LOOP_PAD;
-src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
-
-
-        const g = off.createGain();
-        g.gain.value = clamp01(t.volume);
-
-        src.connect(g);
-        g.connect(master);
-        src.start(0);
-      }
-
-      // events (deterministic schedule)
-      const rand = mulberry32(fnv1a32(`export|${mood}|${lengthMin}|${seed}`));
-      for (const t of tracks.filter((x) => x.type === 'event')) {
-        const u = urlForTrack(t);
-        const buf = buffers.get(u);
-        if (!buf) continue;
-
-        const preset = (t.ratePreset ?? 'Rare') as 'Rare' | 'Medium' | 'Often' | 'Very Often';
-        const speed = t.rateSpeed ?? 1;
-
-        const base = EVENT_RATE_SECONDS[preset];
-        const min = base.min / speed;
-        const max = base.max / speed;
-
-        let at = 0.8 + rand() * 1.2;
-        while (at < durationSec) {
-          const src = off.createBufferSource();
-          src.buffer = buf;
-
-          const g = off.createGain();
-          g.gain.value = clamp01(t.volume);
-
-          src.connect(g);
-          g.connect(master);
-          src.start(at);
-
-          at += min + rand() * (max - min);
-        }
-      }
-
-      const rendered = await off.startRendering();
-      const wav = encodeWav16(rendered);
-
-      downloadBlob(wav, `soundscape_${mood.toLowerCase()}_${lengthMin}m_${seed}.wav`);
-      setExportMsg('Downloaded WAV.');
-    } catch (e) {
-      console.error(e);
-      setExportMsg('WAV export failed. Check console.');
-    } finally {
-      setIsExporting(false);
+    const startJson = await startRes.json();
+    if (!startRes.ok) {
+      setExportMsg(startJson?.error ?? 'Could not start export');
+      return;
     }
+    jobId = startJson.jobId;
+
+    // render wav locally
+    const durationSec = exportDurationMin * 60;
+    const sampleRate = 44100;
+    const frames = Math.floor(durationSec * sampleRate);
+
+    const off = new OfflineAudioContext(2, frames, sampleRate);
+
+    const master = off.createGain();
+    master.gain.value = clamp01(masterVol);
+    master.connect(off.destination);
+
+    const urls = Array.from(new Set(tracks.map((t) => assetUrlFor(t, t.assetId))));
+    const buffers = new Map<string, AudioBuffer>();
+
+    await Promise.all(
+      urls.map(async (u) => {
+        try {
+          buffers.set(u, await fetchAudioBuffer(off, u));
+        } catch {
+          console.warn('Missing audio for export:', u);
+        }
+      })
+    );
+
+    for (const t of tracks.filter((x) => x.type === 'loop')) {
+      const u = assetUrlFor(t, t.assetId);
+      const buf = buffers.get(u);
+      if (!buf) continue;
+
+      const src = off.createBufferSource();
+      src.buffer = buf;
+      src.loop = true;
+
+      const LOOP_PAD = 0.02;
+      src.loopStart = LOOP_PAD;
+      src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
+
+      const g = off.createGain();
+      g.gain.value = clamp01(t.volume);
+
+      src.connect(g);
+      g.connect(master);
+      src.start(0);
+    }
+
+    const rendered = await off.startRendering();
+    const wav = encodeWav16(rendered);
+
+    const baseName = `soundscape_${mood.toLowerCase()}_${exportDurationMin}m_${seedForExport}`;
+
+    downloadBlob(wav, `${baseName}.wav`);
+
+    const recipeText = buildRecipeTextFor(seedForExport);
+    downloadBlob(new Blob([recipeText], { type: 'text/plain' }), `${baseName}.txt`);
+
+    setExportMsg('Downloaded WAV + recipe.');
+
+    await fetch('/api/export/complete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+      body: JSON.stringify({ jobId }),
+    });
+  } catch (e) {
+    console.error(e);
+
+    if (jobId) {
+      await fetch('/api/export/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        body: JSON.stringify({ jobId }),
+      }).catch(() => {});
+    }
+
+    setExportMsg('Export failed. Check console.');
+  } finally {
+    setIsExporting(false);
   }
+}
 
   const nowPlaying = useMemo(() => {
     if (tracks.length === 0) return 'Generate a mix to start.';
@@ -522,76 +481,40 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
   return (
     <main className="mx-auto max-w-4xl p-6">
       <div className="glass-panel elev-3 rounded-3xl p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-xl font-semibold">Autopilot</h1>
-            <p className="mt-1 text-sm text-faint">
-              Deterministic mix generator using only available assets. No AI.
-            </p>
-          </div>
+<div className="flex items-start justify-between gap-4">
+  <div>
+    <h1 className="text-xl font-semibold">Autopilot</h1>
+    <p className="mt-1 text-sm text-faint">
+      Deterministic mix generator using only available assets. No AI.
+    </p>
+  </div>
+</div>
 
-          <div className="flex gap-2">
-            <button onClick={generate} className="btn-glass rounded-xl px-4 py-2 text-sm">
-              Generate
-            </button>
-            <button
-              onClick={activateAudio}
-              className="btn-glass rounded-xl px-4 py-2 text-sm"
-            >
-              {audioOn ? 'Audio Active' : 'Activate Audio'}
-            </button>
-            <button onClick={stopAudio} className="btn-glass rounded-xl px-4 py-2 text-sm">
-              Stop
-            </button>
-          </div>
-        </div>
+<div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto] md:items-end">
+  <div>
+    <label className="text-xs text-faint">Mood</label>
+    <select
+      className="glass-panel mt-1 w-full rounded-lg px-2 py-2 text-sm"
+      value={mood}
+      onChange={(e) => setMood(e.target.value as Mood)}
+    >
+      <option>Sleep</option>
+      <option>Focus</option>
+      <option>Cozy</option>
+      <option>Nature</option>
+    </select>
+  </div>
 
-        <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div>
-            <label className="text-xs text-faint">Mood</label>
-            <select
-              className="glass-panel mt-1 w-full rounded-lg px-2 py-2 text-sm"
-              value={mood}
-              onChange={(e) => setMood(e.target.value as Mood)}
-            >
-              <option>Sleep</option>
-              <option>Focus</option>
-              <option>Cozy</option>
-              <option>Nature</option>
-            </select>
-          </div>
+  <div className="flex gap-2 md:justify-end">
+    <button onClick={() => generate()} className="btn-glass rounded-xl px-4 py-2 text-sm">
+      Generate
+    </button>
+    <button onClick={toggleAudio} className="btn-glass rounded-xl px-4 py-2 text-sm">
+      {audioOn ? 'Stop' : 'Play'}
+    </button>
+  </div>
+</div>
 
-          <div>
-            <label className="text-xs text-faint">Length</label>
-            <select
-              className="glass-panel mt-1 w-full rounded-lg px-2 py-2 text-sm"
-              value={lengthMin}
-              onChange={(e) => setLengthMin(Number(e.target.value) as 10 | 30 | 60)}
-            >
-              <option value={10}>10 min</option>
-              <option value={30}>30 min</option>
-              <option value={60}>60 min</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="text-xs text-faint">Seed</label>
-            <div className="mt-1 flex gap-2">
-              <input
-                className="glass-panel w-full rounded-lg px-2 py-2 text-sm"
-                value={seed}
-                onChange={(e) => setSeed(e.target.value)}
-              />
-              <button
-                onClick={randomizeSeed}
-                className="btn-glass"
-                title="New seed"
-              >
-                ↻
-              </button>
-            </div>
-          </div>
-        </div>
 
         <div className="glass-panel mt-5 rounded-3xl p-6">
           <div className="flex items-center justify-between">
@@ -665,81 +588,16 @@ src.loopEnd = Math.max(LOOP_PAD, buf.duration - LOOP_PAD);
           </p>
 
           <div className="mt-4 space-y-3">
-            <div>
-              <label className="text-xs text-faint">Duration</label>
-              <select
-                className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-app focus:outline-none focus:ring-2 focus:ring-white/20"
-                value={lengthMin}
-                onChange={(e) => setLengthMin(Number(e.target.value) as 10 | 30 | 60)}
-              >
-                <option value={10} className="text-app">5 min</option>
-              </select>
-            </div>
+<select
+  className="glass-surface mt-1 w-full rounded-lg px-3 py-2 text-sm text-app focus:outline-none focus:ring-2 focus:ring-white/20"
+  value={exportDurationMin}
+  onChange={(e) => setExportDurationMin(Number(e.target.value) as 5 | 15 | 30)}
+>
+  <option value={5} className="text-app">5 min</option>
+  <option value={15} className="text-app">15 min</option>
+  <option value={30} className="text-app">30 min</option>
+</select>
 
-            <div>
-              <label className="text-xs text-faint">Format</label>
-              <div className="mt-1 grid grid-cols-3 gap-2">
-                <button
-                  className={`glass-panel rounded-lg border  px-3 py-2 text-sm${
-                    exportKind === 'wav' ? 'glass-inset' : ''
-                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:glass-inset' : 'text-faint'}`}
-                  disabled={!EXPORT_TEMPORARILY_UNLOCKED || isExporting}
-                  onClick={() => setExportKind('wav')}
-                >
-                  WAV
-                </button>
-                <button
-                  className={`glass-panel rounded-lg border  px-3 py-2 text-sm${
-                    exportKind === 'mp3' ? 'glass-inset' : ''
-                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:glass-inset' : 'text-faint'}`}
-                  disabled={!EXPORT_TEMPORARILY_UNLOCKED || isExporting}
-                  onClick={() => setExportKind('mp3')}
-                >
-                  MP3
-                </button>
-                <button
-                  className={`glass-panel rounded-lg border  px-3 py-2 text-sm${
-                    exportKind === 'recipe' ? 'glass-inset' : ''
-                  }${EXPORT_TEMPORARILY_UNLOCKED ? 'hover:glass-inset' : 'text-faint'}`}
-                  disabled={!EXPORT_TEMPORARILY_UNLOCKED || isExporting}
-                  onClick={() => setExportKind('recipe')}
-                >
-                  Recipe
-                </button>
-              </div>
-
-              <div className="mt-2 text-xs text-faint">
-                {exportKind === 'wav'
-                  ? 'WAV renders offline in-browser.'
-                  : exportKind === 'mp3'
-                    ? 'MP3 is not implemented yet.'
-                    : 'Downloads a text recipe of the mix.'}
-              </div>
-            </div>
-
-            <div className="mt-2 text-xs text-faint">
-              🔒 Commercial license required to export.
-            </div>
-
-            <button
-              className={`glass-panel w-full rounded-lg border  px-4 py-2 text-sm${
-                EXPORT_TEMPORARILY_UNLOCKED ? 'hover:glass-inset' : 'text-faint'
-              }`}
-              disabled={!EXPORT_TEMPORARILY_UNLOCKED || isExporting}
-              onClick={() => {
-                if (exportKind === 'recipe') return onExportRecipe();
-                if (exportKind === 'wav') return onExportWav();
-                return onExportMp3();
-              }}
-            >
-              {isExporting
-                ? 'Exporting…'
-                : exportKind === 'recipe'
-                  ? 'Download Recipe'
-                  : exportKind === 'wav'
-                    ? 'Export WAV'
-                    : 'Export MP3'}
-            </button>
 
             {exportMsg && <div className="text-xs text-faint">{exportMsg}</div>}
 

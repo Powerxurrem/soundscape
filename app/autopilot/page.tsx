@@ -170,6 +170,11 @@ export default function AutopilotPage() {
   const [exportDurationMin, setExportDurationMin] = useState<5 | 15 | 30>(5);
   const [isExporting, setIsExporting] = useState(false);
   const [exportMsg, setExportMsg] = useState('');
+  const [exportStage, setExportStage] = useState<
+  'idle' | 'starting' | 'loading' | 'rendering' | 'encoding' | 'downloading' | 'done' | 'error'
+>('idle');
+const [exportProgress, setExportProgress] = useState(0); // 0..1
+
 
   // cleanup
   useEffect(() => {
@@ -375,6 +380,9 @@ if (secondaryBed) {
 
   setExportMsg('');
   setIsExporting(true);
+  setExportStage('starting');
+  setExportProgress(0.05);
+
 
   try {
     // start server-side charge/lock
@@ -391,6 +399,9 @@ if (secondaryBed) {
       return;
     }
     jobId = startJson.jobId;
+      setExportStage('loading');
+      setExportProgress(0.15);
+
 
     // render wav locally
     const durationSec = exportDurationMin * 60;
@@ -436,11 +447,17 @@ if (secondaryBed) {
       g.connect(master);
       src.start(0);
     }
+      setExportStage('rendering');
+      setExportProgress(0.45);
 
     const rendered = await off.startRendering();
+      setExportStage('encoding');
+      setExportProgress(0.85);
     const wav = encodeWav16(rendered);
 
     const baseName = `soundscape_${mood.toLowerCase()}_${exportDurationMin}m_${seedForExport}`;
+      setExportStage('downloading');
+      setExportProgress(0.95);
 
     downloadBlob(wav, `${baseName}.wav`);
 
@@ -569,15 +586,6 @@ if (secondaryBed) {
           )}
         </div>
 
-        {recipe && (
-          <div className="mt-5">
-            <div className="font-medium">Recipe</div>
-            <pre className="glass-panel mt-2 whitespace-pre-wrap rounded-xl p-4 text-xs text-app">
-              {recipe}
-            </pre>
-          </div>
-        )}
-
         {/* EXPORT */}
         <div className="glass-panel mt-5 rounded-3xl p-6">
           <h2 className="text-lg font-semibold">Export</h2>
@@ -597,7 +605,39 @@ if (secondaryBed) {
   <option value={15} className="text-app">15 min</option>
   <option value={30} className="text-app">30 min</option>
 </select>
+<button
+    className={`glass-panel w-full rounded-lg border px-4 py-2 text-sm ${
+      EXPORT_TEMPORARILY_UNLOCKED ? 'hover:glass-inset' : 'text-faint'
+    }`}
+    disabled={!EXPORT_TEMPORARILY_UNLOCKED || isExporting}
+    onClick={onExportWavAndRecipe}
+  >
+    {isExporting ? 'Exporting…' : 'Export WAV + Recipe'}
+  </button>
 
+  {(isExporting || exportStage === 'done' || exportStage === 'error') && (
+    <div className="mt-3">
+      <div className="flex items-center justify-between text-xs text-faint">
+        <span>
+          {exportStage === 'starting' && 'Starting…'}
+          {exportStage === 'loading' && 'Loading audio…'}
+          {exportStage === 'rendering' && 'Rendering…'}
+          {exportStage === 'encoding' && 'Encoding WAV…'}
+          {exportStage === 'downloading' && 'Downloading…'}
+          {exportStage === 'done' && 'Done.'}
+          {exportStage === 'error' && 'Export failed.'}
+        </span>
+        <span>{Math.round(exportProgress * 100)}%</span>
+      </div>
+
+      <div className="mt-2 h-2 w-full rounded-full bg-white/10">
+        <div
+          className="h-2 rounded-full bg-white/30 transition-[width] duration-200"
+          style={{ width: `${Math.round(exportProgress * 100)}%` }}
+        />
+      </div>
+    </div>
+  )}
 
             {exportMsg && <div className="text-xs text-faint">{exportMsg}</div>}
 

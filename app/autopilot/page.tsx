@@ -165,6 +165,8 @@ export default function AutopilotPage() {
   const [tracks, setTracks] = useState<MixTrack[]>([]);
   const [trackStatus, setTrackStatus] = useState<Record<string, boolean>>({});
   const [recipe, setRecipe] = useState<string>('');
+  const creditsLeft = 12; // TODO: fetch from server/user session
+
 
   // export control plane
   const [exportDurationMin, setExportDurationMin] = useState<5 | 15 | 30>(5);
@@ -377,6 +379,10 @@ if (secondaryBed) {
   if (tracks.length === 0) return alert('Generate a mix first.');
 
   const seedForExport = String(seed).trim() || `${Date.now()}`;
+  const chunkSec = 60;
+  const totalSec = exportDurationMin * 60;
+  const chunks = Math.ceil(totalSec / chunkSec);
+
 
   setExportMsg('');
   setIsExporting(true);
@@ -505,7 +511,21 @@ if (secondaryBed) {
       Deterministic mix generator using only available assets. No AI.
     </p>
   </div>
+
+  <div className="flex items-center gap-2">
+    <div className="glass-panel rounded-xl px-3 py-2 text-xs text-faint">
+      Credits: <span className="text-app">{creditsLeft}</span>
+    </div>
+
+    <a
+      href="/pricing"
+      className="btn-glass rounded-xl px-3 py-2 text-xs"
+    >
+      Buy
+    </a>
+  </div>
 </div>
+
 
 <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto] md:items-end">
   <div>

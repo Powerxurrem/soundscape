@@ -3,11 +3,9 @@ import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "crypto";
 
-export const runtime = "nodejs";
-
 const supabase = createClient(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // server-only
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 const COOKIE_NAME = "soundscape_device_id";
@@ -18,7 +16,7 @@ function newDeviceId() {
 
 // GET so the UI can fetch it safely
 export async function GET() {
-  const jar = await cookies(); // <-- THIS is the fix
+  const jar = await cookies(); // ✅ MUST await
 
   let deviceId = jar.get(COOKIE_NAME)?.value;
   if (!deviceId) deviceId = newDeviceId();
@@ -43,11 +41,10 @@ export async function GET() {
     value: deviceId,
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env.NODE_ENV === "production", // ✅ don't force secure on localhost
     path: "/",
     maxAge: 60 * 60 * 24 * 365,
   });
 
   return res;
 }
-

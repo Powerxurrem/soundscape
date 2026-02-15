@@ -1,12 +1,15 @@
 import { MetadataRoute } from "next";
 
+const base = "https://www.soundscape.run";
+
 export default function sitemap(): MetadataRoute.Sitemap {
+  const now = new Date();
   return [
-    { url: "https://www.soundscape.run/", lastModified: new Date() },
-    { url: "https://www.soundscape.run/mixer", lastModified: new Date() },
-    { url: "https://www.soundscape.run/autopilot", lastModified: new Date() },
-    { url: "https://www.soundscape.run/pricing", lastModified: new Date() },
-    { url: "https://www.soundscape.run/about", lastModified: new Date() },
-    { url: "https://www.soundscape.run/terms", lastModified: new Date() },
+    { url: `${base}/`, lastModified: now },
+    { url: `${base}/mixer`, lastModified: now },
+    { url: `${base}/autopilot`, lastModified: now },
+    { url: `${base}/pricing`, lastModified: now },
+    { url: `${base}/about`, lastModified: now },
+    { url: `${base}/terms`, lastModified: now },
   ];
 }

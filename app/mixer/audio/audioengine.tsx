@@ -65,11 +65,13 @@ export type AudioEngine = {
   isActive: () => boolean;
   setMaster: (v: number) => void;
 
-  // idempotent: brings audio in sync with current tracks state
-  syncMix: (tracks: MixTrackLike[], getUrl: GetUrl) => Promise<void>;
+  // preload/decode buffers without starting playback
+  preload: (urls: string[]) => Promise<void>;
 
+  syncMix: (tracks: MixTrackLike[], getUrl: GetUrl) => Promise<void>;
   stopAll: () => void;
 };
+
 
 export function createAudioEngine(): AudioEngine {
   let ctx: AudioContext | null = null;
@@ -325,5 +327,6 @@ export function createAudioEngine(): AudioEngine {
     }, TICK_MS);
   }
 
-  return { activate, isActive, setMaster, syncMix, stopAll };
+  return { activate, isActive, setMaster, preload, syncMix, stopAll };
+
 }

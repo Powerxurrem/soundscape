@@ -1,5 +1,8 @@
+import MobileNotice from './components/MobileNotice';
+
 import './globals.css';
 import type { ReactNode } from 'react';
+
 
 export const metadata = {
   title: {
@@ -70,7 +73,7 @@ export default function RootLayout({
     </nav>
   </div>
 </header>
-
+<MobileNotice />
 
         {/* ===== Main ===== */}
         <main>

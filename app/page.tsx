@@ -146,7 +146,8 @@ async function startDemo() {
     if (isStarting) return; //
     if (!audioRef.current?.isActive()) return;
     audioRef.current.syncMix(tracks as any, (t: any, id: string) => assetUrlFor(t, id));
-  }, [isOn, tracks]);
+  }, [isOn, isStarting, tracks]);
+
 
   const rainPath = assetUrlFor({ type: 'loop', libraryId: 'rain' }, 'rain_soft_loop_01');
   const firePath = assetUrlFor({ type: 'loop', libraryId: 'fireplace' }, 'fireplace_cozy_open_01');

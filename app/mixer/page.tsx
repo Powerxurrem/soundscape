@@ -125,6 +125,23 @@ function assetUrlFor(track: { type: TrackType; libraryId: string }, assetId: str
   return `/assets/${base}/${folder}/${assetId}.mp3`;
 }
 // ---------- Export helpers (chunked offline WAV) ----------
+const decodedCache: Record<string, Promise<AudioBuffer>> = {};
+let decodeCtx: AudioContext | null = null;
+
+async function loadAndDecodeCached(url: string) {
+  if (!decodeCtx) decodeCtx = new AudioContext();
+
+  if (!decodedCache[url]) {
+    decodedCache[url] = (async () => {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Failed to fetch ${url}`);
+      const arr = await res.arrayBuffer();
+      return await decodeCtx!.decodeAudioData(arr);
+    })();
+  }
+
+  return decodedCache[url];
+}
 
 function mulberry32(seed: number) {
   return function () {
@@ -243,8 +260,9 @@ async function renderChunk({
   for (const t of tracks) {
     const url = assetUrlFor(t, t.assetId);
     const key = `${t.type}:${t.libraryId}:${t.assetId}`;
-    if (!buffers[key]) buffers[key] = await loadAndDecode(offline, url);
+    if (!buffers[key]) buffers[key] = await loadAndDecodeCached(url);
   }
+
 
   for (const t of tracks) {
     const gain = offline.createGain();
@@ -292,17 +310,22 @@ async function exportWavChunked({
   info?: WavInfoTags;
   onProgress?: (done: number, total: number) => void;
 }) {
-
   const durationSec = durationMin * 60;
-  const chunkSec = 60; // 1-minute chunks
+  const chunkSec = 60; // keep 60s chunks
   const sampleRate = 44100;
   const numChannels = 2;
 
-  const pcmChunks: Int16Array[] = [];
   const totalChunks = Math.ceil(durationSec / chunkSec);
+
+  // total frames = durationSec * sampleRate, interleaved stereo => * numChannels
+  const totalFrames = Math.ceil(durationSec * sampleRate);
+  const pcmAll = new Int16Array(totalFrames * numChannels);
+
+  let writeOffset = 0;
 
   for (let i = 0; i < totalChunks; i++) {
     const chunkStartSec = i * chunkSec;
+
     const buf = await renderChunk({
       tracks,
       seed,
@@ -312,22 +335,17 @@ async function exportWavChunked({
       chunkSec,
     });
 
-    pcmChunks.push(audioBufferToPCM16(buf));
+    const pcm = audioBufferToPCM16(buf);
+    pcmAll.set(pcm, writeOffset);
+    writeOffset += pcm.length;
+
     onProgress?.(i + 1, totalChunks);
   }
 
-  const totalPcmLen = pcmChunks.reduce((sum, a) => sum + a.length, 0);
-  const pcmAll = new Int16Array(totalPcmLen);
-  let off = 0;
-  for (const c of pcmChunks) {
-    pcmAll.set(c, off);
-    off += c.length;
-  }
-
-  const pcmBytes = new Uint8Array(pcmAll.buffer);
+  const pcmBytes = new Uint8Array(pcmAll.buffer, 0, writeOffset * 2); // int16 => 2 bytes
   return makeWavBlobPCM16({ pcmBytes, sampleRate, numChannels, info });
-
 }
+
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -533,7 +551,9 @@ export default function MixerPage() {
 
   // Export / Scene
   const [seed, setSeed] = useState<string>(() => makeSeed());
-  const [durationMin, setDurationMin] = useState<5 | 15 | 30>(5);
+  type DurationMin = 5 | 15 | 30 | 60;
+  const [durationMin, setDurationMin] = useState<DurationMin>(5);
+
   const [exportFormat, setExportFormat] = useState<'wav' | 'recipe'>('wav');
 
   // UI-only placeholder credits (we’ll wire real credits later)
@@ -827,7 +847,7 @@ const exportPct = useMemo(() => {
             <div className="my-5 h-px opacity-40" style={{ background: 'var(--glass-border-soft)' }} />
 
             <div className="mb-2 flex items-baseline justify-between">
-              <div className="text-sm font-semibold">Events</div>
+              <div className="text-sm font-semibold">Events (WIP)</div>
               <div className="text-xs text-faint">Total {eventsList.length}</div>
             </div>
 
@@ -1021,26 +1041,23 @@ const exportPct = useMemo(() => {
               </div>
             </div>
 
-            <div className="mt-2 grid grid-cols-3 gap-2">
-              <button
-                className={`btn-glass rounded-lg px-3 py-2 text-sm ${durationMin === 5 ? 'glass-active' : ''}`}
-                onClick={() => setDurationMin(5)}
+            <div className="mt-2">
+              <select
+                className="glass-surface w-full rounded-lg px-3 py-2 text-sm text-app focus:outline-none focus:ring-2 focus:ring-white/20"
+                value={durationMin}
+                onChange={(e) => setDurationMin(Number(e.target.value) as DurationMin)}
               >
-                5m
-              </button>
-              <button
-                className={`btn-glass rounded-lg px-3 py-2 text-sm ${durationMin === 15 ? 'glass-active' : ''}`}
-                onClick={() => setDurationMin(15)}
-              >
-                15m
-              </button>
-              <button
-                className={`btn-glass rounded-lg px-3 py-2 text-sm ${durationMin === 30 ? 'glass-active' : ''}`}
-                onClick={() => setDurationMin(30)}
-              >
-                30m
-              </button>
+                <option value={5} className="text-app">5 min</option>
+                <option value={15} className="text-app">15 min</option>
+                <option value={30} className="text-app">30 min</option>
+                <option value={60} className="text-app">60 min</option>
+              </select>
+
+              <div className="mt-2 text-[11px] text-faint">
+                Tip: longer exports take longer to render.
+              </div>
             </div>
+
 
             <div className="mt-2 text-[11px] text-faint">
               (We’ll unlock 60m after stability tests.)

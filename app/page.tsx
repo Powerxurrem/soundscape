@@ -26,6 +26,9 @@ export default function Home() {
   const audioRef = useRef<AudioEngine | null>(null);
 
   const [isOn, setIsOn] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
+  const startTokenRef = useRef(0);
+
 
   // Master volume
   const [masterVol, setMasterVol] = useState(0.82);
@@ -63,13 +66,32 @@ export default function Home() {
     };
   }, []);
 
-  async function startDemo() {
+async function startDemo() {
+  if (isOn || isStarting) return;
+
+  setIsStarting(true);
+  const token = ++startTokenRef.current;
+
+  try {
     if (!audioRef.current) audioRef.current = createAudioEngine();
+
     await audioRef.current.activate();
+    if (startTokenRef.current !== token) return;
+
     audioRef.current.setMaster(masterVol);
-    await audioRef.current.syncMix(tracks as any, (t: any, id: string) => assetUrlFor(t, id));
+
+    await audioRef.current.syncMix(
+      tracks as any,
+      (t: any, id: string) => assetUrlFor(t, id)
+    );
+    if (startTokenRef.current !== token) return;
+
     setIsOn(true);
+  } finally {
+    if (startTokenRef.current === token) setIsStarting(false);
   }
+}
+
 
   function stopDemo() {
     audioRef.current?.stopAll();
@@ -167,14 +189,21 @@ export default function Home() {
 
             <div className="glass-panel mt-3 rounded-xl px-3 py-2 text-[11px] text-muted">
               {!isOn ? (
-                <button onClick={startDemo} className="btn-inset">
-                  Play
-                </button>
-              ) : (
-                <button onClick={stopDemo} className="btn-inset">
-                  Stop
-                </button>
-              )}
+            
+              <button
+                onClick={startDemo}
+                className="btn-inset"
+                disabled={isStarting}
+                aria-busy={isStarting}
+              >
+                {isStarting ? "Starting…" : "Play"}
+              </button>
+            ) : (
+              <button onClick={stopDemo} className="btn-inset">
+                Stop
+              </button>
+            )}
+
             </div>
           </div>
 

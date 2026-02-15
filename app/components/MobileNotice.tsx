@@ -38,7 +38,7 @@ export default function MobileNotice() {
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[100] p-3">
+    <div className="fixed inset-x-0 bottom-0 z-[9999] p-3">
       <div className="glass-panel mx-auto max-w-5xl rounded-2xl px-4 py-3 shadow-lg">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">

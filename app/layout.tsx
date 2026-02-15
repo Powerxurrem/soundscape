@@ -1,13 +1,31 @@
 import './globals.css';
 import type { ReactNode } from 'react';
 
-
 export const metadata = {
+  title: {
+    default: "Soundscape – Deterministic Ambient Sound Generator",
+    template: "%s | Soundscape",
+  },
+  description:
+    "Create deterministic ambient soundscapes for videos, apps, and commercial projects. Export licensed WAV files instantly. No subscriptions.",
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: "https://www.soundscape.run",
+  },
+  openGraph: {
+    title: "Soundscape – Ambient Sound Generator",
+    description:
+      "Generate ambient soundscapes and export licensed WAV files for commercial use.",
+    url: "https://www.soundscape.run",
+    siteName: "Soundscape",
+    locale: "en_US",
+    type: "website",
   },
 };
+
 
 export default function RootLayout({
   children,

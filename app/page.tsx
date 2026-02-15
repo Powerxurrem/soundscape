@@ -31,6 +31,17 @@ export default function Home() {
 const [showStarting, setShowStarting] = useState(false);
 const startingTimerRef = useRef<number | null>(null);
 
+useEffect(() => {
+  const engine = createAudioEngine();
+  audioRef.current = engine;
+
+  const urls = [
+    assetUrlFor({ type: 'loop', libraryId: 'rain' }, 'rain_soft_loop_01'),
+    assetUrlFor({ type: 'loop', libraryId: 'fireplace' }, 'fireplace_cozy_loop_01'),
+  ];
+
+  void engine.preload(urls);
+}, []);
 
   // Master volume
   const [masterVol, setMasterVol] = useState(0.82);
@@ -55,7 +66,7 @@ const startingTimerRef = useRef<number | null>(null);
         libraryId: 'fireplace',
         name: 'Fireplace',
         type: 'loop',
-        assetId: 'fireplace_cozy_open_01',
+        assetId: 'fireplace_cozy_loop_01',
         volume: clamp01(fireVol),
       },
     ],
@@ -150,7 +161,7 @@ async function startDemo() {
 
 
   const rainPath = assetUrlFor({ type: 'loop', libraryId: 'rain' }, 'rain_soft_loop_01');
-  const firePath = assetUrlFor({ type: 'loop', libraryId: 'fireplace' }, 'fireplace_cozy_open_01');
+  const firePath = assetUrlFor({ type: 'loop', libraryId: 'fireplace' }, 'fireplace_cozy_loop_01');
 
   return (
     <main className="min-h-screen bg-transparent text-strong">

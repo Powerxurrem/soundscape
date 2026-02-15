@@ -48,10 +48,13 @@ export default function MobileNotice() {
             </div>
             <div className="mt-2 flex gap-2">
               <a
-                href="/app" // or your App Store / Play Store link
+                href="https://play.google.com/store/apps/details?id=com.summitsight.soundscape"
                 className="btn-glass rounded-xl px-3 py-1.5 text-xs"
+                target="_blank"
+                rel="noreferrer"
               >
-                Get the app
+                Get the Android app
+
               </a>
               <button
                 onClick={dismiss}

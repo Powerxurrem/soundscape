@@ -66,10 +66,10 @@ export type AudioEngine = {
   setMaster: (v: number) => void;
 
   // preload/decode buffers without starting playback
-  preload: (urls: string[]) => Promise<void>;
 
   syncMix: (tracks: MixTrackLike[], getUrl: GetUrl) => Promise<void>;
   stopAll: () => void;
+  preload: (urls: string[]) => Promise<void>;
 };
 
 
@@ -327,6 +327,7 @@ export function createAudioEngine(): AudioEngine {
     }, TICK_MS);
   }
 
-  return { activate, isActive, setMaster, preload, syncMix, stopAll };
+  return { activate, isActive, setMaster, syncMix, stopAll, preload };
+
 
 }

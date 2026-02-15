@@ -1,15 +1,14 @@
-import { Metadata } from 'next';
+import { Suspense } from 'react';
 import MobileGate from './mobile-gate';
 
-export const metadata: Metadata = {
-  title: 'Open Soundscape',
-  robots: { index: false, follow: false },
-};
+export const dynamic = 'force-dynamic'; // avoids static prerender headaches
 
 export default function MobilePage() {
   return (
     <main className="min-h-screen flex items-center justify-center p-6">
-      <MobileGate />
+      <Suspense fallback={<div className="text-sm opacity-70">Opening Soundscape…</div>}>
+        <MobileGate />
+      </Suspense>
     </main>
   );
 }

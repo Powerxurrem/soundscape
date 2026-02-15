@@ -29,45 +29,62 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: `Webhook signature failed: ${err.message}` }, { status: 400 });
   }
 
-if (event.type === "checkout.session.completed") {
-  const session = event.data.object as Stripe.Checkout.Session;
+  // Helper: write purchase as paid (idempotent by stripe_session_id)
+  async function markPaid(session: Stripe.Checkout.Session) {
+    const pack = session.metadata?.pack ?? "";
+    const credits = Number(session.metadata?.credits ?? "");
 
-  const pack = session.metadata?.pack ?? "";
-  const credits = Number(session.metadata?.credits ?? "");
+    if (!pack || !Number.isFinite(credits) || credits <= 0) {
+      return NextResponse.json({ error: "Missing/invalid session metadata" }, { status: 400 });
+    }
 
-  if (!pack || !Number.isFinite(credits) || credits <= 0) {
-    return NextResponse.json({ error: "Missing/invalid session metadata" }, { status: 400 });
+    const device_id = session.metadata?.deviceId ?? session.client_reference_id ?? null;
+    if (!device_id) {
+      return NextResponse.json({ error: "Missing deviceId on session" }, { status: 400 });
+    }
+
+    const stripe_session_id = session.id;
+    const customer_email = session.customer_details?.email ?? null;
+
+    const supabase = createClient(supabaseUrl!, supabaseKey!, {
+  auth: { persistSession: false },
+});
+
+
+    const { error } = await supabase.from("purchases").upsert(
+      {
+        stripe_session_id,
+        pack,
+        credits,
+        status: "paid",
+        customer_email,
+        device_id,
+      },
+      { onConflict: "stripe_session_id" }
+    );
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return null;
   }
 
-  const device_id =
-    session.metadata?.deviceId ??
-    session.client_reference_id ??
-    null;
+  // iDEAL and other async methods: grant credits on async success.
+  if (
+    event.type === "checkout.session.completed" ||
+    event.type === "checkout.session.async_payment_succeeded"
+  ) {
+    const session = event.data.object as Stripe.Checkout.Session;
 
-  if (!device_id) {
-    return NextResponse.json({ error: "Missing deviceId on session" }, { status: 400 });
+    // completed can fire before payment is actually captured for async methods
+    if (event.type === "checkout.session.completed" && session.payment_status !== "paid") {
+      return NextResponse.json({ received: true, skipped: "not_paid_yet" });
+    }
+
+    const resp = await markPaid(session);
+    if (resp) return resp;
   }
 
-  const stripe_session_id = session.id;
-  const customer_email = session.customer_details?.email ?? null;
-
-  const supabase = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } });
-
-  const { error } = await supabase.from("purchases").upsert(
-    {
-      stripe_session_id,
-      pack,
-      credits,
-      status: "paid",
-      customer_email,
-      device_id,
-    },
-    { onConflict: "stripe_session_id" }
-  );
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-}
-
+  // Optional: track failures if you want (not required to go live)
+  // if (event.type === "checkout.session.async_payment_failed") { ... }
 
   return NextResponse.json({ received: true });
 }

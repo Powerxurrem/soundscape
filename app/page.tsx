@@ -28,6 +28,8 @@ export default function Home() {
   const [isOn, setIsOn] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const startTokenRef = useRef(0);
+const [showStarting, setShowStarting] = useState(false);
+const startingTimerRef = useRef<number | null>(null);
 
 
   // Master volume
@@ -66,11 +68,24 @@ export default function Home() {
     };
   }, []);
 
+  function nextFrame() {
+    return new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+  }
+
+  
 async function startDemo() {
   if (isOn || isStarting) return;
 
   setIsStarting(true);
   const token = ++startTokenRef.current;
+
+  // Delay the visible "Starting…" label to avoid 1-frame flash
+  setShowStarting(false);
+  if (startingTimerRef.current) window.clearTimeout(startingTimerRef.current);
+  startingTimerRef.current = window.setTimeout(() => setShowStarting(true), 200);
+
+  // Let the UI paint before heavy work starts
+  await nextFrame();
 
   try {
     if (!audioRef.current) audioRef.current = createAudioEngine();
@@ -80,23 +95,44 @@ async function startDemo() {
 
     audioRef.current.setMaster(masterVol);
 
+    // Flip UI to "on" early so it doesn't feel ignored
+    setIsOn(true);
+
     await audioRef.current.syncMix(
       tracks as any,
       (t: any, id: string) => assetUrlFor(t, id)
     );
     if (startTokenRef.current !== token) return;
-
-    setIsOn(true);
   } finally {
+    // Clear delayed label timer
+    if (startingTimerRef.current) {
+      window.clearTimeout(startingTimerRef.current);
+      startingTimerRef.current = null;
+    }
+    setShowStarting(false);
+
+    // Only clear starting for the latest attempt
     if (startTokenRef.current === token) setIsStarting(false);
   }
 }
 
 
+
+
   function stopDemo() {
-    audioRef.current?.stopAll();
-    setIsOn(false);
+  startTokenRef.current++;
+
+  if (startingTimerRef.current) {
+    window.clearTimeout(startingTimerRef.current);
+    startingTimerRef.current = null;
   }
+  setShowStarting(false);
+
+  audioRef.current?.stopAll();
+  setIsOn(false);
+  setIsStarting(false);
+}
+
 
   // Keep master volume applied
   useEffect(() => {
@@ -107,6 +143,7 @@ async function startDemo() {
   // Keep demo mix levels synced while playing
   useEffect(() => {
     if (!isOn) return;
+    if (isStarting) return; //
     if (!audioRef.current?.isActive()) return;
     audioRef.current.syncMix(tracks as any, (t: any, id: string) => assetUrlFor(t, id));
   }, [isOn, tracks]);
@@ -196,7 +233,8 @@ async function startDemo() {
                 disabled={isStarting}
                 aria-busy={isStarting}
               >
-                {isStarting ? "Starting…" : "Play"}
+                {showStarting ? "Starting…" : "Play"}
+
               </button>
             ) : (
               <button onClick={stopDemo} className="btn-inset">

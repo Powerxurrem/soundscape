@@ -25,10 +25,8 @@ function attemptOpenApp({
 }) {
   const start = Date.now();
 
-  // If the page is hidden quickly, likely the app opened
   const onVis = () => {
     // If user switched away quickly, we assume success and do nothing.
-    // If not, fallback triggers below.
   };
 
   document.addEventListener('visibilitychange', onVis);
@@ -40,7 +38,6 @@ function attemptOpenApp({
   setTimeout(() => {
     document.removeEventListener('visibilitychange', onVis);
 
-    // If the page is still visible and enough time passed, go to fallback
     const stillHere = document.visibilityState === 'visible';
     const elapsed = Date.now() - start;
     if (stillHere && elapsed >= timeoutMs) {
@@ -56,22 +53,18 @@ export default function MobileGate() {
   const [autoTried, setAutoTried] = useState(false);
 
   const links = useMemo(() => {
-    // ✅ Replace these with your real links
     const ANDROID_STORE =
       'https://play.google.com/store/apps/details?id=com.summitsight.soundscape';
 
-    // If you have a TestFlight public link, put it here.
-    // Otherwise keep null and show “iOS in review”.
-    const IOS_TESTFLIGHT: string | null = null;
+    const IOS_STORE = 'https://apps.apple.com/app/id6759100910';
 
-    // Best: universal link like https://soundscape.app/open (configured on iOS + Android)
-    // If you don't have one yet, scheme links can still work but less reliably.
+    // If you have universal links later, replace these with https://yourdomain/open
     const DEEP_LINK_IOS = 'soundscape://open';
     const DEEP_LINK_ANDROID = 'soundscape://open';
 
     return {
       ANDROID_STORE,
-      IOS_TESTFLIGHT,
+      IOS_STORE,
       DEEP_LINK_IOS,
       DEEP_LINK_ANDROID,
     };
@@ -82,10 +75,7 @@ export default function MobileGate() {
   }, []);
 
   useEffect(() => {
-    // Auto-redirect attempt once on mount
     if (autoTried) return;
-
-    // Only auto-try if we're actually on mobile platform
     if (!platform.isAndroid && !platform.isIOS) return;
 
     setAutoTried(true);
@@ -99,18 +89,14 @@ export default function MobileGate() {
     }
 
     if (platform.isIOS) {
-      // If you have TestFlight, fallback there; otherwise just don't auto-jump to nowhere.
-      if (links.IOS_TESTFLIGHT) {
-        attemptOpenApp({
-          deepLink: links.DEEP_LINK_IOS,
-          fallbackUrl: links.IOS_TESTFLIGHT,
-        });
-      }
+      attemptOpenApp({
+        deepLink: links.DEEP_LINK_IOS,
+        fallbackUrl: links.IOS_STORE,
+      });
     }
   }, [platform, autoTried, links]);
 
   const continueToWeb = () => {
-    // bypass gate
     window.location.href = `${from}?desktop=1`;
   };
 
@@ -131,24 +117,14 @@ export default function MobileGate() {
           Get Android app
         </a>
 
-        {links.IOS_TESTFLIGHT ? (
-          <a
-            className="btn-glass rounded-xl px-4 py-2 text-sm text-center"
-            href={links.IOS_TESTFLIGHT}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Get iOS (TestFlight)
-          </a>
-        ) : (
-          <button
-            className="btn-glass rounded-xl px-4 py-2 text-sm text-center opacity-60 cursor-not-allowed"
-            aria-disabled="true"
-            type="button"
-          >
-            iOS is in review — coming soon
-          </button>
-        )}
+        <a
+          className="btn-glass rounded-xl px-4 py-2 text-sm text-center"
+          href={links.IOS_STORE}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Get iOS app
+        </a>
 
         <button
           className="btn-inset rounded-xl px-4 py-2 text-sm"
@@ -160,10 +136,10 @@ export default function MobileGate() {
               });
               return;
             }
-            if (platform.isIOS && links.IOS_TESTFLIGHT) {
+            if (platform.isIOS) {
               attemptOpenApp({
                 deepLink: links.DEEP_LINK_IOS,
-                fallbackUrl: links.IOS_TESTFLIGHT,
+                fallbackUrl: links.IOS_STORE,
               });
             }
           }}
